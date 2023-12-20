@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.21"
-    kotlin("plugin.serialization") version "1.9.21"
+    kotlin("jvm")
+    kotlin("plugin.serialization")
     id("fabric-loom") version "1.4.4"
     id("maven-publish")
 //    `java-library`
@@ -55,6 +55,7 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api_version")}") {
         exclude(module = "fabric-api-deprecated")
     }
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.processResources {
@@ -97,4 +98,12 @@ publishing {
         // uncomment to publish to the local maven
         // mavenLocal()
     }
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "17"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "17"
 }

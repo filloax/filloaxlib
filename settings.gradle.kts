@@ -1,3 +1,5 @@
+// Only used if not in multi-project setup
+
 pluginManagement {
     repositories {
         maven {
@@ -5,5 +7,11 @@ pluginManagement {
             url = uri("https://maven.fabricmc.net/")
         }
         gradlePluginPortal()
+    }
+
+    val kotlinVersion: String by settings
+    plugins {
+        kotlin("jvm") version kotlinVersion
+        kotlin("plugin.serialization") version kotlinVersion
     }
 }

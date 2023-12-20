@@ -34,6 +34,8 @@ fun getData(entity: Entity): CompoundTag {
     return (entity as WithPersistentData).`ruins_of_growsseth$getPersistentData`()
 }
 
+fun Entity.getPersistData() = getData(this)
+
 fun getStructTagOrKey(structureId: String): Either<TagKey<Structure>, ResourceKey<Structure>> {
     return if (structureId.startsWith("#")) {
         Either.left(TagKey.create(Registries.STRUCTURE, ResourceLocation(structureId.replaceFirst("#", ""))))
@@ -98,6 +100,8 @@ fun boundBoxChunkRange(boundingBox: BoundingBox): Stream<ChunkPos> {
 
     return ChunkPos.rangeClosed(chunkPosMinBounds, chunkPosMaxBounds)
 }
+
+fun BoundingBox.chunkRange() = boundBoxChunkRange(this)
 
 fun iterBlocks(volume: BoundingBox) = BlockVolumeIterator(volume)
 
