@@ -1,5 +1,6 @@
 package com.filloax.fxlib
 
+import com.filloax.fxlib.interfaces.WithPersistentData
 import com.mojang.datafixers.util.Either
 //import com.ruslan.growsseth.interfaces.WithPersistentData
 import net.minecraft.core.BlockPos
@@ -29,9 +30,9 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-//fun getData(entity: Entity): CompoundTag {
-//    return (entity as WithPersistentData).persistentData
-//}
+fun getData(entity: Entity): CompoundTag {
+    return (entity as WithPersistentData).`ruins_of_growsseth$getPersistentData`()
+}
 
 fun getStructTagOrKey(structureId: String): Either<TagKey<Structure>, ResourceKey<Structure>> {
     return if (structureId.startsWith("#")) {
