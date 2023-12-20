@@ -37,7 +37,7 @@ loom {
         }
     }
 
-//    accessWidenerPath = file("src/main/resources/fxlib.accesswidener")
+    accessWidenerPath = file("src/main/resources/fxlib.accesswidener")
 }
 
 dependencies {
