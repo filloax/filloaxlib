@@ -51,21 +51,6 @@ fun getYAtXZ(level: ServerLevel, x: Int, z: Int, heightmap: Heightmap.Types = He
     return level.getChunk(samplePos).getHeight(heightmap, x, z)
 }
 
-fun isBlockPosInChunk(chunkPos: ChunkPos, blockPos: BlockPos): Boolean {
-    return (blockPos.x in chunkPos.minBlockX..chunkPos.maxBlockX) && (blockPos.z in chunkPos.minBlockZ .. chunkPos.maxBlockZ)
-}
-
-fun ChunkAccess.getBoundingBox(): BoundingBox {
-    val pos = this.pos
-    val minY = this.minBuildHeight
-    val maxY = this.maxBuildHeight
-    return BoundingBox(pos.minBlockX, minY, pos.minBlockZ, pos.maxBlockX, maxY, pos.maxBlockZ)
-}
-
-fun ChunkAccess.getAABB(): AABB {
-    return AABB.of(this.getBoundingBox())
-}
-
 private val defaultRandom = RandomSource.create()
 
 fun <T>weightedRandom(items: Collection<T>, getWeight: (T) -> Float, random: RandomSource = defaultRandom): T {
@@ -88,21 +73,6 @@ fun <T>weightedRandom(items: Collection<T>, getWeight: (T) -> Float, random: Ran
 fun secondsToTicks(seconds: Float): Int {
     return floor(seconds * 20).toInt()
 }
-
-fun boundBoxChunkRange(boundingBox: BoundingBox): Stream<ChunkPos> {
-    val chunkPosMinBounds = ChunkPos(
-        SectionPos.blockToSectionCoord(boundingBox.minX()),
-        SectionPos.blockToSectionCoord(boundingBox.minZ())
-    )
-    val chunkPosMaxBounds = ChunkPos(
-        SectionPos.blockToSectionCoord(boundingBox.maxX()),
-        SectionPos.blockToSectionCoord(boundingBox.maxZ())
-    )
-
-    return ChunkPos.rangeClosed(chunkPosMinBounds, chunkPosMaxBounds)
-}
-
-fun BoundingBox.chunkRange() = boundBoxChunkRange(this)
 
 fun iterBlocks(volume: BoundingBox) = BlockVolumeIterator(volume)
 

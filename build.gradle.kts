@@ -55,7 +55,6 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api_version")}") {
         exclude(module = "fabric-api-deprecated")
     }
-    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.processResources {
