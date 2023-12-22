@@ -9,8 +9,10 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.fabricmc.loader.api.FabricLoader
 import net.fabricmc.loader.api.MappingResolver
+import net.minecraft.core.RegistryAccess
 import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
+import net.minecraft.resources.RegistryOps
 import java.util.*
 import kotlin.Pair
 import kotlin.jvm.optionals.getOrNull
@@ -25,6 +27,11 @@ import com.mojang.datafixers.util.Pair as MojPair
 
 fun <A> Codec<A>.decodeJson(jsonElement: JsonElement): DataResult<MojPair<A, JsonElement>> {
     return decode(JsonOps.INSTANCE, jsonElement)
+}
+
+fun <A> Codec<A>.decodeRegistryJson(jsonElement: JsonElement, registryAccess: RegistryAccess): DataResult<com.mojang.datafixers.util.Pair<A, JsonElement>> {
+    val registryOps: RegistryOps<JsonElement> = RegistryOps.create(JsonOps.INSTANCE, registryAccess)
+    return decode(registryOps, jsonElement)
 }
 
 fun <A> Codec<A>.decodeNbt(tag: Tag): DataResult<MojPair<A, Tag>> {

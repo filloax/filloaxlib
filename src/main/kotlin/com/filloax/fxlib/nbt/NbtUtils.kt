@@ -2,10 +2,7 @@ package com.filloax.fxlib.nbt
 
 import com.filloax.fxlib.FXLib
 import com.mojang.serialization.Codec
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.nbt.ListTag
-import net.minecraft.nbt.NbtOps
-import net.minecraft.nbt.Tag
+import net.minecraft.nbt.*
 import java.lang.ClassCastException
 
 
@@ -103,4 +100,16 @@ fun <T> CompoundTag.saveField(name: String, codec: Codec<T>, getter: () -> T?) {
 
 fun <T : Tag> listTag(from: List<T>): ListTag {
     return ListTag().also { it.addAll(from) }
+}
+
+fun String.toTag(): StringTag {
+    return StringTag.valueOf(this)
+}
+
+fun Int.toTag(): IntTag {
+    return IntTag.valueOf(this)
+}
+
+fun Long.toTag(): LongTag {
+    return LongTag.valueOf(this)
 }

@@ -23,6 +23,7 @@ import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.level.levelgen.structure.BoundingBox
 import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import java.util.*
 import java.util.stream.Stream
 import kotlin.math.floor
@@ -307,3 +308,5 @@ fun Vec3i.rotate(rotation: Rotation): Vec3i {
         Rotation.NONE -> Vec3i(x, y, z)
     }
 }
+
+fun Vec3i.vec3(): Vec3 = Vec3(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
