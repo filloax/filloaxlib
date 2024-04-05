@@ -1,4 +1,4 @@
-package com.filloax.fxlib.fabric
+package com.filloax.fxlib.platform.fabric
 
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 

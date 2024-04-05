@@ -1,4 +1,4 @@
-package com.filloax.fxlib.fabric
+package com.filloax.fxlib.platform.fabric
 
 import com.filloax.fxlib.*
 import com.filloax.fxlib.nbt.*

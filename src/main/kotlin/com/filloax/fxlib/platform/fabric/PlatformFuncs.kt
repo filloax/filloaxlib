@@ -1,8 +1,7 @@
-package com.filloax.fxlib.platform
+package com.filloax.fxlib.platform.fabric
 
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.portal.PortalInfo
 

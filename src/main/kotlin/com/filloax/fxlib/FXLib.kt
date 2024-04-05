@@ -1,5 +1,6 @@
 package com.filloax.fxlib
 
+import com.filloax.fxlib.platform.IPlatformEvents
 import com.filloax.fxlib.structure.FXLibStructures
 import net.fabricmc.api.ModInitializer
 import net.minecraft.core.registries.BuiltInRegistries
@@ -19,6 +20,7 @@ object FXLib : ModInitializer {
     override fun onInitialize() {
         FXLibStructures.init(BuiltInRegistries.STRUCTURE_TYPE)
 
+        IPlatformEvents.get().initEvents()
 
         logger.info("Loaded!")
     }
