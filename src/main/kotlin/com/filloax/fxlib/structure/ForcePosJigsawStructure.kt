@@ -27,6 +27,8 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilde
 import net.minecraft.world.level.levelgen.structure.pools.EmptyPoolElement
 import net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool
+import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasBinding
+import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.shapes.BooleanOp
@@ -53,13 +55,14 @@ class ForcePosJigsawStructure(
     useExpansionHack: Boolean,
     projectStartToHeightmap: Optional<Heightmap.Types>,
     maxDistanceToCenter: Int,
+    poolAliases: List<PoolAliasBinding>,
     forcePosUseY: Boolean = false,
     val forcePosOffset: Vec3i = Vec3i.ZERO,
     override val defaultRotation: Rotation? = null,
     val useRotationInDefaultPlacement: Boolean = false,
 ) : JigsawStructure(
     settings, startPool, startJigsawName, maxDepth, startHeight, useExpansionHack, projectStartToHeightmap,
-    maxDistanceToCenter
+    maxDistanceToCenter, poolAliases
 ), FixablePosition, FixableRotation {
     private var nextPlacePosition: BlockPos? = null
     private var nextPlaceRotation: Rotation? = null
@@ -77,18 +80,19 @@ class ForcePosJigsawStructure(
                     Codec.BOOL.fieldOf("use_expansion_hack").forGetter(JigsawStructure::useExpansionHack),
                     Heightmap.Types.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter(JigsawStructure::projectStartToHeightmap),
                     Codec.intRange(1, 128).fieldOf("max_distance_from_center").forGetter(JigsawStructure::maxDistanceFromCenter),
+                    Codec.list(PoolAliasBinding.CODEC).optionalFieldOf("pool_aliases", listOf()).forGetter(JigsawStructure::getPoolAliases),
                     Codec.BOOL.optionalFieldOf("force_pos_uses_y").forGetter{ Optional.of(it.nextPlaceUseY) },
                     Vec3i.CODEC.optionalFieldOf("force_pos_offset").forGetter { Optional.of(it.forcePosOffset) },
                     Rotation.CODEC.optionalFieldOf("default_rotation").forNullableGetter(ForcePosJigsawStructure::defaultRotation),
                     Codec.BOOL.optionalFieldOf("normal_placement_uses_default_rotation").forGetter{ Optional.of(it.useRotationInDefaultPlacement) },
                 ).apply(builder) {
                         settings, startPool, startJigsawName, maxDepth, startHeight,
-                        useExpansionHack, projectStartToHeightmap, maxDistanceToCenter,
+                        useExpansionHack, projectStartToHeightmap, maxDistanceToCenter, poolAliases,
                         forcePosUseYOpt, forcePosOffsetOpt, defaultRotationOpt, useRotationInDefaultPlacementOpt,
                     ->
                     ForcePosJigsawStructure(
                         settings, startPool, startJigsawName, maxDepth, startHeight,
-                        useExpansionHack, projectStartToHeightmap, maxDistanceToCenter,
+                        useExpansionHack, projectStartToHeightmap, maxDistanceToCenter, poolAliases,
                         forcePosUseYOpt.orElse(false),
                         forcePosOffsetOpt.orElse(Vec3i.ZERO),
                         defaultRotationOpt.orElse(Rotation.NONE),
@@ -136,6 +140,7 @@ class ForcePosJigsawStructure(
                 context, startPool, startJigsawName, maxDepth, pos, useExpansionHack,
                 if (nextPlaceUseY) Optional.empty() else projectStartToHeightmap,
                 maxDistanceFromCenter,
+                PoolAliasLookup.create(this.poolAliases, pos, context.seed()),
                 rotation,
             )
         }
@@ -163,6 +168,7 @@ object JigsawPlacementExtra {
         context: GenerationContext, holder: Holder<StructureTemplatePool>, startJigsawName: Optional<ResourceLocation>,
         maxDepth: Int, blockPos: BlockPos, useExpansionHack: Boolean,
         projectStartToHeightmap: Optional<Heightmap.Types>, maxDistanceFromCenter: Int,
+        aliasLookup: PoolAliasLookup,
         rotation: Rotation,
     ): Optional<GenerationStub> {
         //after this its more or less an exact copy of og function, just instead of setting rotation here its passed as arg
@@ -242,7 +248,8 @@ object JigsawPlacementExtra {
                         registry,
                         poolElementStructurePiece,
                         list,
-                        voxelShape
+                        voxelShape,
+                        aliasLookup
                     )
                     list.forEach(structurePiecesBuilder::addPiece)
                 }
