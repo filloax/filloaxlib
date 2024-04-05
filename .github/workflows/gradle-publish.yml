@@ -6,7 +6,7 @@ on:
 
 #Environment variables that can later be referenced using ${{ env.MINECRAFT_VERSION }}. These are useful for repeating information and allow for quick changes for new mod updates
 env: 
-  MINECRAFT_VERSION: 1.20.1
+  MINECRAFT_VERSION: 1.20.4
   JAVA_VERSION: 17                   
   # RELEASE_NAME: FxLib
   GITHUB_TOKEN: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
