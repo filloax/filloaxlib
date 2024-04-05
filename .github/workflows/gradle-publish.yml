@@ -1,8 +1,18 @@
-name: Gradle Package
-
 on:
-  release:
-    types: [created]
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v[0-9].*'
+
+#Environment variables that can later be referenced using ${{ env.MINECRAFT_VERSION }}. These are useful for repeating information and allow for quick changes for new mod updates
+env: 
+  MINECRAFT_VERSION: 1.20.1
+  JAVA_VERSION: 17                   
+  # RELEASE_NAME: FxLib
+  GITHUB_TOKEN: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
+
+permissions:
+  contents: write
 
 jobs:
   build:
