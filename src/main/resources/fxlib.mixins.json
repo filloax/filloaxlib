@@ -3,6 +3,7 @@
   "package": "com.filloax.fxlib.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "PlaceCommandMixin",
     "edata.EntityMixin",
     "structuretrack.ChunkGeneratorTrackMixin",
     "structuretrack.StructureManagerTrackMixin",
