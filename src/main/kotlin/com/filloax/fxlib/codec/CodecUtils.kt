@@ -29,6 +29,11 @@ fun <A> Codec<A>.decodeJson(jsonElement: JsonElement): DataResult<MojPair<A, Jso
     return decode(JsonOps.INSTANCE, jsonElement)
 }
 
+fun <A> Codec<A>.decodeJsonNullable(jsonElement: JsonElement): A? {
+    return this.decodeJson(jsonElement).get().map({ it.first }, { null })
+}
+
+
 fun <A> Codec<A>.decodeRegistryJson(jsonElement: JsonElement, registryAccess: RegistryAccess): DataResult<com.mojang.datafixers.util.Pair<A, JsonElement>> {
     val registryOps: RegistryOps<JsonElement> = RegistryOps.create(JsonOps.INSTANCE, registryAccess)
     return decode(registryOps, jsonElement)
@@ -36,6 +41,10 @@ fun <A> Codec<A>.decodeRegistryJson(jsonElement: JsonElement, registryAccess: Re
 
 fun <A> Codec<A>.decodeNbt(tag: Tag): DataResult<MojPair<A, Tag>> {
     return decode(NbtOps.INSTANCE, tag)
+}
+
+fun <A> Codec<A>.decodeNbtNullable(tag: Tag): A? {
+    return this.decodeNbt(tag).get().map({ it.first }, { null })
 }
 
 fun <A> Codec<A>.encodeJson(value: A): DataResult<JsonElement> {
