@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("fabric-loom") version "1.4.4"
+    id("fabric-loom") version "1.6-SNAPSHOT"
     id("maven-publish")
 //    `java-library`
 }
