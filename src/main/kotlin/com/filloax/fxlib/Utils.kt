@@ -11,6 +11,7 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.tags.TagKey
 import net.minecraft.util.RandomSource
@@ -34,6 +35,8 @@ import kotlin.math.min
 fun getData(entity: Entity): CompoundTag {
     return (entity as WithPersistentData).`ruins_of_growsseth$getPersistentData`()
 }
+
+fun server() = MixinHelpers.SERVER_HOLDER.get()
 
 fun Entity.getPersistData() = getData(this)
 
