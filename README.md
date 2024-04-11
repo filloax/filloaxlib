@@ -24,3 +24,5 @@ dependencies {
 ```
 
 Guide is also in the JitPack link.
+
+Uses template [Paramita](https://github.com/3TUSK/Paramita) as base.
