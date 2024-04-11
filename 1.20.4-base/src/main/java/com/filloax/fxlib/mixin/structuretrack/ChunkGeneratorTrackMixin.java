@@ -1,7 +1,6 @@
 package com.filloax.fxlib.mixin.structuretrack;
 
 import com.filloax.fxlib.FxLib;
-import com.filloax.fxlib.FxLibFabric;
 import com.filloax.fxlib.structure.tracking.CustomPlacedStructureTracker;
 import com.filloax.fxlib.structure.tracking.FixedStructurePlacement;
 import com.filloax.fxlib.structure.tracking.PlacedStructureData;

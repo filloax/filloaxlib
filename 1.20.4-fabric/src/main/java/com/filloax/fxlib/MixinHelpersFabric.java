@@ -3,7 +3,7 @@ package com.filloax.fxlib;
 import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
-public class MixinHelpers {
+public class MixinHelpersFabric {
     public static final ServerHolder SERVER_HOLDER = new ServerHolder();
 
     public static class ServerHolder {

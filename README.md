@@ -26,3 +26,12 @@ dependencies {
 Guide is also in the JitPack link.
 
 Uses template [Paramita](https://github.com/3TUSK/Paramita) as base.
+
+---
+
+## Source code structure
+
+- **shared** contains code that does not depend on a specific Minecraft version (and so, Minecraft classes in general).
+  So, classes that are only used by other modules without referencing MC directly.
+- **\<version>-base** includes non mod-loader specific code that ideally should contain as much logic as possible
+- **\<version>-\<loader>** contains loader specific code.

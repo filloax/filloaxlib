@@ -7,6 +7,6 @@ import net.minecraft.resources.ResourceLocation
  */
 object FXLibUtils {
     fun resLoc(path: String): ResourceLocation {
-        return ResourceLocation(FxLibFabric.MOD_ID, path)
+        return ResourceLocation(FxLib.MOD_ID, path)
     }
 }

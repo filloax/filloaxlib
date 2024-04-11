@@ -1,6 +1,4 @@
-package com.filloax.fxlib.platform.fabric
-
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+package com.filloax.fxlib
 
 import net.minecraft.server.MinecraftServer
 
@@ -13,11 +11,7 @@ class ScheduledServerTask(private val delayTicks: Int, private val task: Runnabl
             tasks.add(ScheduledServerTask(delayTicks, task, server.tickCount))
         }
 
-        fun init() {
-            ServerTickEvents.START_SERVER_TICK.register(this::onTick)
-        }
-
-        private fun onTick(server: MinecraftServer) {
+        fun onStartServerTick(server: MinecraftServer) {
             tasks.removeIf { task -> task.executeIfElapsed(server) }
         }
     }

@@ -3,7 +3,7 @@ package com.filloax.fxlib.structure
 import com.filloax.fxlib.FxLib
 import com.filloax.fxlib.UnknownStructureIdException
 import com.filloax.fxlib.codec.mutableSetCodec
-import com.filloax.fxlib.platform.fabric.ScheduledServerTask
+import com.filloax.fxlib.ScheduledServerTask
 import com.filloax.fxlib.savedata.FxSavedData
 import com.filloax.fxlib.savedata.FxSavedData.Companion.loadData
 import com.filloax.fxlib.structure.tracking.CustomPlacedStructureTracker
@@ -212,9 +212,9 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
             val CODEC: Codec<Save> = RecordCodecBuilder.create { builder ->
                 builder.group(
                     mutableSetCodec(Codec.STRING).optionalFieldOf("generatedSpawns", mutableSetOf()).forGetter{it.generatedSpawns}
-                ).apply(builder, ::Save)
+                ).apply(builder, FixedStructureGenerationImpl::Save)
             }
-            val DEF = define("FixedStructureGeneration", ::Save, CODEC)
+            val DEF = define("FixedStructureGeneration", FixedStructureGenerationImpl::Save, CODEC)
         }
     }
 

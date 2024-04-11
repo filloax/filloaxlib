@@ -1,5 +1,6 @@
 package com.filloax.fxlib.structure
 
+import com.filloax.fxlib.platform.ServiceUtil
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceKey
@@ -14,10 +15,6 @@ import net.minecraft.world.level.levelgen.structure.Structure
  * to be extra sure register them on server started
  */
 interface FixedStructureGeneration {
-    companion object {
-        fun get(): FixedStructureGeneration = FixedStructureGenerationImpl
-    }
-
     /**
      * Register a structure to be spawned at the specified pos.
      *
@@ -63,3 +60,5 @@ interface FixedStructureGeneration {
      */
     fun spawnedQueuedStructure(structureSpawnId: String): Boolean?
 }
+
+fun getFixedStructureGeneration(): FixedStructureGeneration = ServiceUtil.findService(FixedStructureGeneration::class.java)

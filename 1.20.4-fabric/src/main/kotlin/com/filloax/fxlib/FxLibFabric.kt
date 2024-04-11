@@ -1,9 +1,6 @@
 package com.filloax.fxlib
 
-import com.filloax.fxlib.platform.IPlatformEvents
-import com.filloax.fxlib.structure.FXLibStructures
 import net.fabricmc.api.ModInitializer
-import net.minecraft.core.registries.BuiltInRegistries
 
 object FxLibFabric : ModInitializer, FxLib() {
     const val MOD_ID = "fxlib"
