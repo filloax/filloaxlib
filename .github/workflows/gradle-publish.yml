@@ -6,7 +6,6 @@ on:
 
 #Environment variables that can later be referenced using ${{ env.MINECRAFT_VERSION }}. These are useful for repeating information and allow for quick changes for new mod updates
 env: 
-  MINECRAFT_VERSION: 1.20.4
   JAVA_VERSION: 17                   
   # RELEASE_NAME: FxLib
   GITHUB_TOKEN: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
@@ -46,18 +45,22 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
-    - name: Publish (GitHub)
+    - name: Publish (Fabric 1.20.4)
       uses: Kir-Antipov/mc-publish@v3.3
       with:
+        files: |
+          1.20.4-fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+          1.20.4-fabric/build/libs/*-@(dev|sources|javadoc).jar
+
         github-token: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
         github-generate-changelog: true
 
-        name: "Version ${{ steps.get_version.outputs.VERSION }}"                             
-        version: "${{ steps.get_version.outputs.VERSION }}"
+        name: "FxLib ${{ steps.get_version.outputs.VERSION }} - Fabric 1.20.4"
+        version: "1.20.4-fabric-${{ steps.get_version.outputs.VERSION }}"
         version-type: release
 
         loaders: fabric
-        game-versions: "${{env.MINECRAFT_VERSION}}"
+        game-versions: "1.20.4"
         java: "${{env.JAVA_VERSION}}"
       env:
         USERNAME: ${{ github.actor }}
