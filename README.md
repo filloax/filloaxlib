@@ -19,11 +19,14 @@ dependencyResolutionManagement {
 
 ```kt
 dependencies {
-        implementation 'com.github.filloax:fx-lib:Tag'
+  implementation("com.github.filloax:fx-lib:Tag")
+  // for example
+  implementation("com.github.filloax:fx-lib:v0.10.0-1.20.4-fabric")
 }
 ```
 
-Guide is also in the JitPack link.
+Guide is also in the JitPack link. The first time a version gets downloaded (globally) it will likely time out as
+JitPack still needs to build it.
 
 Uses template [Paramita](https://github.com/3TUSK/Paramita) as base, and also Botania's structure for
 cross-loader development. Feel free to use this as a Kotlin multi-version/loader minecraft mod project template, 
