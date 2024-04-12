@@ -1,4 +1,4 @@
-package com.filloax.fxlib.platform.fabric
+package com.filloax.fxlib.fabric
 
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.minecraft.resources.ResourceLocation
@@ -20,7 +20,7 @@ class FabricReloadListener(private val id: ResourceLocation, private val listene
     override fun reload(
         barrier: PreparationBarrier, manager: ResourceManager,
         profiler: ProfilerFiller, profiler2: ProfilerFiller, executor: Executor, executor2: Executor
-    ): CompletableFuture<Void>? {
+    ): CompletableFuture<Void> {
         return listener.reload(barrier, manager, profiler, profiler2, executor, executor2)
     }
 }

@@ -1,19 +1,16 @@
 package com.filloax.fxlib
 
-import com.filloax.fxlib.interfaces.WithPersistentData
+import com.filloax.fxlib.platform.getPlatformAbstractions
 import com.mojang.datafixers.util.Either
-//import com.ruslan.growsseth.interfaces.WithPersistentData
 import net.minecraft.core.BlockPos
 import net.minecraft.core.BlockPos.MutableBlockPos
 import net.minecraft.core.Vec3i
 import net.minecraft.core.registries.Registries
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.tags.TagKey
 import net.minecraft.util.RandomSource
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.levelgen.Heightmap
@@ -26,11 +23,9 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-fun getData(entity: Entity): CompoundTag {
-    return (entity as WithPersistentData).`ruins_of_growsseth$getPersistentData`()
-}
+val platformAbstractions = getPlatformAbstractions()
 
-fun Entity.getPersistData() = getData(this)
+fun getServer() = platformAbstractions.getServer()
 
 fun getStructTagOrKey(structureId: String): Either<TagKey<Structure>, ResourceKey<Structure>> {
     return if (structureId.startsWith("#")) {

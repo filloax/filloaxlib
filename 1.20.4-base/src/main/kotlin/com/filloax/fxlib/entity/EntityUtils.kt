@@ -1,9 +1,13 @@
-package com.filloax.fxlib.platform.fabric
+package com.filloax.fxlib.entity
 
-import net.fabricmc.fabric.api.dimension.v1.FabricDimensions
+import com.filloax.fxlib.interfaces.WithPersistentData
+import com.filloax.fxlib.platform.getPlatformAbstractions
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.portal.PortalInfo
+
+val platformAbstractions = getPlatformAbstractions()
 
 /**
  * Description adapted from Fabric API, applies here too mostly
@@ -23,5 +27,12 @@ import net.minecraft.world.level.portal.PortalInfo
  * @apiNote this method must be called from the main server thread
  */
 fun Entity.fixedChangeDimension(level: ServerLevel, target: PortalInfo) {
-    FabricDimensions.teleport(this, level, target)
+    platformAbstractions.fixedChangeDimension(this, level, target)
 }
+
+
+fun getData(entity: Entity): CompoundTag {
+    return (entity as WithPersistentData).`ruins_of_growsseth$getPersistentData`()
+}
+
+fun Entity.getPersistData() = getData(this)

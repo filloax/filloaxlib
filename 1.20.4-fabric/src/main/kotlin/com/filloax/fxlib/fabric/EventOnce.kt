@@ -1,4 +1,4 @@
-package com.filloax.fxlib.platform.fabric
+package com.filloax.fxlib.fabric
 
 import com.filloax.fxlib.*
 import com.filloax.fxlib.nbt.*
@@ -23,6 +23,16 @@ object EventOnce {
     // Do not use actual queue classes, due to implementation of iteration below
     private val eventQueues = mutableMapOf<Event<out Any>, MutableList<OneOffEvent<Any>>>()
     val registeredEvents = mutableSetOf<Event<out Any>>()
+
+    object Callbacks {
+        fun onServerShutdown(server: MinecraftServer) {
+            eventQueues.forEach { (event, queue) ->
+                synchronized(queue) {
+                    queue.removeIf { it.clearOnServerShutdown }
+                }
+            }
+        }
+    }
 
     data class OneOffEvent<out T : Any>(
         val listener: T,
@@ -77,10 +87,6 @@ object EventOnce {
         )
     }
 
-    /**
-     * Run the action on the entity immediately if loaded, as soon as it's loaded
-     * otherwise. Will not persist on game reload.
-     */
     fun runOnEntityWhenPossible(level: ServerLevel, entityUUID: UUID, action: (Entity) -> Unit) {
         val entity = level.getEntity(entityUUID)
         if (entity != null) {
@@ -99,18 +105,10 @@ object EventOnce {
         }
     }
 
-    /**
-     * Run now if server started, or wait for server to start then run otherwise.
-     */
     fun runWhenServerStarted(server: MinecraftServer, action: (MinecraftServer) -> Unit) {
         runWhenServerStarted(server, false, action)
     }
 
-    /**
-     * Run now if server started, or wait for server to start then run otherwise.
-     * @param onServerThread If set, run on server thread, in case you want to be
-     *  safe around multithreaded messing.
-     */
     fun runWhenServerStarted(server: MinecraftServer, onServerThread: Boolean, action: (MinecraftServer) -> Unit) {
         val callback = if (onServerThread) {
             ServerLifecycleEvents.ServerStarted { srv -> srv.submit { action(srv) } }
@@ -128,11 +126,6 @@ object EventOnce {
         runWhenChunksLoaded(level, chunkPos, chunkPos, action)
     }
 
-    /**
-     * Execute code when all the chunks in the surrounding area are loaded, or immediately if loaded already.
-     * Note that this isn't assured to ever run depending on area, as if big enough chunks on one end might be
-     * unloaded when the other end is loaded; use forced chunks for this, in case.
-     */
     fun runWhenChunksLoaded(level: ServerLevel, minChunkPos: ChunkPos, maxChunkPos: ChunkPos, action: (ServerLevel) -> Unit) {
         val allLoaded = ChunkPos.rangeClosed(minChunkPos, maxChunkPos).allMatch {
             level.isLoaded(it.worldPosition)
@@ -187,14 +180,6 @@ object EventOnce {
             synchronized(queue) {
                 // Remove all, but keep duplicates in case something reschedules etc
                 queue.removeAllCountDuplicates(iterQueue)
-            }
-        }
-    }
-
-    fun onServerShutdown(server: MinecraftServer) {
-        eventQueues.forEach { (event, queue) ->
-            synchronized(queue) {
-                queue.removeIf { it.clearOnServerShutdown }
             }
         }
     }

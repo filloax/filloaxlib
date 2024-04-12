@@ -4,7 +4,7 @@ import com.filloax.fxlib.platform.fxLibEvents
 import com.filloax.fxlib.structure.FixedStructureGenerationImpl
 
 abstract class VersionFxLib : FxLib() {
-    override fun initCallbacks() {
+    final override fun initCallbacks() {
         fxLibEvents.onServerStopped { server ->
             FixedStructureGenerationImpl.onServerStopped()
         }
@@ -16,5 +16,18 @@ abstract class VersionFxLib : FxLib() {
         fxLibEvents.onLoadChunk { level, chunk ->
             FixedStructureGenerationImpl.onLoadChunk(level, chunk)
         }
+
+        initPlatformCallbacks()
     }
+
+    // For Platform implementation-specific callbacks
+    open fun initPlatformCallbacks() {}
+
+    final override fun initRegistries() {
+        initRegistryStructureType()
+        initRegistryStructurePlacementType()
+    }
+
+    abstract fun initRegistryStructureType()
+    abstract fun initRegistryStructurePlacementType()
 }
