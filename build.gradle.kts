@@ -2,11 +2,13 @@ import org.gradle.api.internal.provider.AbstractProperty
 import org.gradle.api.internal.provider.EvaluationContext
 import org.gradle.api.internal.provider.PropertyHost
 import org.gradle.api.internal.provider.ValueSupplier
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.ir.backend.js.compile
 
 plugins {
     kotlin("jvm")
+    id("maven-publish")
 
 //    id("com.modrinth.minotaur") version "2.+" apply false
 //    id("net.darkhax.curseforgegradle") version "1.1.17" apply false
@@ -49,6 +51,7 @@ data class PlatformInfo(
 }
 
 val mainProject = project
+val baseProjectSuffix = "base"
 val commonProjectName = "shared"
 
 val projsToInclude = mutableMapOf<String, MutableSet<Project>>()
@@ -57,7 +60,7 @@ subprojects {
     projsToInclude[name] = mutableSetOf<Project>().also {
         if (name.endsWith(commonProjectName)) return@also
         it.add(project(":$commonProjectName"))
-        if (!name.endsWith("base")) {
+        if (!name.endsWith(baseProjectSuffix)) {
             val baseProject = ":${name.substringBefore('-')}-base"
             it.add(project(baseProject))
         }
@@ -88,9 +91,6 @@ subprojects {
         }
     }
 
-    base {
-        archivesName.set(archivesBaseNameProp)
-    }
     version = versionProp
     group = groupProp
 
@@ -120,6 +120,10 @@ subprojects {
 
     afterEvaluate {
         val projectExt = PlatformInfo(ext)
+
+        val isVanilla = projectExt.platform.get() == "Vanilla"
+        val isFabric = projectExt.platform.get() == "Fabric"
+
         tasks.compileJava {
             projectsToInclude.forEach {
                 source(it.sourceSets.getByName("main").allSource)
@@ -150,6 +154,13 @@ subprojects {
             projectsToInclude.forEach {
                 from(it.sourceSets.getByName("main").resources)
             }
+            inputs.property("version", project.version)
+
+            if (isFabric) {
+                filesMatching("fabric.mod.json") {
+                    expand(mapOf("version" to project.version))
+                }
+            }
         }
 
         if (debugDependencies) {
@@ -159,27 +170,45 @@ subprojects {
         }
 
         base {
-            archivesName.apply { set(get() + "-${projectExt.platform.get()}-${projectExt.minecraftVersion.get()}") }
+            archivesName = ("$archivesBaseNameProp-${projectExt.platform.get().lowercase()}-${projectExt.minecraftVersion.get()}")
         }
 
-//            if (projectExt.platform.get() == "Vanilla") {
-//                tasks.named("modrinth") {
-//                    enabled = false
-//                }
-//            } else {
-//                tasks.register("curseforge", TaskPublishCurseForge::class) {
-//                    disableVersionDetection()
-//                    apiToken = System.getenv("CURSEFORGE_TOKEN")
-//                    val projectId = System.getenv("CURSEFORGE_PROJECT_ID")
-//                    val mainFile = upload(projectId, if (useLoom != null) remapJar else jar)
-//                    mainFile.addModLoader(projectExt.platform.get())
-//                    projectExt.supportedMinecraftVersions.getOrElse(emptyList()).forEach {
-//                        mainFile.addGameVersion(it)
-//                    }
-//                    mainFile.releaseType = "release"
-//                    mainFile.changelog = "Bug fixes"
-//                }
+        if (isVanilla) {
+//            tasks.named("modrinth") {
+//                enabled = false
 //            }
+        } else {
+//            tasks.register("curseforge", TaskPublishCurseForge::class) {
+//                disableVersionDetection()
+//                apiToken = System.getenv("CURSEFORGE_TOKEN")
+//                val projectId = System.getenv("CURSEFORGE_PROJECT_ID")
+//                val mainFile = upload(projectId, if (useLoom != null) remapJar else jar)
+//                mainFile.addModLoader(projectExt.platform.get())
+//                projectExt.supportedMinecraftVersions.getOrElse(emptyList()).forEach {
+//                    mainFile.addGameVersion(it)
+//                }
+//                mainFile.releaseType = "release"
+//                mainFile.changelog = "Bug fixes"
+//            }
+            // configure the maven publication
+            publishing {
+                publications {
+                    create<MavenPublication>("mavenJava") {
+                        from(components["java"])
+                        groupId = project.group.toString()
+                        artifactId = project.archivesName.get()
+                        version = project.version.toString()
+                        println("MAVEN: $groupId $artifactId $version")
+                    }
+                }
+
+                // select the repositories you want to publish to
+                repositories {
+                    // uncomment to publish to the local maven
+                    mavenLocal()
+                }
+            }
+        }
 
         tasks.named<Jar>("jar") {
             manifest {

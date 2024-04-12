@@ -51,6 +51,9 @@ interface PlatformAbstractions {
      */
     fun runWhenServerStarted(server: MinecraftServer, onServerThread: Boolean, action: (MinecraftServer) -> Unit)
 
+    fun runAtServerTickEnd(action: (MinecraftServer) -> Unit)
+    fun runAtNextServerTickStart(action: (MinecraftServer) -> Unit)
+
     fun runWhenChunkLoaded(level: ServerLevel, chunkPos: ChunkPos, action: (ServerLevel) -> Unit)
 
     /**

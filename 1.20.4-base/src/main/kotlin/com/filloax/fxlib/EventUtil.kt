@@ -21,7 +21,12 @@ object EventUtil {
      * Run now if server started, or wait for server to start then run otherwise.
      */
     fun runWhenServerStarted(server: MinecraftServer, action: (MinecraftServer) -> Unit)
-            = runWhenServerStarted(server, false, action)
+        = runWhenServerStarted(server, false, action)
+
+    fun runAtServerTickEnd(action: (MinecraftServer) -> Unit)
+        = platformAbstractions.runAtServerTickEnd(action)
+    fun runAtNextServerTickStart(action: (MinecraftServer) -> Unit)
+        = platformAbstractions.runAtNextServerTickStart(action)
 
     /**
      * Run now if server started, or wait for server to start then run otherwise.
@@ -32,6 +37,7 @@ object EventUtil {
         = platformAbstractions.runWhenServerStarted(server, onServerThread, action)
     fun runWhenChunkLoaded(level: ServerLevel, chunkPos: ChunkPos, action: (ServerLevel) -> Unit)
         = platformAbstractions.runWhenChunkLoaded(level, chunkPos, action)
+
     /**
      * Execute code when all the chunks in the surrounding area are loaded, or immediately if loaded already.
      * Note that this isn't assured to ever run depending on area, as if big enough chunks on one end might be

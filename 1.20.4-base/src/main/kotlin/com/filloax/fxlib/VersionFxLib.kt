@@ -1,6 +1,7 @@
 package com.filloax.fxlib
 
 import com.filloax.fxlib.platform.fxLibEvents
+import com.filloax.fxlib.platform.getPlatformAbstractions
 import com.filloax.fxlib.structure.FixedStructureGenerationImpl
 
 abstract class VersionFxLib : FxLib() {

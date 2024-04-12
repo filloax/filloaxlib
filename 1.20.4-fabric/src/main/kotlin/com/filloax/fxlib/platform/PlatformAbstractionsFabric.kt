@@ -1,8 +1,9 @@
-package com.filloax.fxlib.fabric
+package com.filloax.fxlib.platform
 
 import com.filloax.fxlib.MixinHelpersFabric
-import com.filloax.fxlib.platform.PlatformAbstractions
+import com.filloax.fxlib.fabric.EventOnce
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
@@ -36,6 +37,14 @@ class PlatformAbstractionsFabric : PlatformAbstractions {
         action: (MinecraftServer) -> Unit,
     ) {
         EventOnce.runWhenServerStarted(server, onServerThread, action)
+    }
+
+    override fun runAtServerTickEnd(action: (MinecraftServer) -> Unit) {
+        EventOnce.runEventOnce(ServerTickEvents.END_SERVER_TICK, action as ServerTickEvents.EndTick, clearOnServerShutdown = true)
+    }
+
+    override fun runAtNextServerTickStart(action: (MinecraftServer) -> Unit) {
+        EventOnce.runEventOnce(ServerTickEvents.START_SERVER_TICK, action as ServerTickEvents.StartTick, clearOnServerShutdown = true)
     }
 
     override fun runWhenChunkLoaded(level: ServerLevel, chunkPos: ChunkPos, action: (ServerLevel) -> Unit) {

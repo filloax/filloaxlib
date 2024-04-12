@@ -61,4 +61,4 @@ interface FixedStructureGeneration {
     fun spawnedQueuedStructure(structureSpawnId: String): Boolean?
 }
 
-fun getFixedStructureGeneration(): FixedStructureGeneration = ServiceUtil.findService(FixedStructureGeneration::class.java)
+fun getFixedStructureGeneration(): FixedStructureGeneration = FixedStructureGenerationImpl

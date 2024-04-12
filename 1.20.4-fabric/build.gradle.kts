@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -48,21 +49,6 @@ tasks.withType<JavaCompile> {
 
 loom.runs.matching{ it.name != "data" }.configureEach {
     this.vmArg("-Dmixin.debug.export=true")
-}
-
-// configure the maven publication
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-        }
-    }
-
-    // select the repositories you want to publish to
-    repositories {
-        // uncomment to publish to the local maven
-         mavenLocal()
-    }
 }
 
 val compileKotlin: KotlinCompile by tasks

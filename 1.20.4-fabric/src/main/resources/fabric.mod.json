@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fxlib",
   "version": "${version}",
-  "name": "FXLib",
+  "name": "FxLib",
   "description": "Assorted utilities for Filloax's mods",
   "authors": ["Filloax"],
   "contributors": [],
@@ -12,7 +12,7 @@
   "entrypoints": {
     "main": [
       {
-        "value": "com.filloax.fxlib.FXLib",
+        "value": "com.filloax.fxlib.FxLibFabric",
         "adapter": "kotlin"
       }
     ]
