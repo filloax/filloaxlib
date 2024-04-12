@@ -3,6 +3,7 @@ import org.gradle.api.internal.provider.EvaluationContext
 import org.gradle.api.internal.provider.PropertyHost
 import org.gradle.api.internal.provider.ValueSupplier
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.ir.backend.js.compile
 
 plugins {
     kotlin("jvm")
@@ -24,7 +25,7 @@ val modid: String by project
 val archivesBaseNameProp = property("archives_base_name") as String
 val authorProp = property("author") as String
 
-/* Unused as idk how to make it work with kotlin
+/* Unused as idk how to make it work with kotlin DSL
 interface PlatformInfoExtension {
     // Which platform (i.e. Fabric/Forge/Quilt) is this implementation is on?
     // In case of projects uses solely VanillaGradle, here we use 'Vanilla'.
@@ -48,6 +49,19 @@ data class PlatformInfo(
 
 val mainProject = project
 val commonProjectName = "shared"
+
+val projsToInclude = mutableMapOf<String, MutableSet<Project>>()
+
+subprojects {
+    projsToInclude[name] = mutableSetOf<Project>().also {
+        if (name.endsWith(commonProjectName)) return@also
+        it.add(project(":$commonProjectName"))
+        if (!name.endsWith("base")) {
+            val baseProject = ":${name.substringBefore('-')}-base"
+            it.add(project(baseProject))
+        }
+    }
+}
 
 subprojects {
     apply {
@@ -97,27 +111,43 @@ subprojects {
 
     if (name.endsWith(commonProjectName)) return@subprojects
 
+    // by extra to share with the subproject
+    val projectsToInclude = projsToInclude[name]!!
+
+    dependencies {
+        projectsToInclude.forEach { compileOnly(it) }
+    }
+
     afterEvaluate {
 //        val projectExt = extensions.findByType<PlatformInfoExtension>()
 //            ?: throw Exception("No projectExt found for $this")
         val projectExt = PlatformInfo(ext)
-
-        dependencies {
-            implementation(project(":$commonProjectName"))
-
-            if (!name.endsWith("base")) {
-                val baseProject = ":${name.substringBefore('-')}-base"
-                implementation(project(baseProject))
+        tasks.withType<JavaCompile> {
+            projectsToInclude.forEach {
+                source(it.sourceSets.getByName("main").allSource)
             }
         }
 
-//        println("Setup dependencies for $name: are ${project.configurations.map { "\n\t${it.name}: ${it.dependencies.map {d -> d.name}}" } }")
-
-        val useLoom = extensions.findByName("loom")
-
-        if (useLoom != null) {
-            // Configure Loom if needed
+        tasks.withType<KotlinCompile>  {
+            projectsToInclude.forEach {
+                source(it.sourceSets.getByName("main").allSource)
+            }
         }
+
+        tasks.getByName<Jar>("sourcesJar") {
+            projectsToInclude.forEach {
+                val mainSourceSet = it.sourceSets.getByName("main")
+                from(mainSourceSet.allJava)
+            }
+        }
+
+        tasks.processResources {
+            exclude(".cache")
+            projectsToInclude.forEach {
+                from(it.sourceSets.getByName("main").resources)
+            }
+        }
+
 
         base {
             archivesName.apply { set(get() + "-${projectExt.platform.get()}-${projectExt.minecraftVersion.get()}") }
@@ -157,6 +187,4 @@ subprojects {
             }
         }
     }
-
-
 }

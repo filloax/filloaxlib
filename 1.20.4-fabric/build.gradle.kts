@@ -42,6 +42,10 @@ dependencies {
     }
 }
 
+tasks.withType<JavaCompile> {
+    options.compilerArgs.addAll(listOf("-Xlint:all,-classfile,-processing,-deprecation,-serial", "-Werror"))
+}
+
 loom.runs.matching{ it.name != "data" }.configureEach {
     this.vmArg("-Dmixin.debug.export=true")
 }
