@@ -1,6 +1,6 @@
 package com.filloax.fxlib.structure.tracking
 
-import com.filloax.fxlib.*
+import com.filloax.fxlib.FxLib
 import com.filloax.fxlib.chunk.boundBoxChunkRange
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import it.unimi.dsi.fastutil.longs.LongSet

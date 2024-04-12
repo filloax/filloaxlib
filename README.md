@@ -25,7 +25,9 @@ dependencies {
 
 Guide is also in the JitPack link.
 
-Uses template [Paramita](https://github.com/3TUSK/Paramita) as base.
+Uses template [Paramita](https://github.com/3TUSK/Paramita) as base, and also Botania's structure for
+cross-loader development. Feel free to use this as a Kotlin multi-version/loader minecraft mod project template, 
+even if it's not comprehensive at the moment (but adding new versions should be simple enough).
 
 ---
 

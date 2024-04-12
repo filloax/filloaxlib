@@ -24,6 +24,7 @@ val groupProp = property("maven_group") as String
 val modid: String by project
 val archivesBaseNameProp = property("archives_base_name") as String
 val authorProp = property("author") as String
+val debugDependencies = property("debugDependencies") == "true"
 
 /* Unused as idk how to make it work with kotlin DSL
 interface PlatformInfoExtension {
@@ -70,8 +71,6 @@ subprojects {
 //        plugin("net.darkhax.curseforgegradle")
     }
 
-//    extensions.create("platformInfo", PlatformInfoExtension::class.java)
-
     java {
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(17))
@@ -111,30 +110,35 @@ subprojects {
 
     if (name.endsWith(commonProjectName)) return@subprojects
 
-    // by extra to share with the subproject
     val projectsToInclude = projsToInclude[name]!!
 
     dependencies {
         projectsToInclude.forEach { compileOnly(it) }
     }
 
+//    println("Setup dependencies for $name: are ${project.configurations.map { "\n\t${it.name}: ${it.dependencies.map {d -> d.name}}" } }")
+
     afterEvaluate {
-//        val projectExt = extensions.findByType<PlatformInfoExtension>()
-//            ?: throw Exception("No projectExt found for $this")
         val projectExt = PlatformInfo(ext)
-        tasks.withType<JavaCompile> {
+        tasks.compileJava {
             projectsToInclude.forEach {
                 source(it.sourceSets.getByName("main").allSource)
             }
         }
 
-        tasks.withType<KotlinCompile>  {
+        tasks.compileKotlin  {
             projectsToInclude.forEach {
                 source(it.sourceSets.getByName("main").allSource)
             }
         }
 
         tasks.getByName<Jar>("sourcesJar") {
+            projectsToInclude.forEach {
+                val mainSourceSet = it.sourceSets.getByName("main")
+                from(mainSourceSet.allJava)
+            }
+        }
+        tasks.kotlinSourcesJar {
             projectsToInclude.forEach {
                 val mainSourceSet = it.sourceSets.getByName("main")
                 from(mainSourceSet.allJava)
@@ -148,6 +152,11 @@ subprojects {
             }
         }
 
+        if (debugDependencies) {
+//        println("Setup dependencies for $name: are ${project.configurations.map { "\n\t${it.name}: ${it.dependencies.map {d -> d.name}}" } }")
+            println("Setup sources for $name J are:\n\t${tasks.compileJava.get().source.files.joinToString("\n\t")}")
+            println("Setup sources for $name K are:\n\t${tasks.compileKotlin.get().sources.joinToString("\n\t")}")
+        }
 
         base {
             archivesName.apply { set(get() + "-${projectExt.platform.get()}-${projectExt.minecraftVersion.get()}") }

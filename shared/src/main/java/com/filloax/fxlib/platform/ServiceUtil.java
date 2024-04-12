@@ -4,8 +4,8 @@ package com.filloax.fxlib.platform;
 // Specifically https://github.com/VazkiiMods/Botania/blob/1.20.x/Xplat/src/main/java/vazkii/botania/api/ServiceUtil.java
 
 import com.filloax.fxlib.FxLib;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ServiceLoader;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;

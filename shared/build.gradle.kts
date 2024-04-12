@@ -12,8 +12,8 @@ dependencies {
     compileOnly("com.mojang:datafixerupper:6.0.8")
     compileOnly("com.google.code.gson:gson:2.10.1")
     compileOnly("javax.annotation:javax.annotation-api:1.3.2")
-    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
     // Included in other version-specific libraries
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
+    compileOnly("org.jetbrains:annotations:24.1.0")
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:1.9.23")
+    compileOnly("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
 }
