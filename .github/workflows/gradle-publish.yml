@@ -45,6 +45,8 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
+    # - name: Publish (JitPack source)
+
     - name: Publish (Fabric 1.20.4)
       uses: Kir-Antipov/mc-publish@v3.3
       with:
@@ -52,6 +54,7 @@ jobs:
           1.20.4-fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
           1.20.4-fabric/build/libs/*-@(dev|sources|javadoc).jar
 
+        github-tag: "v${{ steps.get_version.outputs.VERSION }}-1.20.4-fabric"
         github-token: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
         github-generate-changelog: true
 
