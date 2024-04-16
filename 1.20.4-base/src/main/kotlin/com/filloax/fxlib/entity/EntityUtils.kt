@@ -3,9 +3,12 @@ package com.filloax.fxlib.entity
 import com.filloax.fxlib.interfaces.WithPersistentData
 import com.filloax.fxlib.platform.getPlatformAbstractions
 import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.syncher.EntityDataAccessor
+import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.portal.PortalInfo
+import kotlin.reflect.KProperty
 
 val platformAbstractions = getPlatformAbstractions()
 
@@ -36,3 +39,15 @@ fun getData(entity: Entity): CompoundTag {
 }
 
 fun Entity.getPersistData() = getData(this)
+
+fun <T : Any> SynchedEntityData.delegate(accessor: EntityDataAccessor<T>) = SynchedEntityDataDelegateImpl(this, accessor)
+
+class SynchedEntityDataDelegateImpl<T : Any>(val entityData: SynchedEntityData, val accessor: EntityDataAccessor<T>) {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+        return entityData.get(accessor)
+    }
+
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        entityData.set(accessor, value)
+    }
+}
