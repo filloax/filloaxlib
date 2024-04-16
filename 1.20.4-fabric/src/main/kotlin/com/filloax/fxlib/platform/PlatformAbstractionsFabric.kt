@@ -40,11 +40,11 @@ class PlatformAbstractionsFabric : PlatformAbstractions {
     }
 
     override fun runAtServerTickEnd(action: (MinecraftServer) -> Unit) {
-        EventOnce.runEventOnce(ServerTickEvents.END_SERVER_TICK, action as ServerTickEvents.EndTick, clearOnServerShutdown = true)
+        EventOnce.runEventOnce(ServerTickEvents.END_SERVER_TICK, ServerTickEvents.EndTick { action(it) }, clearOnServerShutdown = true)
     }
 
     override fun runAtNextServerTickStart(action: (MinecraftServer) -> Unit) {
-        EventOnce.runEventOnce(ServerTickEvents.START_SERVER_TICK, action as ServerTickEvents.StartTick, clearOnServerShutdown = true)
+        EventOnce.runEventOnce(ServerTickEvents.START_SERVER_TICK, ServerTickEvents.StartTick { action(it) }, clearOnServerShutdown = true)
     }
 
     override fun runWhenChunkLoaded(level: ServerLevel, chunkPos: ChunkPos, action: (ServerLevel) -> Unit) {
