@@ -23,10 +23,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: Get version from gradle
-      id: get_version
-      run: echo "VERSION=$(./gradlew modVersion | grep VERSION | awk -F'=' '{print $2}')" >> $GITHUB_OUTPUT
       
     # - name: Create Release (Jitpack Source)
     #   id: create_release
@@ -55,6 +51,10 @@ jobs:
         
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+
+    - name: Get version from gradle
+      id: get_version
+      run: echo "VERSION=$(./gradlew modVersion | grep VERSION | awk -F'=' '{print $2}')" >> $GITHUB_OUTPUT
 
     - name: Build with Gradle
       run: ./gradlew build
