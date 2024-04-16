@@ -28,6 +28,10 @@ val archivesBaseNameProp = property("archives_base_name") as String
 val authorProp = property("author") as String
 val debugDependencies = property("debugDependencies") == "true"
 
+tasks.register("modVersion") {
+    println("VERSION=$versionProp")
+}
+
 /* Unused as idk how to make it work with kotlin DSL
 interface PlatformInfoExtension {
     // Which platform (i.e. Fabric/Forge/Quilt) is this implementation is on?

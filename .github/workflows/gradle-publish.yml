@@ -24,11 +24,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Get version from gradle.properties
+    - name: Get version from gradle
       id: get_version
-      uses: ./.github/workflows/get_version.js
-      with:
-        gradle_properties_path: 'path/to/gradle.properties'
+      run: echo "VERSION=$(./gradlew modVersion | grep VERSION | awk -F'=' '{print $2}')" >> $GITHUB_OUTPUT
       
     # - name: Create Release (Jitpack Source)
     #   id: create_release
