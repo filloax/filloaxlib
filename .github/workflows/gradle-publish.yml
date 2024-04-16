@@ -2,9 +2,10 @@ on:
   workflow_dispatch:
   push:
     tags:
-      # vX.Y (optionally.Z) plus optional extra stuff but without -1.x.y (game versions attached) as those are produced by this script
-      # (to avoid endless recursion)
-      - '^(v[0-9]+\.[0-9]+\b(?:\.[0-9]+)?)(-[^\d\.].*?|[^-\.].*?)?$'
+      - 'v[0-9].*'
+    tags-ignore:
+      # avoid pushing own tags
+      - 'v[0-9]+.[0-9]+.[0-9]+-[0-9]+'
 
 #Environment variables that can later be referenced using ${{ env.MINECRAFT_VERSION }}. These are useful for repeating information and allow for quick changes for new mod updates
 env: 
