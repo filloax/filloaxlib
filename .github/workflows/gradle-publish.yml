@@ -1,11 +1,8 @@
 on:
   workflow_dispatch:
   push:
-    tags:
-      - 'v[0-9].*'
-    tags-ignore:
-      # avoid pushing own tags
-      - 'v[0-9]+.[0-9]+.[0-9]+-[0-9]+'
+    branches:
+      - 'master'
 
 #Environment variables that can later be referenced using ${{ env.MINECRAFT_VERSION }}. These are useful for repeating information and allow for quick changes for new mod updates
 env: 
@@ -26,10 +23,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Get the version
-      id: get_version
-      run: 'echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT'
 
+    - name: Get version from gradle.properties
+      id: get_version
+      uses: ./.github/workflows/get_version.js
+      with:
+        gradle_properties_path: 'path/to/gradle.properties'
+      
     # - name: Create Release (Jitpack Source)
     #   id: create_release
     #   uses: actions/create-release@v1
