@@ -143,13 +143,13 @@ subprojects {
         tasks.getByName<Jar>("sourcesJar") {
             projectsToInclude.forEach {
                 val mainSourceSet = it.sourceSets.getByName("main")
-                from(mainSourceSet.allJava)
+                from(mainSourceSet.allSource)
             }
         }
         tasks.kotlinSourcesJar {
             projectsToInclude.forEach {
                 val mainSourceSet = it.sourceSets.getByName("main")
-                from(mainSourceSet.allJava)
+                from(mainSourceSet.allSource)
             }
         }
 
