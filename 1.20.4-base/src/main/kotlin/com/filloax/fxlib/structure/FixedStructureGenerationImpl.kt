@@ -28,6 +28,9 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
     private val extraStructSpawnChunks = mutableMapOf<Long, MutableList<StructureSpawnData>>()
     private val alreadyGeneratedStructures = mutableMapOf<String, StructureStart>()
 
+    override val registeredStructureSpawns: Map<String, StructureSpawnData>
+        get() = structsToSpawnById
+
     override fun register(
         level: ServerLevel,
         id: String, pos: BlockPos,
@@ -45,6 +48,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
         // temporarily only support overworld
         tryQueueSpawnData(level.server, spawnData)
     }
+
     override fun spawnedQueuedStructure(structureSpawnId: String): Boolean? {
         return if (structureSpawnId in structureSpawnId)
             alreadyGeneratedStructures[structureSpawnId] != null
@@ -217,12 +221,4 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
             val DEF = define("FixedStructureGeneration", FixedStructureGenerationImpl::Save, CODEC)
         }
     }
-
-    data class StructureSpawnData(
-        val pos: BlockPos,
-        val structure: ResourceLocation,
-        val spawnId: String,
-        val rotation: Rotation? = null,
-        val force: Boolean = false
-    )
 }

@@ -59,6 +59,16 @@ interface FixedStructureGeneration {
      * null if not in queue
      */
     fun spawnedQueuedStructure(structureSpawnId: String): Boolean?
+
+    val registeredStructureSpawns: Map<String, StructureSpawnData>
 }
+
+data class StructureSpawnData(
+    val pos: BlockPos,
+    val structure: ResourceLocation,
+    val spawnId: String,
+    val rotation: Rotation? = null,
+    val force: Boolean = false
+)
 
 fun getFixedStructureGeneration(): FixedStructureGeneration = FixedStructureGenerationImpl
