@@ -10,14 +10,18 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.core.Vec3i
 import net.minecraft.core.registries.Registries
+import net.minecraft.data.worldgen.BootstapContext
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
 import net.minecraft.util.ExtraCodecs
 import net.minecraft.world.level.block.Rotation
+import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.level.levelgen.WorldGenerationContext
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece
+import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationContext
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationStub
 import net.minecraft.world.level.levelgen.structure.StructureType
@@ -55,7 +59,7 @@ class ForcePosJigsawStructure(
     projectStartToHeightmap: Optional<Heightmap.Types>,
     maxDistanceToCenter: Int,
     poolAliases: List<PoolAliasBinding>,
-    forcePosUseY: Boolean = false,
+    private val defaultForcePosUsesY: Boolean = false,
     val forcePosOffset: Vec3i = Vec3i.ZERO,
     override val defaultRotation: Rotation? = null,
     val useRotationInDefaultPlacement: Boolean = false,
@@ -65,6 +69,7 @@ class ForcePosJigsawStructure(
 ), FixablePosition, FixableRotation {
     private var nextPlacePosition: BlockPos? = null
     private var nextPlaceRotation: Rotation? = null
+    private var forcePosUsesY = defaultForcePosUsesY
 
     companion object {
         val CODEC: Codec<ForcePosJigsawStructure> = ExtraCodecs.validate(
@@ -131,13 +136,15 @@ class ForcePosJigsawStructure(
             // Rotate offset too
             val offset = forcePosOffset.rotate(rotation)
             position = position.offset(offset)
-            val pos = if (nextPlaceUseY) position else BlockPos(position.x, y + offset.y, position.z)
+            val thisGenUsesForcedY = forcePosUsesY
+            forcePosUsesY = defaultForcePosUsesY
+            val pos = if (thisGenUsesForcedY) position else BlockPos(position.x, y + offset.y, position.z)
             nextPlacePosition = null
             nextPlaceRotation = null
 
             JigsawPlacementExtra.addPieces(
                 context, startPool, startJigsawName, maxDepth, pos, useExpansionHack,
-                if (nextPlaceUseY) Optional.empty() else projectStartToHeightmap,
+                if (thisGenUsesForcedY) Optional.empty() else projectStartToHeightmap,
                 maxDistanceFromCenter,
                 PoolAliasLookup.create(this.poolAliases, pos, context.seed()),
                 rotation,
@@ -145,11 +152,12 @@ class ForcePosJigsawStructure(
         }
     }
 
-    override fun setNextPlacePosition(pos: BlockPos) {
+    override fun setNextPlacePosition(pos: BlockPos, useY: Boolean?) {
         nextPlacePosition = pos
+        forcePosUsesY = useY ?: defaultForcePosUsesY
     }
 
-    override val nextPlaceUseY = forcePosUseY
+    override val nextPlaceUseY = forcePosUsesY
 
     override fun setNextPlaceRotation(rotation: Rotation) {
         nextPlaceRotation = rotation

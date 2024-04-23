@@ -125,6 +125,8 @@ subprojects {
     afterEvaluate {
         val projectExt = PlatformInfo(ext)
 
+        version = "$version-${projectExt.minecraftVersion.get()}-${projectExt.platform.get().lowercase()}"
+
         val isVanilla = projectExt.platform.get() == "Vanilla"
         val isFabric = projectExt.platform.get() == "Fabric"
 
@@ -174,7 +176,8 @@ subprojects {
         }
 
         base {
-            archivesName = ("$archivesBaseNameProp-${projectExt.platform.get().lowercase()}-${projectExt.minecraftVersion.get()}")
+//            archivesName = ("$archivesBaseNameProp-${projectExt.platform.get().lowercase()}-${projectExt.minecraftVersion.get()}")
+            archivesName = archivesBaseNameProp
         }
 
         if (isVanilla) {

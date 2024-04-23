@@ -4,7 +4,18 @@ import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.Rotation
 
 interface FixablePosition {
-    fun setNextPlacePosition(pos: BlockPos)
+    /**
+     * Force the next placement of this structure to be at the specified position
+     * (as structure generation is often done automatically). If useY is null (default),
+     * will use the setting placed in the structure data json.
+     */
+    fun setNextPlacePosition(pos: BlockPos, useY: Boolean?)
+    /**
+     * Force the next placement of this structure to be at the specified position
+     * (as structure generation is often done automatically). If useY is null (default),
+     * will use the setting placed in the structure data json.
+     */
+    fun setNextPlacePosition(pos: BlockPos) { setNextPlacePosition(pos, null) }
     val nextPlaceUseY: Boolean
 }
 
