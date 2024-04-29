@@ -4,6 +4,7 @@ import com.filloax.fxlib.FxLib
 import com.mojang.serialization.Codec
 import net.minecraft.nbt.*
 import java.lang.ClassCastException
+import kotlin.reflect.KMutableProperty0
 
 
 fun CompoundTag.putIfAbsent(key: String, tag: Tag): Tag? {
@@ -53,16 +54,14 @@ inline fun <reified T : Tag> CompoundTag.getOrPut(key: String, default: T): T {
  * Will not load if key is not present.
  */
 fun <T> CompoundTag.loadField(name: String, codec: Codec<T>, setter: (T) -> Unit) {
-    this.get(name)?.let{ tag ->
-        try {
-            setter(codec.decode(NbtOps.INSTANCE, tag).getOrThrow(false) {
-                FxLib.logger.error("Error in decoding $name: $it")
-            }.first)
-        } catch (e: Exception) {
-            FxLib.logger.error("Exception while decoding $name: ${e.stackTraceToString()}")
-        }
+    val value = loadField(name, codec)
+    if (value != null) {
+        setter(value)
     }
 }
+
+fun <T> CompoundTag.loadField(name: String, codec: Codec<T>, property: KMutableProperty0<T>) =
+    loadField(name, codec, property.setter)
 
 /**
  * Convenient way to load values from NBT using a codec.
@@ -93,7 +92,7 @@ fun <T> CompoundTag.saveField(name: String, codec: Codec<T>, getter: () -> T?) {
                 FxLib.logger.error("Error in encoding $name: $it")
             })
         } catch (e: Exception) {
-            FxLib.logger.error("Error in encoding $name: ${e.stackTraceToString()}")
+            FxLib.logger.error("Exception while encoding $name: ${e.stackTraceToString()}")
         }
     }
 }
