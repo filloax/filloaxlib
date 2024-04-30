@@ -60,9 +60,6 @@ fun <T> CompoundTag.loadField(name: String, codec: Codec<T>, setter: (T) -> Unit
     }
 }
 
-fun <T> CompoundTag.loadField(name: String, codec: Codec<T>, property: KMutableProperty0<T>) =
-    loadField(name, codec, property.setter)
-
 /**
  * Convenient way to load values from NBT using a codec.
  * Will return null if key is not present.

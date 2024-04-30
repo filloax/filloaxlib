@@ -1,10 +1,12 @@
 package com.filloax.fxlib
 
+import com.filloax.fxlib.nbt.getListOrNull
 import com.filloax.fxlib.nbt.getOrPut
 import net.minecraft.ChatFormatting
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
+import net.minecraft.nbt.Tag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentUtils
 import net.minecraft.network.chat.Style
@@ -54,34 +56,61 @@ private class StringListTagProxy(private val listTag: ListTag): AbstractMutableL
 
 fun createWrittenBook(title: Component, author: Component, pages: List<Component>): ItemStack {
     val book = ItemStack(Items.WRITTEN_BOOK)
-    setBookTags(book, title, author, pages)
+    book.setBookTags(title, author, pages)
     return book
 }
 
-fun setBookTags(book: ItemStack, title: String?, author: String?, pages: List<Component>) {
-    val tag = book.getOrCreateTag()
+fun ItemStack.setBookTags(title: String?, author: String?, pages: List<Component>) {
+    val tag = getOrCreateTag()
 
     val pagesTag = ListTag()
-    if (book.`is`(Items.WRITABLE_BOOK)) {
+    if (`is`(Items.WRITABLE_BOOK)) {
         pages.forEach { page ->
             pagesTag.add(StringTag.valueOf(page.string))
         }
-    } else {
+    } else if (`is`(Items.WRITTEN_BOOK)) {
         pages.forEach { page ->
             pagesTag.add(StringTag.valueOf(Component.Serializer.toJson(page)))
         }
+    } else {
+        throw IllegalStateException("Cannot set pages of non-book item stack $this")
     }
     tag.put("pages", pagesTag)
-    if (book.`is`(Items.WRITTEN_BOOK)) {
+    if (`is`(Items.WRITTEN_BOOK)) {
         tag.putString("author", author ?: "???")
         tag.putString("title", title ?: Items.WRITTEN_BOOK.descriptionId)
     }
 }
 
-fun setBookTags(book: ItemStack, pages: List<Component>) {
-    setBookTags(book, null, null, pages)
+fun ItemStack.setBookTags(pages: List<Component>) {
+    setBookTags(null, null, pages)
 }
 
-fun setBookTags(book: ItemStack, title: Component, author: Component, pages: List<Component>) {
-    setBookTags(book, title.string, author.string, pages)
+fun ItemStack.setBookTags(title: Component, author: Component, pages: List<Component>) {
+    setBookTags( title.string, author.string, pages)
 }
+
+fun ItemStack.getBookText(): List<Component> {
+    val tag = getOrCreateTag()
+    return if (`is`(Items.WRITABLE_BOOK)) {
+        tag.getList("pages", Tag.TAG_STRING.toInt()).map{ Component.literal((it as StringTag).asString) }
+    } else if (`is`(Items.WRITTEN_BOOK)) {
+        tag.getList("pages", Tag.TAG_STRING.toInt()).map{ Component.Serializer.fromJson((it as StringTag).asString) as Component}
+    } else {
+        throw IllegalStateException("Cannot get pages of non-book item stack $this")
+    }
+}
+
+fun ItemStack.getBookTitle() =
+    if (`is`(Items.WRITTEN_BOOK)) {
+        getOrCreateTag().getString("title")
+    } else {
+        throw IllegalStateException("Cannot get title of non-written book item stack $this")
+    }
+
+fun ItemStack.getBookAuthor() =
+    if (`is`(Items.WRITTEN_BOOK)) {
+        getOrCreateTag().getString("author")
+    } else {
+        throw IllegalStateException("Cannot get author of non-written book item stack $this")
+    }
