@@ -270,3 +270,13 @@ fun Vec3i.rotate(rotation: Rotation): Vec3i {
 }
 
 fun Vec3i.vec3(): Vec3 = Vec3(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
+
+fun Vec3i.withX(x: Int): Vec3i = Vec3i(x, this.y, this.z)
+fun Vec3i.withY(y: Int): Vec3i = Vec3i(this.x, y, this.z)
+fun Vec3i.withZ(z: Int): Vec3i = Vec3i(this.x, this.y, z)
+fun Vec3i.copy(x: Int = this.x, y: Int = this.y, z: Int = this.z) = Vec3i(x, y, z)
+
+fun BlockPos.withX(x: Int): BlockPos = BlockPos(x, this.y, this.z)
+fun BlockPos.withY(y: Int): BlockPos = BlockPos(this.x, y, this.z)
+fun BlockPos.withZ(z: Int): BlockPos = BlockPos(this.x, this.y, z)
+fun BlockPos.copy(x: Int = this.x, y: Int = this.y, z: Int = this.z) = BlockPos(x, y, z)
