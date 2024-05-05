@@ -1,27 +1,23 @@
 package com.filloax.fxlib.structure
 
+import com.filloax.fxlib.*
+import com.filloax.fxlib.codec.*
 import com.google.common.collect.Lists
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import com.filloax.fxlib.*
-import com.filloax.fxlib.codec.*
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.core.Vec3i
 import net.minecraft.core.registries.Registries
-import net.minecraft.data.worldgen.BootstapContext
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.tags.TagKey
 import net.minecraft.util.ExtraCodecs
 import net.minecraft.world.level.block.Rotation
-import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.level.levelgen.WorldGenerationContext
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece
-import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationContext
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationStub
 import net.minecraft.world.level.levelgen.structure.StructureType
@@ -37,6 +33,8 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.shapes.BooleanOp
 import net.minecraft.world.phys.shapes.Shapes
 import java.util.*
+import java.util.function.Consumer
+import java.util.function.Function
 
 /**
  * Variant of Jigsaw structure that forces it to be placed at the exact position instead of chunk start when placed
@@ -172,9 +170,14 @@ object JigsawPlacementExtra {
      * easies way to do this as opposed to mixing it in the function if we call it ourselves anyways
      */
     fun addPieces(
-        context: GenerationContext, holder: Holder<StructureTemplatePool>, startJigsawName: Optional<ResourceLocation>,
-        maxDepth: Int, blockPos: BlockPos, useExpansionHack: Boolean,
-        projectStartToHeightmap: Optional<Heightmap.Types>, maxDistanceFromCenter: Int,
+        context: GenerationContext,
+        startPool: Holder<StructureTemplatePool>,
+        startJigsawName: Optional<ResourceLocation>,
+        maxDepth: Int,
+        pos: BlockPos,
+        useExpansionHack: Boolean,
+        projectStartToHeightmap: Optional<Heightmap.Types>,
+        maxDistanceFromCenter: Int,
         aliasLookup: PoolAliasLookup,
         rotation: Rotation,
     ): Optional<GenerationStub> {
@@ -182,85 +185,98 @@ object JigsawPlacementExtra {
         //after vanilla updates, check that his still is the same
         val registryAccess = context.registryAccess()
         val chunkGenerator = context.chunkGenerator()
-        val worldgenRandom = context.random()
         val structureTemplateManager = context.structureTemplateManager()
         val levelHeightAccessor = context.heightAccessor()
+        val worldgenRandom = context.random()
         val registry = registryAccess.registryOrThrow(Registries.TEMPLATE_POOL)
-        val structureTemplatePool = holder.value()
+        val structureTemplatePool = startPool.unwrapKey().flatMap { resourceKey ->
+                registry.getOptional(aliasLookup.lookup(resourceKey))
+            }.orElse(startPool.value())
         val structurePoolElement = structureTemplatePool.getRandomTemplate(worldgenRandom)
-        return if (structurePoolElement === EmptyPoolElement.INSTANCE) {
-            Optional.empty()
+        if (structurePoolElement === EmptyPoolElement.INSTANCE) {
+            return Optional.empty()
         } else {
-            val blockPos2: BlockPos = if (startJigsawName.isPresent) {
+            val blockPos = if (startJigsawName.isPresent) {
                 val resourceLocation = startJigsawName.get()
-                val optional3 = JigsawPlacement.getRandomNamedJigsaw(
-                    structurePoolElement, resourceLocation, blockPos, rotation, structureTemplateManager, worldgenRandom
+                val optional = JigsawPlacement.getRandomNamedJigsaw(
+                    structurePoolElement, resourceLocation, pos, rotation, structureTemplateManager, worldgenRandom
                 )
-                if (optional3.isEmpty) {
+                if (optional.isEmpty) {
                     FxLib.logger.error(
                         "No starting jigsaw {} found in start pool {}",
                         resourceLocation,
-                        holder.unwrapKey().map { resourceKey: ResourceKey<StructureTemplatePool> ->
-                            resourceKey.location().toString()
-                        }.orElse("<unregistered>")
+                        startPool.unwrapKey().map { resourceKey -> resourceKey.location().toString() }.orElse("<unregistered>")
                     )
                     return Optional.empty()
                 }
-                optional3.get()
+
+                optional.get()
             } else {
-                blockPos
+                pos
             }
-            val vec3i: Vec3i = blockPos2.subtract(blockPos)
-            val blockPos3 = blockPos.subtract(vec3i)
+
+            val vec3i = blockPos.subtract(pos)
+            val blockPos2 = pos.subtract(vec3i)
             val poolElementStructurePiece = PoolElementStructurePiece(
                 structureTemplateManager,
                 structurePoolElement,
-                blockPos3,
+                blockPos2,
                 structurePoolElement.groundLevelDelta,
                 rotation,
-                structurePoolElement.getBoundingBox(structureTemplateManager, blockPos3, rotation)
+                structurePoolElement.getBoundingBox(structureTemplateManager, blockPos2, rotation)
             )
             val boundingBox = poolElementStructurePiece.boundingBox
-            val k = (boundingBox.maxX() + boundingBox.minX()) / 2
-            val l = (boundingBox.maxZ() + boundingBox.minZ()) / 2
-            val m = if (projectStartToHeightmap.isPresent) {
-                blockPos.y + chunkGenerator.getFirstFreeHeight(
-                    k, l, projectStartToHeightmap.get(), levelHeightAccessor, context.randomState()
+            val i = (boundingBox.maxX() + boundingBox.minX()) / 2
+            val j = (boundingBox.maxZ() + boundingBox.minZ()) / 2
+            val k = if (projectStartToHeightmap.isPresent) {
+                pos.y + chunkGenerator.getFirstFreeHeight(
+                    i, j, projectStartToHeightmap.get() as Heightmap.Types, levelHeightAccessor, context.randomState()
                 )
             } else {
-                blockPos3.y
+                blockPos2.y
             }
-            val n = boundingBox.minY() + poolElementStructurePiece.groundLevelDelta
-            poolElementStructurePiece.move(0, m - n, 0)
-            val o = m + vec3i.y
-            Optional.of(GenerationStub(BlockPos(k, o, l)) { structurePiecesBuilder: StructurePiecesBuilder ->
-                val list: MutableList<PoolElementStructurePiece> = Lists.newArrayList()
-                list.add(poolElementStructurePiece)
-                if (maxDepth > 0) {
-                    val aABB = AABB(
-                        (k - maxDistanceFromCenter).toDouble(), (o - maxDistanceFromCenter).toDouble(), (l - maxDistanceFromCenter).toDouble(), (k + maxDistanceFromCenter + 1).toDouble(),
-                        (o + maxDistanceFromCenter + 1).toDouble(), (l + maxDistanceFromCenter + 1).toDouble()
-                    )
-                    val voxelShape = Shapes.join(
-                        Shapes.create(aABB), Shapes.create(AABB.of(boundingBox)), BooleanOp.ONLY_FIRST
-                    )
-                    JigsawPlacement.addPieces(
-                        context.randomState(),
-                        maxDepth,
-                        useExpansionHack,
-                        chunkGenerator,
-                        structureTemplateManager,
-                        levelHeightAccessor,
-                        worldgenRandom,
-                        registry,
-                        poolElementStructurePiece,
-                        list,
-                        voxelShape,
-                        aliasLookup
-                    )
-                    list.forEach(structurePiecesBuilder::addPiece)
+
+            val l = boundingBox.minY() + poolElementStructurePiece.groundLevelDelta
+            poolElementStructurePiece.move(0, k - l, 0)
+            val m = k + vec3i.y
+            return Optional.of(
+                GenerationStub(
+                    BlockPos(i, m, j)
+                ) { structurePiecesBuilder ->
+                    val list: MutableList<PoolElementStructurePiece> = Lists.newArrayList()
+                    list.add(poolElementStructurePiece)
+                    if (maxDepth > 0) {
+                        val aABB = AABB(
+                            (i - maxDistanceFromCenter).toDouble(),
+                            (m - maxDistanceFromCenter).toDouble(),
+                            (j - maxDistanceFromCenter).toDouble(),
+                            (i + maxDistanceFromCenter + 1).toDouble(),
+                            (m + maxDistanceFromCenter + 1).toDouble(),
+                            (j + maxDistanceFromCenter + 1).toDouble()
+                        )
+                        val voxelShape = Shapes.join(
+                            Shapes.create(aABB),
+                            Shapes.create(AABB.of(boundingBox)),
+                            BooleanOp.ONLY_FIRST
+                        )
+                        JigsawPlacement.addPieces(
+                            context.randomState(),
+                            maxDepth,
+                            useExpansionHack,
+                            chunkGenerator,
+                            structureTemplateManager,
+                            levelHeightAccessor,
+                            worldgenRandom,
+                            registry,
+                            poolElementStructurePiece,
+                            list,
+                            voxelShape,
+                            aliasLookup
+                        )
+                        list.forEach(structurePiecesBuilder::addPiece)
+                    }
                 }
-            })
+            )
         }
     }
 }
