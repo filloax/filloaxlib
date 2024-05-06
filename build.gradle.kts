@@ -1,17 +1,36 @@
-import org.gradle.api.internal.provider.AbstractProperty
-import org.gradle.api.internal.provider.EvaluationContext
-import org.gradle.api.internal.provider.PropertyHost
-import org.gradle.api.internal.provider.ValueSupplier
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.ir.backend.js.compile
+import org.jetbrains.kotlin.utils.addToStdlib.flattenTo
+
+val kotlinVersion: String by project
 
 plugins {
-    kotlin("jvm")
     id("maven-publish")
+    kotlin("jvm")
+    kotlin("plugin.serialization")
+
+    id("org.spongepowered.gradle.vanilla") apply false
+    id("com.github.johnrengelman.shadow") apply false
+
+    id("fabric-loom") apply false
 
 //    id("com.modrinth.minotaur") version "2.+" apply false
 //    id("net.darkhax.curseforgegradle") version "1.1.17" apply false
+}
+
+//val projectDependencies: Map<String, String> by extra
+//(settings["projectDependencies"] as Map<String, String>).forEach(::println)
+val projectDependencies: Map<String, Set<String>> by gradle.extra
+val projectJavaVersions: Map<Int, Set<String>> by gradle.extra
+
+fun getProjectsToInclude(forProject: String): Set<String> {
+    var current = setOf(forProject)
+    val out = mutableSetOf<String>()
+    while (current.isNotEmpty()) {
+        current = current.mapNotNull { projectDependencies[it] }.flattenTo(mutableSetOf())
+        out.addAll(current.map{":$it"})
+    }
+    return out
 }
 
 repositories {
@@ -27,6 +46,7 @@ val modid: String by project
 val archivesBaseNameProp = property("archives_base_name") as String
 val authorProp = property("author") as String
 val debugDependencies = property("debugDependencies") == "true"
+val commonProjectName: String by project
 
 tasks.register("modVersion") {
     println("VERSION=$versionProp")
@@ -55,32 +75,40 @@ data class PlatformInfo(
 }
 
 val mainProject = project
-val baseProjectSuffix = "base"
-val commonProjectName = "shared"
-
-val projsToInclude = mutableMapOf<String, MutableSet<Project>>()
+val projsToInclude = mutableMapOf<String, Set<Project>>()
 
 subprojects {
-    projsToInclude[name] = mutableSetOf<Project>().also {
-        if (name.endsWith(commonProjectName)) return@also
-        it.add(project(":$commonProjectName"))
-        if (!name.endsWith(baseProjectSuffix)) {
-            val baseProject = ":${name.substringBefore('-')}-base"
-            it.add(project(baseProject))
-        }
-    }
+    projsToInclude[name] = getProjectsToInclude(name).map { project(it) }.toSet()
 }
+
+println("Setup projects to include tree: ${projsToInclude.entries.joinToString("\n")}")
 
 subprojects {
     apply {
         plugin("java")
+        plugin("org.jetbrains.kotlin.jvm")
+        plugin("org.jetbrains.kotlin.plugin.serialization")
+
+        if ("base" in name) {
+            plugin("org.spongepowered.gradle.vanilla")
+            plugin("com.github.johnrengelman.shadow")
+        } else {
+            plugin("maven-publish")
+        }
+
+        if ("fabric" in name) {
+            plugin("fabric-loom")
+        }
+
 //        plugin("com.modrinth.minotaur")
 //        plugin("net.darkhax.curseforgegradle")
     }
 
+    val javaVersion = projectJavaVersions.filter { it.value.contains(name) }.keys.firstOrNull() ?: throw IllegalStateException("No java version set for $name")
+
     java {
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(javaVersion))
         }
         withSourcesJar()
     }
@@ -91,7 +119,7 @@ subprojects {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "17"
+            jvmTarget = javaVersion.toString()
         }
     }
 
@@ -131,6 +159,8 @@ subprojects {
         val isFabric = projectExt.platform.get() == "Fabric"
 
         tasks.compileJava {
+            options.compilerArgs.addAll(listOf("-Xlint:all,-classfile,-processing,-deprecation,-serial", "-Werror"))
+
             projectsToInclude.forEach {
                 source(it.sourceSets.getByName("main").allSource)
             }
@@ -140,6 +170,15 @@ subprojects {
             projectsToInclude.forEach {
                 source(it.sourceSets.getByName("main").allSource)
             }
+        }
+
+        val compileKotlin: KotlinCompile by tasks
+        compileKotlin.kotlinOptions {
+            jvmTarget = javaVersion.toString()
+        }
+        val compileTestKotlin: KotlinCompile by tasks
+        compileTestKotlin.kotlinOptions {
+            jvmTarget = javaVersion.toString()
         }
 
         tasks.getByName<Jar>("sourcesJar") {
