@@ -2,9 +2,11 @@ package com.filloax.fxlib.structure.tracking
 
 import com.filloax.fxlib.FxLib
 import com.filloax.fxlib.chunk.boundBoxChunkRange
+import com.filloax.fxlib.nbt.getCompoundOrNull
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import it.unimi.dsi.fastutil.longs.LongSet
 import net.minecraft.core.BlockPos
+import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -39,7 +41,12 @@ class CustomPlacedStructureTracker private constructor(val level: ServerLevel) :
     private var lastReference = 0L
 
     companion object {
-        private val factory = { level: ServerLevel -> Factory({ CustomPlacedStructureTracker(level) }, { tag -> load(tag, level) }, DataFixTypes.STRUCTURE) }
+        private val factory = { level: ServerLevel ->
+            Factory(
+                { CustomPlacedStructureTracker(level) }, { tag, _ -> load(tag, level) },
+                DataFixTypes.STRUCTURE
+            )
+        }
 
         @JvmStatic
         fun get(level: ServerLevel): CustomPlacedStructureTracker {
@@ -49,7 +56,7 @@ class CustomPlacedStructureTracker private constructor(val level: ServerLevel) :
         private fun load(compoundTag: CompoundTag, level: ServerLevel): CustomPlacedStructureTracker {
             val out = CustomPlacedStructureTracker(level)
             val ctx = StructurePieceSerializationContext.fromLevel(level)
-            compoundTag.getCompound("spawnedStructureData")?.let { tag ->
+            compoundTag.getCompoundOrNull("spawnedStructureData")?.let { tag ->
                 tag.allKeys.forEach { idStr ->
                     val id = idStr.toLong()
                     val data = PlacedStructureData.load(tag.getCompound(idStr), ctx, level)
@@ -63,7 +70,7 @@ class CustomPlacedStructureTracker private constructor(val level: ServerLevel) :
         }
     }
 
-    override fun save(compoundTag: CompoundTag): CompoundTag {
+    override fun save(compoundTag: CompoundTag, holderLookup: HolderLookup.Provider): CompoundTag {
         val ctx = StructurePieceSerializationContext.fromLevel(level)
         compoundTag.put("spawnedStructureData", CompoundTag().also { tag ->
             structureData.forEach { (refId, data) ->
@@ -160,7 +167,7 @@ data class PlacedStructureData(
     fun save(ctx: StructurePieceSerializationContext): CompoundTag {
         return CompoundTag().also { tag ->
             tag.put("StructureStart", structureStart.createTag(ctx, structureStart.chunkPos))
-            tag.put("BlockPos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).getOrThrow(false) {})
+            tag.put("BlockPos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).orThrow)
         }
     }
 
@@ -168,8 +175,8 @@ data class PlacedStructureData(
         fun load(tag: CompoundTag, ctx: StructurePieceSerializationContext, level: ServerLevel): PlacedStructureData {
             return PlacedStructureData(
                 StructureStart.loadStaticStart(ctx, tag.getCompound("StructureStart"), level.seed) ?: throw IllegalStateException("Couldn't load structure start from $tag"),
-                BlockPos.CODEC.decode(NbtOps.INSTANCE, tag.get("BlockPos")).getOrThrow(false) {
-                    FxLib.logger.error("Error in decoding BlockPos: $it")
+                BlockPos.CODEC.decode(NbtOps.INSTANCE, tag.get("BlockPos")).getOrThrow {
+                    Exception("Error in decoding BlockPos: $it")
                 }.first,
             )
         }

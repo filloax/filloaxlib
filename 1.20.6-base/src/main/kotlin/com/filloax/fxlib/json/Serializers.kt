@@ -2,7 +2,7 @@ package com.filloax.fxlib.json
 
 import com.filloax.fxlib.codec.decodeJson
 import com.filloax.fxlib.codec.encodeJson
-import com.filloax.fxlib.codec.simpleCodecErr
+import com.filloax.fxlib.codec.throwableCodecErr
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -54,14 +54,14 @@ class ItemByNameSerializer : KSerializer<Item> {
         return BuiltInRegistries.ITEM.byNameCodec()
             .decodeJson(com.google.gson.JsonPrimitive(string))
             .map { it.first }
-            .getOrThrow(false, simpleCodecErr("ItemByNameSerializer.deserialize"))
+            .getOrThrow(throwableCodecErr("ItemByNameSerializer.deserialize"))
     }
 
     override fun serialize(encoder: Encoder, value: Item) {
         val string = BuiltInRegistries.ITEM.byNameCodec()
             .encodeJson(value)
             .map { it.asString }
-            .getOrThrow(false, simpleCodecErr("ItemByNameSerializer.serialize"))
+            .getOrThrow(throwableCodecErr("ItemByNameSerializer.serialize"))
         encoder.encodeString(string)
     }
 }

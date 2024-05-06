@@ -1,9 +1,11 @@
 package com.filloax.fxlib.savedata
 
 import com.filloax.fxlib.SaveDataTypeException
+import com.filloax.fxlib.codec.decodeNbtNullable
 import com.filloax.fxlib.codec.encodeNbt
-import com.filloax.fxlib.codec.simpleCodecErr
+import com.filloax.fxlib.codec.throwableCodecErr
 import com.mojang.serialization.Codec
+import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
@@ -61,15 +63,15 @@ abstract class FxSavedData<T : FxSavedData<T>>(
 
 
         private fun <T : FxSavedData<T>> makeVanillaFactory(codec: Codec<T>, provider: () -> T): Factory<T> {
-            return Factory(provider, { compoundTag ->
+            return Factory(provider, { compoundTag, _ ->
                 codec.decodeNbtNullable(compoundTag) ?: provider()
             }, DataFixTypes.SAVED_DATA_COMMAND_STORAGE)
         }
     }
 
     @SuppressWarnings("unchecked")
-    override fun save(compoundTag: CompoundTag): CompoundTag {
-        return codec.encodeNbt(this as T).getOrThrow(false, simpleCodecErr("fxSavedData")) as CompoundTag
+    override fun save(compoundTag: CompoundTag, holderLookup: HolderLookup.Provider): CompoundTag {
+        return codec.encodeNbt(this as T).getOrThrow(throwableCodecErr("fxSavedData")) as CompoundTag
     }
 
     @SuppressWarnings("unchecked")

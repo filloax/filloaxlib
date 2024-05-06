@@ -2,8 +2,13 @@ ext["mcVersion"] = "1.20.6"
 ext["platform"] = "Vanilla"
 ext["supported"] = listOf("1.20.6")
 
+repositories {
+    mavenCentral()
+}
+
+
 minecraft {
-    version("1.20.4")
+    version("1.20.6")
 
     // Used only in dev, in actual mod uses the platform AW
     accessWideners("src/main/resources/fxlib_base_1.20.6.accesswidener")

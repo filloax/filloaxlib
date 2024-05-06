@@ -2,6 +2,7 @@ package com.filloax.fxlib
 
 import com.filloax.fxlib.nbt.getOrPut
 import net.minecraft.ChatFormatting
+import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.nbt.ListTag
 import net.minecraft.nbt.StringTag
@@ -10,9 +11,13 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentUtils
 import net.minecraft.network.chat.Style
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.network.Filterable
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.item.component.ItemLore
+import net.minecraft.world.item.component.WritableBookContent
+import net.minecraft.world.item.component.WrittenBookContent
 
 fun itemFromId(id: String): Item {
     return itemFromId(ResourceLocation(id))
@@ -22,35 +27,35 @@ fun itemFromId(id: ResourceLocation): Item {
     return BuiltInRegistries.ITEM.get(id)
 }
 
+
 /**
  * Get lore lines as mutable list string, whose changes are reflected on the item tags
  */
 fun ItemStack.loreLines(): MutableList<Component> {
-    val listTag = getOrCreateTagElement("display").getOrPut("Lore", ListTag())
-
-    return StringListTagProxy(listTag)
+    return LoreListProxy(this)
 }
 
-private class StringListTagProxy(private val listTag: ListTag): AbstractMutableList<Component>() {
-    private val LORE_STYLE = Style.EMPTY.withColor(ChatFormatting.DARK_PURPLE).withItalic(true)
-
-    override val size: Int
-        get() = listTag.size
-
-    private fun fromString(string: String): Component {
-        return ComponentUtils.mergeStyles(
-            Component.Serializer.fromJson(string)
-                ?: throw Exception("Wrong component format $string"),
-            LORE_STYLE
-        )
+private class LoreListProxy(val itemStack: ItemStack): AbstractMutableList<Component>() {
+    private fun lore() = itemStack[DataComponents.LORE] ?: run {
+        val lore = ItemLore.EMPTY
+        itemStack[DataComponents.LORE] = lore
+        lore
     }
 
-    override fun get(index: Int): Component = fromString(listTag.getString(index))
-    override fun removeAt(index: Int): Component = fromString(listTag.removeAt(index).asString)
-    override fun set(index: Int, element: Component): Component {
-        return fromString(listTag.set(index, StringTag.valueOf(Component.Serializer.toJson(element))).asString)
+    private fun <T> updateLore(updateLinesFunction: (MutableList<Component>) -> T): T {
+        val list = lore().styledLines.toMutableList()
+        val out = updateLinesFunction(list)
+        val newLore = ItemLore(list)
+        itemStack[DataComponents.LORE] = newLore
+        return out
     }
-    override fun add(index: Int, element: Component) = listTag.add(index, StringTag.valueOf(Component.Serializer.toJson(element)))
+
+    override val size: Int = lore().styledLines.size
+
+    override fun get(index: Int): Component = lore().styledLines[index]
+    override fun removeAt(index: Int): Component = updateLore { it.removeAt(index) }
+    override fun set(index: Int, element: Component) = updateLore { it.set(index, element) }
+    override fun add(index: Int, element: Component) = updateLore { it.add(index, element) }
 }
 
 fun createWrittenBook(title: Component, author: Component, pages: List<Component>): ItemStack {
@@ -60,24 +65,18 @@ fun createWrittenBook(title: Component, author: Component, pages: List<Component
 }
 
 fun ItemStack.setBookTags(title: String?, author: String?, pages: List<Component>) {
-    val tag = getOrCreateTag()
-
-    val pagesTag = ListTag()
     if (`is`(Items.WRITABLE_BOOK)) {
-        pages.forEach { page ->
-            pagesTag.add(StringTag.valueOf(page.string))
-        }
+        this[DataComponents.WRITABLE_BOOK_CONTENT] = WritableBookContent(pages.map { Filterable.passThrough(it.string) })
     } else if (`is`(Items.WRITTEN_BOOK)) {
-        pages.forEach { page ->
-            pagesTag.add(StringTag.valueOf(Component.Serializer.toJson(page)))
-        }
+        this[DataComponents.WRITTEN_BOOK_CONTENT] = WrittenBookContent(
+            Filterable.passThrough(title ?: Items.WRITTEN_BOOK.descriptionId),
+            author ?: "???",
+            0,
+            pages.map { Filterable.passThrough(it) },
+            true
+        )
     } else {
         throw IllegalStateException("Cannot set pages of non-book item stack $this")
-    }
-    tag.put("pages", pagesTag)
-    if (`is`(Items.WRITTEN_BOOK)) {
-        tag.putString("author", author ?: "???")
-        tag.putString("title", title ?: Items.WRITTEN_BOOK.descriptionId)
     }
 }
 
@@ -90,11 +89,10 @@ fun ItemStack.setBookTags(title: Component, author: Component, pages: List<Compo
 }
 
 fun ItemStack.getBookText(): List<Component> {
-    val tag = getOrCreateTag()
     return if (`is`(Items.WRITABLE_BOOK)) {
-        tag.getList("pages", Tag.TAG_STRING.toInt()).map{ Component.literal((it as StringTag).asString) }
+        this.getOrDefault(DataComponents.WRITABLE_BOOK_CONTENT, WritableBookContent.EMPTY).pages.map{Component.literal(it.raw)}
     } else if (`is`(Items.WRITTEN_BOOK)) {
-        tag.getList("pages", Tag.TAG_STRING.toInt()).map{ Component.Serializer.fromJson((it as StringTag).asString) as Component }
+        this.getOrDefault(DataComponents.WRITTEN_BOOK_CONTENT, WrittenBookContent.EMPTY).pages.map{it.raw}
     } else {
         throw IllegalStateException("Cannot get pages of non-book item stack $this")
     }
@@ -102,14 +100,14 @@ fun ItemStack.getBookText(): List<Component> {
 
 fun ItemStack.getBookTitle() =
     if (`is`(Items.WRITTEN_BOOK)) {
-        getOrCreateTag().getString("title")
+        this.getOrDefault(DataComponents.WRITTEN_BOOK_CONTENT, WrittenBookContent.EMPTY).title.raw
     } else {
         throw IllegalStateException("Cannot get title of non-written book item stack $this")
     }
 
 fun ItemStack.getBookAuthor() =
     if (`is`(Items.WRITTEN_BOOK)) {
-        getOrCreateTag().getString("author")
+        this.getOrDefault(DataComponents.WRITTEN_BOOK_CONTENT, WrittenBookContent.EMPTY).author
     } else {
         throw IllegalStateException("Cannot get author of non-written book item stack $this")
     }
