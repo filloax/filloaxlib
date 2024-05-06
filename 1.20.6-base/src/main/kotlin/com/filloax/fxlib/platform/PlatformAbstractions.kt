@@ -67,9 +67,6 @@ interface PlatformAbstractions {
      * unloaded when the other end is loaded; use forced chunks for this, in case.
      */
     fun runWhenChunksLoaded(level: ServerLevel, minChunkPos: ChunkPos, maxChunkPos: ChunkPos, action: (ServerLevel) -> Unit)
-
-    fun <T : StructurePlacement> makeStructurePlacementType(codecGetter: () -> MapCodec<T>): StructurePlacementType<T>
-    fun <T : Structure> makeStructureType(codecGetter: () -> MapCodec<T>): StructureType<T>
 }
 
 fun getPlatformAbstractions(): PlatformAbstractions = ServiceUtil.findService(PlatformAbstractions::class.java)
