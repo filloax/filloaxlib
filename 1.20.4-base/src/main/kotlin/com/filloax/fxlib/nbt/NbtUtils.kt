@@ -85,7 +85,7 @@ fun <T> CompoundTag.saveField(name: String, codec: Codec<T>, getter: () -> T?) {
     val value = getter()
     if (value != null) {
         try {
-            this.put(name, codec.encodeStart(NbtOps.INSTANCE, getter()).getOrThrow(true) {
+            this.put(name, codec.encodeStart(NbtOps.INSTANCE, getter()).getOrThrow(false) {
                 FxLib.logger.error("Error in encoding $name: $it")
             })
         } catch (e: Exception) {

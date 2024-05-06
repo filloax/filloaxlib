@@ -1,9 +1,10 @@
 package com.filloax.fxlib.structure.tracking
 
-import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import com.filloax.fxlib.chunk.isBlockPosInChunk
 import com.filloax.fxlib.structure.FXLibStructurePlacementTypes
+import com.mojang.serialization.Codec
+import com.mojang.serialization.MapCodec
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Vec3i
 import net.minecraft.world.level.ChunkPos
@@ -21,7 +22,7 @@ import java.util.*
 class FixedStructurePlacement(locateOffset: Vec3i, val pos: BlockPos) : StructurePlacement(locateOffset, FrequencyReductionMethod.DEFAULT, 0f, 1, Optional.empty()) {
     companion object {
         // Ignore base structure placement codec as we don't need half of that
-        val CODEC: Codec<FixedStructurePlacement> = RecordCodecBuilder.create { b -> b.group(
+        val CODEC: MapCodec<FixedStructurePlacement> = RecordCodecBuilder.mapCodec { b -> b.group(
             Vec3i.CODEC.fieldOf("locateOffset").forGetter(FixedStructurePlacement::locateOffset),
             BlockPos.CODEC.fieldOf("pos").forGetter(FixedStructurePlacement::pos),
         ).apply(b, ::FixedStructurePlacement) }

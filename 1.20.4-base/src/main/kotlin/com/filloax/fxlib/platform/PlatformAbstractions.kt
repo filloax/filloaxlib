@@ -1,9 +1,14 @@
 package com.filloax.fxlib.platform
 
+import com.mojang.serialization.MapCodec
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ChunkPos
+import net.minecraft.world.level.levelgen.structure.Structure
+import net.minecraft.world.level.levelgen.structure.StructureType
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType
 import net.minecraft.world.level.portal.PortalInfo
 import java.util.*
 

@@ -35,7 +35,7 @@ fun Entity.fixedChangeDimension(level: ServerLevel, target: PortalInfo) {
 
 
 fun getData(entity: Entity): CompoundTag {
-    return (entity as WithPersistentData).`ruins_of_growsseth$getPersistentData`()
+    return (entity as WithPersistentData).`ruins_of_fxlib$getPersistentData`()
 }
 
 fun Entity.getPersistData() = getData(this)

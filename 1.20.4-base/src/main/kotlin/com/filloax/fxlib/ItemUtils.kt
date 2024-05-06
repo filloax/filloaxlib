@@ -1,6 +1,5 @@
 package com.filloax.fxlib
 
-import com.filloax.fxlib.nbt.getListOrNull
 import com.filloax.fxlib.nbt.getOrPut
 import net.minecraft.ChatFormatting
 import net.minecraft.core.registries.BuiltInRegistries
@@ -95,7 +94,7 @@ fun ItemStack.getBookText(): List<Component> {
     return if (`is`(Items.WRITABLE_BOOK)) {
         tag.getList("pages", Tag.TAG_STRING.toInt()).map{ Component.literal((it as StringTag).asString) }
     } else if (`is`(Items.WRITTEN_BOOK)) {
-        tag.getList("pages", Tag.TAG_STRING.toInt()).map{ Component.Serializer.fromJson((it as StringTag).asString) as Component}
+        tag.getList("pages", Tag.TAG_STRING.toInt()).map{ Component.Serializer.fromJson((it as StringTag).asString) as Component }
     } else {
         throw IllegalStateException("Cannot get pages of non-book item stack $this")
     }

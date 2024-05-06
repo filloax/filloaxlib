@@ -9,7 +9,7 @@ object FXLibStructures {
     @JvmStatic
     val allTypes = mutableMapOf<ResourceLocation, StructureType<*>>()
 
-    val JIGSAW_FORCE_POS = makeType("jigsaw_forced_pos") { ForcePosJigsawStructure.CODEC }
+    val JIGSAW_FORCE_POS = makeType("jigsaw_forced_pos") { ForcePosJigsawStructure.CODEC.codec() }
 
     private fun <T : Structure> makeType(name: String, type: StructureType<T>): StructureType<T> {
         val id = FXLibUtils.resLoc(name)

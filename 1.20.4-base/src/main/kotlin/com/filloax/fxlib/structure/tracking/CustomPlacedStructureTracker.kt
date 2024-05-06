@@ -43,7 +43,7 @@ class CustomPlacedStructureTracker private constructor(val level: ServerLevel) :
 
         @JvmStatic
         fun get(level: ServerLevel): CustomPlacedStructureTracker {
-            return level.dataStorage.computeIfAbsent(factory(level), "growsseth_structure_placement_tracking")
+            return level.dataStorage.computeIfAbsent(factory(level), "fxlib_structure_placement_tracking")
         }
 
         private fun load(compoundTag: CompoundTag, level: ServerLevel): CustomPlacedStructureTracker {

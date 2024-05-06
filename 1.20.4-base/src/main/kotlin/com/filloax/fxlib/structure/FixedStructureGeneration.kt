@@ -71,4 +71,4 @@ data class StructureSpawnData(
     val force: Boolean = false
 )
 
-fun getFixedStructureGeneration(): FixedStructureGeneration = FixedStructureGenerationImpl
+fun getFixedStructureGeneration(): FixedStructureGeneration = ServiceUtil.findService(FixedStructureGeneration::class.java)

@@ -17,7 +17,7 @@ public abstract class EntityMixin implements WithPersistentData {
     private CompoundTag persistentData;
 
     @Override
-    public CompoundTag ruins_of_growsseth$getPersistentData() {
+    public CompoundTag ruins_of_fxlib$getPersistentData() {
         if(this.persistentData == null) {
             this.persistentData = new CompoundTag();
         }
@@ -27,14 +27,14 @@ public abstract class EntityMixin implements WithPersistentData {
     @Inject(method = "saveWithoutId", at = @At("HEAD"))
     protected void injectWriteMethod(CompoundTag nbt, CallbackInfoReturnable<CompoundTag> info) {
         if(persistentData != null) {
-            nbt.put("growsseth.entdata", persistentData);
+            nbt.put("fxlib.entdata", persistentData);
         }
     }
 
     @Inject(method = "load", at = @At("HEAD"))
     protected void injectReadMethod(CompoundTag nbt, CallbackInfo info) {
-        if (nbt.contains("growsseth.entdata", Tag.TAG_COMPOUND)) {
-            persistentData = nbt.getCompound("growsseth.entdata");
+        if (nbt.contains("fxlib.entdata", Tag.TAG_COMPOUND)) {
+            persistentData = nbt.getCompound("fxlib.entdata");
         }
     }
 }

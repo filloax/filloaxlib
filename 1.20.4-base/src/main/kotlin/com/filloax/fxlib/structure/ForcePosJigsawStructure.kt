@@ -5,6 +5,7 @@ import com.filloax.fxlib.codec.*
 import com.google.common.collect.Lists
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
+import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
@@ -70,9 +71,9 @@ class ForcePosJigsawStructure(
     private var forcePosUsesY = defaultForcePosUsesY
 
     companion object {
-        val CODEC: Codec<ForcePosJigsawStructure> = ExtraCodecs.validate(
+        val CODEC: MapCodec<ForcePosJigsawStructure> = CodecCrossVer.inst.validateCodec(
             // Kotlin compilation fails without <ForcePosJigsawStructure> below, even if Intellij says it can be removed
-            RecordCodecBuilder.mapCodec<ForcePosJigsawStructure> { builder ->
+            RecordCodecBuilder.mapCodec { builder ->
                 builder.group(
                     settingsCodec(builder),
                     StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter(JigsawStructure::startPool),
@@ -101,20 +102,19 @@ class ForcePosJigsawStructure(
                         useRotationInDefaultPlacementOpt.orElse(false),
                     )
                 }
-            }) { structure -> verifyJson(structure) }.codec()
+            }) { structure -> verifyJson(structure) }
 
         private fun verifyJson(structure: ForcePosJigsawStructure): DataResult<ForcePosJigsawStructure> {
             val i = when (structure.terrainAdaptation()) {
                 TerrainAdjustment.NONE -> 0
-                TerrainAdjustment.BURY, TerrainAdjustment.BEARD_THIN, TerrainAdjustment.BEARD_BOX -> 12
-                null -> return DataResult.error { "Terrain adaptation must be specified!" }
+                else -> 12
             }
-            if (structure.maxDistanceFromCenter + i > 128)
-                return DataResult.error { "Structure size including terrain adaptation must not exceed 128" }
+            return if (structure.maxDistanceFromCenter + i > 128)
+                DataResult.error { "Structure size including terrain adaptation must not exceed 128" }
             else if (structure.defaultRotation == null && structure.useRotationInDefaultPlacement)
-                return DataResult.error { "Must set a default_rotation if normal_placement_uses_default_rotation is true" }
+                DataResult.error { "Must set a default_rotation if normal_placement_uses_default_rotation is true" }
             else
-                return DataResult.success(structure)
+                DataResult.success(structure)
         }
     }
 

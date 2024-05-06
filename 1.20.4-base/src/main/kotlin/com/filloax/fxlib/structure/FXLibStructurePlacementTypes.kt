@@ -10,7 +10,7 @@ import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
 object FXLibStructurePlacementTypes {
     val all = mutableMapOf<ResourceLocation, StructurePlacementType<*>>()
 
-    var FIXED = make("fixed", FixedStructurePlacement.CODEC)
+    var FIXED = make("fixed", FixedStructurePlacement.CODEC.codec())
 
     private fun <SP : StructurePlacement?> make(name: String, codec: Codec<SP>): StructurePlacementType<SP> {
         val st = StructurePlacementType { codec }
