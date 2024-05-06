@@ -17,10 +17,6 @@ fun <A> Codec<A>.decodeJson(jsonElement: JsonElement): DataResult<MojPair<A, Jso
     return decode(JsonOps.INSTANCE, jsonElement)
 }
 
-fun <A> Codec<A>.decodeJsonNullable(jsonElement: JsonElement): A? {
-    return this.decodeJson(jsonElement).get().map({ it.first }, { null })
-}
-
 fun <A> Codec<A>.encodeJson(value: A): DataResult<JsonElement> {
     return encodeStart(JsonOps.INSTANCE, value)
 }
@@ -57,6 +53,11 @@ fun <V> mutableSetCodec(elementCodec: Codec<V>): Codec<MutableSet<V>> {
     return CodecUtils.setOf(elementCodec) // Already mutable
 }
 
+fun <K, V> Codec<K>.mapWithValueOf(valueCodec: Codec<V>) = mutableMapCodec(this, valueCodec)
+fun <K, V> Codec<V>.mapWithKeyOf(keyCodec: Codec<K>) = mutableMapCodec(keyCodec, this)
+fun <V> Codec<V>.mutableListOf() = mutableListCodec(this)
+fun <V> Codec<V>.mutableSetOf() = mutableSetCodec(this)
+
 fun <T: Any, O> MapCodec<Optional<T>>.forNullableGetter(getter: (O) -> T?): RecordCodecBuilder<O, Optional<T>> {
 //    return this.xmap<T?>({ opt -> opt.getOrNull() }, { Optional.ofNullable(it) }).forGetter(getter)
     return forGetter{ Optional.ofNullable(getter(it)) }
@@ -77,3 +78,7 @@ fun simpleCodecErr(name: String): (String) -> Unit = {
 fun simpleCodecWarn(name: String): (String) -> Unit = {
     FxLib.logger.warn("Error in codec $name: $it")
 }
+
+// For 7.x+
+
+fun throwableCodecErr(name: String) = { err: String -> Exception("Error in codec $name: $err") }

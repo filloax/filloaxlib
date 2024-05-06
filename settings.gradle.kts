@@ -42,6 +42,7 @@ val commonProjectName: String by settings
 // and should include its sources.
 // For example, 1.20.4-fabric depends on 1.20.4-base, which depends on 1.20.x-base, etc
 val projectDependencies by gradle.extra(mapOf(
+    "1.20.6-base" to setOf(commonProjectName),
     "1.20.4-fabric" to setOf("1.20.4-base"),
     "1.20.4-base" to setOf(commonProjectName),
 ))
