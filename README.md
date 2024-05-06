@@ -40,3 +40,5 @@ even if it's not comprehensive at the moment (but adding new versions should be 
   So, classes that are only used by other modules without referencing MC directly.
 - **\<version>-base** includes non mod-loader specific code that ideally should contain as much logic as possible
 - **\<version>-\<loader>** contains loader specific code.
+
+Use java 21 as the gradle JVM.

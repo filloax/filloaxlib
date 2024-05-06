@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-ext["mcVersion"] = "1.20.4"
+ext["mcVersion"] = "1.20.6"
 ext["platform"] = "Fabric"
-ext["supported"] = listOf("1.20.4")
+ext["supported"] = listOf("1.20.6")
 
 
 loom {
