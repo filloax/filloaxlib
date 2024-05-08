@@ -1,12 +1,4 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    id("fabric-loom") version "1.6-SNAPSHOT"
-    id("maven-publish")
-}
 
 ext["mcVersion"] = "1.20.4"
 ext["platform"] = "Fabric"
@@ -43,19 +35,6 @@ dependencies {
     }
 }
 
-tasks.withType<JavaCompile> {
-    options.compilerArgs.addAll(listOf("-Xlint:all,-classfile,-processing,-deprecation,-serial", "-Werror"))
-}
-
 loom.runs.matching{ it.name != "data" }.configureEach {
     this.vmArg("-Dmixin.debug.export=true")
-}
-
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "17"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "17"
 }

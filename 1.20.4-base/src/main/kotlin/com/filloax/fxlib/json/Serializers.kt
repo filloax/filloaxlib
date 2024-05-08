@@ -20,7 +20,7 @@ import java.lang.IllegalStateException
  * and LongAsStringSerializer to see what I took for reference
  */
 class RotationSerializer : KSerializer<Rotation> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("growsseth.RotationSerializer", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("fxlib.RotationSerializer", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): Rotation {
         val string = decoder.decodeString()
@@ -33,7 +33,7 @@ class RotationSerializer : KSerializer<Rotation> {
 }
 
 class SimpleComponentSerializer : KSerializer<Component> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("growsseth.SimpleComponentSerializer", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("fxlib.SimpleComponentSerializer", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): Component {
         val string = decoder.decodeString()
@@ -46,7 +46,7 @@ class SimpleComponentSerializer : KSerializer<Component> {
 }
 
 class ItemByNameSerializer : KSerializer<Item> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("growsseth.ItemByNameSerializer", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("fxlib.ItemByNameSerializer", PrimitiveKind.STRING)
 
 
     override fun deserialize(decoder: Decoder): Item {
