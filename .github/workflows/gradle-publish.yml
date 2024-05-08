@@ -82,3 +82,25 @@ jobs:
       env:
         USERNAME: ${{ github.actor }}
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+    - name: Publish (Fabric 1.20.6)
+      uses: Kir-Antipov/mc-publish@v3.3
+      with:
+        files: |
+          1.20.6-fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+          1.20.6-fabric/build/libs/*-@(dev|sources|javadoc).jar
+
+        github-tag: "v${{ steps.get_version.outputs.VERSION }}-1.20.6-fabric"
+        github-token: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
+        github-generate-changelog: true
+
+        name: "FxLib ${{ steps.get_version.outputs.VERSION }} - Fabric 1.20.6"
+        version: "1.20.6-fabric-${{ steps.get_version.outputs.VERSION }}"
+        version-type: release
+
+        loaders: fabric
+        game-versions: "1.20.6"
+        java: "${{env.JAVA_VERSION}}"
+      env:
+        USERNAME: ${{ github.actor }}
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
