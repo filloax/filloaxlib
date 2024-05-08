@@ -42,3 +42,9 @@ even if it's not comprehensive at the moment (but adding new versions should be 
 - **\<version>-\<loader>** contains loader specific code.
 
 Use java 21 as the gradle JVM.
+
+## TODO
+
+Internally: rework the multi-project layout to use a common 
+plugin to configure subprojects instead of a huge subprojects {}
+block in the root build.gradle.kts
