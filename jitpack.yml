@@ -1,4 +1,8 @@
 jdk:
   - openjdk21
-
-gradle: '8.6'
+before_install:
+  - sdk install java 21.0.3-tem
+  - sdk use java 21.0.3-tem
+  - sdk install maven
+  - mvn -v
+gradle: '8.7'
