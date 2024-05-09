@@ -4,6 +4,7 @@ import com.filloax.fxlib.MixinHelpersFabric
 import com.filloax.fxlib.fabric.EventOnce
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
@@ -13,6 +14,10 @@ import java.util.*
 
 class PlatformAbstractionsFabric : PlatformAbstractions {
     override fun getServer() = MixinHelpersFabric.SERVER_HOLDER.get()
+
+    override fun isDevEnvironment(): Boolean {
+        return FabricLoader.getInstance().isDevelopmentEnvironment
+    }
 
     override fun fixedChangeDimension(entity: Entity, level: ServerLevel, target: PortalInfo) {
         FabricDimensions.teleport(entity, level, target)

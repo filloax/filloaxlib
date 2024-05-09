@@ -2,21 +2,21 @@ package com.filloax.fxlib.platform
 
 import com.filloax.fxlib.MixinHelpersFabric
 import com.filloax.fxlib.fabric.EventOnce
-import com.mojang.serialization.MapCodec
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ChunkPos
-import net.minecraft.world.level.levelgen.structure.Structure
-import net.minecraft.world.level.levelgen.structure.StructureType
-import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
-import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType
 import net.minecraft.world.level.portal.PortalInfo
 import java.util.*
 
 class PlatformAbstractionsFabric : PlatformAbstractions {
+    override fun isDevEnvironment(): Boolean {
+        return FabricLoader.getInstance().isDevelopmentEnvironment
+    }
+
     override fun getServer() = MixinHelpersFabric.SERVER_HOLDER.get()
 
     override fun fixedChangeDimension(entity: Entity, level: ServerLevel, target: PortalInfo) {

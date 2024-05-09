@@ -11,12 +11,15 @@ import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType
 import net.minecraft.world.level.portal.PortalInfo
 import java.util.*
+import org.jetbrains.annotations.*
 
 /**
  * Then used in exposed Kotlin utils
  */
 interface PlatformAbstractions {
     fun getServer(): MinecraftServer?
+
+    fun isDevEnvironment(): Boolean
 
     /**
      * Description adapted from Fabric API, applies here too mostly
@@ -41,11 +44,13 @@ interface PlatformAbstractions {
      * Run the action on the entity immediately if loaded, as soon as it's loaded
      * otherwise. Will not persist on game reload.
      */
+    @ApiStatus.Internal
     fun runOnEntityWhenPossible(level: ServerLevel, entityUUID: UUID, action: (Entity) -> Unit)
 
     /**
      * Run now if server started, or wait for server to start then run otherwise.
      */
+    @ApiStatus.Internal
     fun runWhenServerStarted(server: MinecraftServer, action: (MinecraftServer) -> Unit)
         = runWhenServerStarted(server, false, action)
 
@@ -54,11 +59,15 @@ interface PlatformAbstractions {
      * @param onServerThread If set, run on server thread, in case you want to be
      *  safe around multithreaded messing.
      */
+    @ApiStatus.Internal
     fun runWhenServerStarted(server: MinecraftServer, onServerThread: Boolean, action: (MinecraftServer) -> Unit)
 
+    @ApiStatus.Internal
     fun runAtServerTickEnd(action: (MinecraftServer) -> Unit)
+    @ApiStatus.Internal
     fun runAtNextServerTickStart(action: (MinecraftServer) -> Unit)
 
+    @ApiStatus.Internal
     fun runWhenChunkLoaded(level: ServerLevel, chunkPos: ChunkPos, action: (ServerLevel) -> Unit)
 
     /**
@@ -66,6 +75,7 @@ interface PlatformAbstractions {
      * Note that this isn't assured to ever run depending on area, as if big enough chunks on one end might be
      * unloaded when the other end is loaded; use forced chunks for this, in case.
      */
+    @ApiStatus.Internal
     fun runWhenChunksLoaded(level: ServerLevel, minChunkPos: ChunkPos, maxChunkPos: ChunkPos, action: (ServerLevel) -> Unit)
 }
 

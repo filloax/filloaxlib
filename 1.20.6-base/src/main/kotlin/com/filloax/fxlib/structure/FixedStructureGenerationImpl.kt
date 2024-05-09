@@ -208,6 +208,13 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
         return true
     }
 
+    // Used for service injection with ServiceLoader, as it expects a constructable class instead of an object
+    class ServiceWrapper: FixedStructureGeneration by FixedStructureGenerationImpl {
+        init {
+            FxLib.logger.info("INITIALIZED SERVICE WRAPPER")
+        }
+    }
+
     class Save private constructor (
         val generatedSpawns: MutableSet<String> = HashSet()
     ) : FxSavedData<Save>(CODEC) {

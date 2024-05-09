@@ -9,18 +9,24 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
+import net.minecraft.core.HolderSet
 import net.minecraft.core.Vec3i
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.ExtraCodecs
+import net.minecraft.world.entity.MobCategory
+import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.Rotation
+import net.minecraft.world.level.levelgen.GenerationStep
 import net.minecraft.world.level.levelgen.Heightmap
 import net.minecraft.world.level.levelgen.WorldGenerationContext
+import net.minecraft.world.level.levelgen.heightproviders.ConstantHeight
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider
 import net.minecraft.world.level.levelgen.structure.PoolElementStructurePiece
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationContext
 import net.minecraft.world.level.levelgen.structure.Structure.GenerationStub
+import net.minecraft.world.level.levelgen.structure.StructureSpawnOverride
 import net.minecraft.world.level.levelgen.structure.StructureType
 import net.minecraft.world.level.levelgen.structure.TerrainAdjustment
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder
@@ -71,6 +77,36 @@ class ForcePosJigsawStructure(
     private var forcePosUsesY = defaultForcePosUsesY
 
     companion object {
+        /**
+         * Alternative to constructor with default values for most args,
+         * to be used for datagen
+         */
+        fun build(
+            startPool: Holder<StructureTemplatePool>,
+            biomes: HolderSet<Biome>,
+            spawnOverrides: Map<MobCategory, StructureSpawnOverride> = mapOf(),
+            step: GenerationStep.Decoration = GenerationStep.Decoration.SURFACE_STRUCTURES,
+            terrainAdaptation: TerrainAdjustment = TerrainAdjustment.NONE,
+            startJigsawName: ResourceLocation? = null,
+            size: Int = 7,
+            startHeight: HeightProvider = ConstantHeight.ZERO,
+            useExpansionHack: Boolean = false,
+            projectStartToHeightmap: Heightmap.Types? = Heightmap.Types.WORLD_SURFACE_WG,
+            maxDistanceToCenter: Int = 80,
+            poolAliases: List<PoolAliasBinding> = listOf(),
+            forcePosUsesY: Boolean = true,
+            forcePosOffset: Vec3i = Vec3i.ZERO,
+            defaultRotation: Rotation? = null,
+            useRotationInDefaultPlacement: Boolean = false,
+        ): ForcePosJigsawStructure {
+            return ForcePosJigsawStructure(
+                StructureSettings(biomes, spawnOverrides, step, terrainAdaptation),
+                startPool, Optional.ofNullable(startJigsawName), size, startHeight, useExpansionHack,
+                Optional.ofNullable(projectStartToHeightmap), maxDistanceToCenter, poolAliases, forcePosUsesY,
+                forcePosOffset, defaultRotation, useRotationInDefaultPlacement
+            )
+        }
+
         val CODEC: MapCodec<ForcePosJigsawStructure> = CodecCrossVer.inst.validateCodec(
             // Kotlin compilation fails without <ForcePosJigsawStructure> below, even if Intellij says it can be removed
             RecordCodecBuilder.mapCodec { builder ->
