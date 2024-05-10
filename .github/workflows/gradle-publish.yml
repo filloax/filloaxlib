@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'master'
+      - 'release/1.20.6'
 
 #Environment variables that can later be referenced using ${{ env.MINECRAFT_VERSION }}. These are useful for repeating information and allow for quick changes for new mod updates
 env: 
