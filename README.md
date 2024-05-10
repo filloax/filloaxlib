@@ -1,6 +1,9 @@
 Simple Kotlin library for Minecraft Fabric that contains some handy functions for mods I worked in.
 
 
+IMPORTANT: jitpack in current version doesn't seem to work properly, its version doesn't properly work in some inheritances (like FxSavedData)
+while local versions do.
+
 To use in your project use [JitPack](https://jitpack.io/#filloax/fx-lib), like this:
 
 1. Add Jitpack repository to build.gradle.
@@ -28,13 +31,17 @@ dependencies {
 Guide is also in the JitPack link. The first time a version gets downloaded (globally) it will likely time out as
 JitPack still needs to build it.
 
-Uses template [Paramita](https://github.com/3TUSK/Paramita) as base, and also Botania's structure for
-cross-loader development. Feel free to use this as a Kotlin multi-version/loader minecraft mod project template, 
-even if it's not comprehensive at the moment (but adding new versions should be simple enough).
-
 ---
 
 ## Source code structure
+
+Base module is shared code between fabric and in the future forge. Used to use a multi-version setup, canned for simplicity, we now have a branch per version. (Below details of old version)
+
+<details>
+
+Uses template [Paramita](https://github.com/3TUSK/Paramita) as base, and also Botania's structure for
+cross-loader development. Feel free to use this as a Kotlin multi-version/loader minecraft mod project template, 
+even if it's not comprehensive at the moment (but adding new versions should be simple enough).
 
 - **shared** contains code that does not depend on a specific Minecraft version (and so, Minecraft classes in general).
   So, classes that are only used by other modules without referencing MC directly.
@@ -48,3 +55,4 @@ Use java 21 as the gradle JVM.
 Internally: rework the multi-project layout to use a common 
 plugin to configure subprojects instead of a huge subprojects {}
 block in the root build.gradle.kts
+</details>
