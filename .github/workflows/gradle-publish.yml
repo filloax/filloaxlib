@@ -66,8 +66,8 @@ jobs:
       uses: Kir-Antipov/mc-publish@v3.3
       with:
         files: |
-          ${{env.MINECRAFT_VERSION}}-fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
-          ${{env.MINECRAFT_VERSION}}-fabric/build/libs/*-@(dev|sources|javadoc).jar
+          fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+          fabric/build/libs/*-@(dev|sources|javadoc).jar
 
         github-tag: "v${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}-fabric"
         github-token: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
