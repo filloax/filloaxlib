@@ -18,6 +18,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox
 import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.phys.Vec3
 import java.util.*
+import java.util.function.Predicate
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -280,3 +281,7 @@ fun BlockPos.withX(x: Int): BlockPos = BlockPos(x, this.y, this.z)
 fun BlockPos.withY(y: Int): BlockPos = BlockPos(this.x, y, this.z)
 fun BlockPos.withZ(z: Int): BlockPos = BlockPos(this.x, this.y, z)
 fun BlockPos.copy(x: Int = this.x, y: Int = this.y, z: Int = this.z) = BlockPos(x, y, z)
+
+val ALWAYS_TRUE: Predicate<Any> = Predicate<Any> { true }
+
+fun <T> alwaysTruePredicate(): (T) -> Boolean = { true }

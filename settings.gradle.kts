@@ -37,15 +37,7 @@ val modid: String by settings
 
 rootProject.name = modid
 
-val commonProjectName: String by settings
-
-// Dependencies in the sub-projects.
-// key-value means the key projects depends on the value project
-val projectDependencies by gradle.extra(mapOf(
-    "fabric" to setOf("base"),
-    "base" to setOf(commonProjectName),
-))
-
-val allProjects = (projectDependencies.keys + projectDependencies.values.flatten()).toSet()
-
-allProjects.forEach(::include)
+listOf(
+    "base",
+    "fabric"
+).forEach { include(it) }
