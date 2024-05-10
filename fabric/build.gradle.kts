@@ -104,6 +104,24 @@ tasks.processResources {
     }
 }
 
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+            groupId = project.group.toString()
+            artifactId = project.archivesName.get()
+            version = project.version.toString()
+            println("MAVEN: $groupId $artifactId $version")
+        }
+    }
+
+    // select the repositories you want to publish to
+    repositories {
+        // uncomment to publish to the local maven
+        mavenLocal()
+    }
+}
+
 /*
 tasks.register("curseforge", TaskPublishCurseForge::class) {
     disableVersionDetection()
