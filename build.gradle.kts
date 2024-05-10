@@ -21,7 +21,6 @@ plugins {
 //val projectDependencies: Map<String, String> by extra
 //(settings["projectDependencies"] as Map<String, String>).forEach(::println)
 val projectDependencies: Map<String, Set<String>> by gradle.extra
-val projectJavaVersions: Map<Int, Set<String>> by gradle.extra
 
 fun getProjectsToInclude(forProject: String): Set<String> {
     var current = setOf(forProject)
@@ -40,6 +39,7 @@ repositories {
     mavenCentral()
 }
 
+val javaVersion: Int = (property("javaVersion")!! as String).toInt()
 val versionProp = property("mod_version") as String
 val groupProp = property("maven_group") as String
 val modid: String by project
@@ -47,6 +47,8 @@ val archivesBaseNameProp = property("archives_base_name") as String
 val authorProp = property("author") as String
 val debugDependencies = property("debugDependencies") == "true"
 val commonProjectName: String by project
+
+val javaVersionEnum = JavaVersion.values().find { it.majorVersion == javaVersion.toString() } ?: throw Exception("Cannot find java version for $javaVersion")
 
 tasks.register("modVersion") {
     println("VERSION=$versionProp")
@@ -103,8 +105,6 @@ subprojects {
 //        plugin("com.modrinth.minotaur")
 //        plugin("net.darkhax.curseforgegradle")
     }
-
-    val javaVersion = projectJavaVersions.filter { it.value.contains(name) }.keys.firstOrNull() ?: throw IllegalStateException("No java version set for $name")
 
     java {
         toolchain {

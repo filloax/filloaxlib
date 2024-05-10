@@ -1,4 +1,6 @@
 // Multi-project setup start
+// Note: as multi-version was more trouble than it was worth, I switched to a simpler one-version-per-branch setup
+// Things are still leftover from the other setup
 
 pluginManagement {
     repositories {
@@ -39,18 +41,9 @@ val commonProjectName: String by settings
 
 // Dependencies in the sub-projects.
 // key-value means the key projects depends on the value project
-// and should include its sources.
-// For example, 1.20.4-fabric depends on 1.20.4-base, which depends on 1.20.x-base, etc
 val projectDependencies by gradle.extra(mapOf(
-    "1.20.6-fabric" to setOf("1.20.6-base"),
-    "1.20.6-base" to setOf(commonProjectName),
-    "1.20.4-fabric" to setOf("1.20.4-base"),
-    "1.20.4-base" to setOf(commonProjectName),
-))
-
-val projectJavaVersions by gradle.extra(mapOf(
-    17 to setOf(commonProjectName, "1.20.x-base", "1.20.4-base", "1.20.4-fabric"),
-    21 to setOf("1.20.6-base", "1.20.6-fabric"),
+    "fabric" to setOf("base"),
+    "base" to setOf(commonProjectName),
 ))
 
 val allProjects = (projectDependencies.keys + projectDependencies.values.flatten()).toSet()
