@@ -40,10 +40,7 @@ import java.util.stream.Stream;
 
 @Mixin(StructureManager.class)
 public abstract class StructureManagerTrackMixin implements ServerLevelAccessor {
-    /* Not sure if the mixins here + in ChunkGenerator cover all necessary things
-     * for structure checks, but it's enough for after-worldgen usecases
-     * which is most of the relevant ones in this case.
-     */
+    /* Covers checking if inside a structure for achievements etc */
 
     @Unique
     private final static Map<Structure, LongSet> EMPTY_MAP = Map.of();

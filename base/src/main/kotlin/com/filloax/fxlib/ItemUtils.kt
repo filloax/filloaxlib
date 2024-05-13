@@ -43,14 +43,14 @@ private class LoreListProxy(val itemStack: ItemStack): AbstractMutableList<Compo
     }
 
     private fun <T> updateLore(updateLinesFunction: (MutableList<Component>) -> T): T {
-        val list = lore().styledLines.toMutableList()
+        val list = ArrayList(lore().styledLines)
         val out = updateLinesFunction(list)
         val newLore = ItemLore(list)
         itemStack[DataComponents.LORE] = newLore
         return out
     }
 
-    override val size: Int = lore().styledLines.size
+    override val size: Int get() = lore().styledLines.size
 
     override fun get(index: Int): Component = lore().styledLines[index]
     override fun removeAt(index: Int): Component = updateLore { it.removeAt(index) }

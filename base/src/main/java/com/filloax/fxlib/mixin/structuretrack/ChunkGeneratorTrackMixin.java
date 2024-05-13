@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 @Mixin(ChunkGenerator.class)
+// Currently DISABLED as this led to more issues than it was worth, meaning fixedstructures won't be findable with /locate and similar
+// (most usecases will use it directly anyways)
 public abstract class ChunkGeneratorTrackMixin {
     @WrapOperation(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/ChunkGeneratorStructureState;getPlacementsForStructure(Lnet/minecraft/core/Holder;)Ljava/util/List;"),
             method = "findNearestMapStructure")
