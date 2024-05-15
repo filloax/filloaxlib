@@ -1,5 +1,6 @@
 package com.filloax.fxlib
 
+import com.filloax.fxlib.api.ScheduledServerTask
 import com.filloax.fxlib.platform.fxLibEvents
 import com.filloax.fxlib.structure.FixedStructureGenerationImpl
 

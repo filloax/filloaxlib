@@ -2,11 +2,15 @@ package com.filloax.fxlib.structure
 
 import com.filloax.fxlib.FxLib
 import com.filloax.fxlib.UnknownStructureIdException
-import com.filloax.fxlib.codec.mutableSetCodec
-import com.filloax.fxlib.ScheduledServerTask
-import com.filloax.fxlib.savedata.FxSavedData
-import com.filloax.fxlib.savedata.FxSavedData.Companion.loadData
-import com.filloax.fxlib.structure.tracking.CustomPlacedStructureTracker
+import com.filloax.fxlib.api.ScheduledServerTask
+import com.filloax.fxlib.api.codec.mutableSetOf
+import com.filloax.fxlib.api.savedata.FxSavedData
+import com.filloax.fxlib.api.savedata.FxSavedData.Companion.loadData
+import com.filloax.fxlib.api.structure.FixablePosition
+import com.filloax.fxlib.api.structure.FixableRotation
+import com.filloax.fxlib.api.structure.FixedStructureGeneration
+import com.filloax.fxlib.api.structure.StructureSpawnData
+import com.filloax.fxlib.api.structure.tracking.CustomPlacedStructureTracker
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.BlockPos
@@ -222,7 +226,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
         companion object {
             val CODEC: Codec<Save> = RecordCodecBuilder.create { builder ->
                 builder.group(
-                    mutableSetCodec(Codec.STRING).optionalFieldOf("generatedSpawns", mutableSetOf()).forGetter{it.generatedSpawns}
+                    Codec.STRING.mutableSetOf().optionalFieldOf("generatedSpawns", mutableSetOf()).forGetter{it.generatedSpawns}
                 ).apply(builder, FixedStructureGenerationImpl::Save)
             }
             val DEF = define("FixedStructureGeneration", FixedStructureGenerationImpl::Save, CODEC)

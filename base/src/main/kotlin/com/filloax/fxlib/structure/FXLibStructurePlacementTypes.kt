@@ -1,9 +1,7 @@
 package com.filloax.fxlib.structure
 
-import com.filloax.fxlib.FXLibUtils.resLoc
-import com.filloax.fxlib.platform.getPlatformAbstractions
-import com.filloax.fxlib.structure.tracking.FixedStructurePlacement
-import com.mojang.serialization.MapCodec
+import com.filloax.fxlib.InternalUtils.resLoc
+import com.filloax.fxlib.api.structure.tracking.FixedStructurePlacement
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType

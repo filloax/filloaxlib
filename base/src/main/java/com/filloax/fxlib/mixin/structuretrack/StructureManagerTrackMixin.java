@@ -1,7 +1,7 @@
 package com.filloax.fxlib.mixin.structuretrack;
 
-import com.filloax.fxlib.structure.tracking.CustomPlacedStructureTracker;
-import com.filloax.fxlib.structure.tracking.PlacedStructureData;
+import com.filloax.fxlib.api.structure.tracking.CustomPlacedStructureTracker;
+import com.filloax.fxlib.api.structure.tracking.PlacedStructureData;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
