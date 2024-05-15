@@ -1,6 +1,5 @@
 package com.filloax.fxlib
 
-import com.filloax.fxlib.platform.getPlatformAbstractions
 import com.mojang.datafixers.util.Either
 import net.minecraft.core.BlockPos
 import net.minecraft.core.BlockPos.MutableBlockPos
@@ -24,33 +23,130 @@ import kotlin.math.max
 import kotlin.math.min
 
 
-val platformAbstractions = getPlatformAbstractions()
-
-fun getServer() = platformAbstractions.getServer()
-
-fun getStructTagOrKey(structureId: String): Either<TagKey<Structure>, ResourceKey<Structure>> {
-    return if (structureId.startsWith("#")) {
-        Either.left(TagKey.create(Registries.STRUCTURE, ResourceLocation(structureId.replaceFirst("#", ""))))
-    }
-    else {
-        Either.right(ResourceKey.create(Registries.STRUCTURE, ResourceLocation(structureId)))
-    }
-}
-
-fun getYAtXZ(level: ServerLevel, x: Int, z: Int, heightmap: Heightmap.Types = Heightmap.Types.MOTION_BLOCKING): Int {
-    val samplePos = BlockPos(x, 64, z)
-    return level.getChunk(samplePos).getHeight(heightmap, x, z)
-}
-
 private val defaultRandom = RandomSource.create()
 
-fun <T>weightedRandom(items: Collection<T>, getWeight: (T) -> Float, random: RandomSource = defaultRandom): T {
-    assert(items.isNotEmpty()) { "The collection must not be empty!" }
+/**
+ * Misc utils that do not directly fit as extension methods,
+ * also available as package functions
+ */
+object FxUtils {
+    @JvmStatic
+    fun getServer() = FxLibServices.platform.getServer()
 
-    val totalWeight = items.sumOf { getWeight(it).toDouble() }
+    /**
+     * Decode structure key/tag string as found in commands, data, etc.
+     */
+    @JvmStatic
+    fun getStructTagOrKey(structureId: String): Either<TagKey<Structure>, ResourceKey<Structure>> {
+        return if (structureId.startsWith("#")) {
+            Either.left(TagKey.create(Registries.STRUCTURE, ResourceLocation(structureId.replaceFirst("#", ""))))
+        }
+        else {
+            Either.right(ResourceKey.create(Registries.STRUCTURE, ResourceLocation(structureId)))
+        }
+    }
+
+    @JvmStatic
+    fun <T> concatIterators(firstIterator: Iterator<T>, vararg iterators: Iterator<T>): Iterator<T> {
+        return ConcatenatedIterator(firstIterator, *iterators)
+    }
+
+    @JvmField
+    val ALWAYS_TRUE: Predicate<Any> = Predicate<Any> { true }
+    @JvmStatic
+    fun <T> alwaysTruePredicate(): (T) -> Boolean = { true }
+}
+
+// Package functions
+
+fun getServer() = FxUtils.getServer()
+/**
+ * Decode structure key/tag string as found in commands, data, etc.
+ */
+fun getStructTagOrKey(structureId: String) = FxUtils.getStructTagOrKey(structureId)
+fun <T> concatIterators(firstIterator: Iterator<T>, vararg iterators: Iterator<T>) = FxUtils.concatIterators(firstIterator, *iterators)
+val ALWAYS_TRUE: Predicate<Any> = Predicate<Any> { true }
+
+fun <T> alwaysTruePredicate(): (T) -> Boolean = { true }
+
+
+// Extension functions
+
+fun Level.getYAtXZ(x: Int, z: Int, heightmap: Heightmap.Types = Heightmap.Types.MOTION_BLOCKING): Int {
+    val samplePos = BlockPos(x, 64, z)
+    return getChunk(samplePos).getHeight(heightmap, x, z)
+}
+fun Level.getPosAtXZ(x: Int, z: Int, heightmap: Heightmap.Types = Heightmap.Types.MOTION_BLOCKING): BlockPos {
+    return BlockPos(x, getYAtXZ(x, z, heightmap), z)
+}
+
+/**
+ * Find nearest free position from a block pos, stopping if nothing is found within 200 blocks
+ */
+fun Level.nearestFreePosition(from: BlockPos, aboveSolid: Boolean = false, onlyAbove: Boolean = false): BlockPos? {
+    val maxRange = 200
+    val visited = mutableSetOf<BlockPos>()
+    val queue = PriorityQueue<BlockPos> { a, b ->
+        val distA = distanceSquared(from, a)
+        val distB = distanceSquared(from, b)
+        distA.compareTo(distB)
+    }
+
+    visited.add(from)
+    queue.add(from)
+
+    while (queue.isNotEmpty()) {
+        val current = queue.poll()
+
+        if (
+            getBlockState(current).isAir
+            && (!aboveSolid || getBlockState(current.below()).blocksMotion())
+        ) {
+            return current
+        }
+
+        if (visited.size >= maxRange) {
+            return null
+        }
+
+        for (dx in -1..1) {
+            for (dy in -1..1) {
+                for (dz in -1..1) {
+                    if (dx == 0 && dy == 0 && dz == 0) {
+                        continue
+                    }
+
+                    val neighbor = BlockPos(current.x + dx, current.y + dy, current.z + dz)
+                    if (!visited.contains(neighbor)) {
+                        if (onlyAbove && neighbor.y < from.y) {
+                            continue
+                        }
+
+                        visited.add(neighbor)
+                        queue.add(neighbor)
+                    }
+                }
+            }
+        }
+    }
+
+    return null
+}
+
+private fun distanceSquared(a: BlockPos, b: BlockPos): Int {
+    val dx = a.x - b.x
+    val dy = a.y - b.y
+    val dz = a.z - b.z
+    return dx * dx + dy * dy + dz * dz
+}
+
+fun <T> Collection<T>.weightedRandom(getWeight: (T) -> Float, random: RandomSource = defaultRandom): T {
+    assert(this.isNotEmpty()) { "The collection must not be empty!" }
+
+    val totalWeight = this.sumOf { getWeight(it).toDouble() }
     var randomValue = random.nextDouble() * totalWeight
 
-    for (item in items) {
+    for (item in this) {
         val weight = getWeight(item)
         if (randomValue < weight) {
             return item
@@ -61,15 +157,8 @@ fun <T>weightedRandom(items: Collection<T>, getWeight: (T) -> Float, random: Ran
     throw IllegalStateException("Weighted random selection failed.")
 }
 
-fun secondsToTicks(seconds: Float): Int {
-    return floor(seconds * 20).toInt()
-}
-
-fun iterBlocks(volume: BoundingBox) = BlockVolumeIterator(volume)
-
-fun iterBlocks(volume: BoundingBox, action: (BlockPos) -> Unit) {
-    iterBlocks(volume).forEach(action)
-}
+fun BoundingBox.iterBlocks() = BlockVolumeIterator(this)
+fun BoundingBox.iterBlocks(action: (BlockPos) -> Unit) = BlockVolumeIterator(this).forEach(action)
 
 class BlockVolumeIterator(val volume: BoundingBox) : Iterator<BlockPos> {
     var current = MutableBlockPos(volume.minX(), volume.minY(), volume.minZ())
@@ -110,66 +199,6 @@ fun BoundingBox.clip(minX: Int = Int.MIN_VALUE, minY: Int = Int.MIN_VALUE, minZ:
  */
 fun BoundingBox.clip(other: BoundingBox): BoundingBox {
     return clip(other.minX(), other.minY(), other.minZ(), other.maxX(), other.maxY(), other.maxZ())
-}
-
-/**
- * Find nearest free position from a block pos, stopping if nothing is found within 200 blocks
- */
-fun nearestFreePosition(level: Level, from: BlockPos, aboveSolid: Boolean = false, onlyAbove: Boolean = false): BlockPos? {
-    val maxRange = 200
-    val visited = mutableSetOf<BlockPos>()
-    val queue = PriorityQueue<BlockPos> { a, b ->
-        val distA = distanceSquared(from, a)
-        val distB = distanceSquared(from, b)
-        distA.compareTo(distB)
-    }
-
-    visited.add(from)
-    queue.add(from)
-
-    while (queue.isNotEmpty()) {
-        val current = queue.poll()
-
-        if (
-            level.getBlockState(current).isAir
-            && (!aboveSolid || level.getBlockState(current.below()).blocksMotion())
-        ) {
-            return current
-        }
-
-        if (visited.size >= maxRange) {
-            return null
-        }
-
-        for (dx in -1..1) {
-            for (dy in -1..1) {
-                for (dz in -1..1) {
-                    if (dx == 0 && dy == 0 && dz == 0) {
-                        continue
-                    }
-
-                    val neighbor = BlockPos(current.x + dx, current.y + dy, current.z + dz)
-                    if (!visited.contains(neighbor)) {
-                        if (onlyAbove && neighbor.y < from.y) {
-                            continue
-                        }
-
-                        visited.add(neighbor)
-                        queue.add(neighbor)
-                    }
-                }
-            }
-        }
-    }
-
-    return null
-}
-
-private fun distanceSquared(a: BlockPos, b: BlockPos): Int {
-    val dx = a.x - b.x
-    val dy = a.y - b.y
-    val dz = a.z - b.z
-    return dx * dx + dy * dy + dz * dz
 }
 
 /**
@@ -240,10 +269,6 @@ class ConcatenatedIterator<T>(private vararg val iterators: Iterator<T>) : Itera
     }
 }
 
-fun <T> concatIterators(firstIterator: Iterator<T>, vararg iterators: Iterator<T>): Iterator<T> {
-    return ConcatenatedIterator(firstIterator, *iterators)
-}
-
 fun Long.ticksToSeconds(): Float {
     return this / 20f
 }
@@ -259,6 +284,10 @@ fun Long.ticksToTimecode(): String {
 
 fun Int.ticksToSeconds(): Float {
     return this / 20f
+}
+
+fun Float.secondsToTicks(): Int {
+    return floor(this * 20).toInt()
 }
 
 fun Vec3i.rotate(rotation: Rotation): Vec3i {
@@ -281,7 +310,3 @@ fun BlockPos.withX(x: Int): BlockPos = BlockPos(x, this.y, this.z)
 fun BlockPos.withY(y: Int): BlockPos = BlockPos(this.x, y, this.z)
 fun BlockPos.withZ(z: Int): BlockPos = BlockPos(this.x, this.y, z)
 fun BlockPos.copy(x: Int = this.x, y: Int = this.y, z: Int = this.z) = BlockPos(x, y, z)
-
-val ALWAYS_TRUE: Predicate<Any> = Predicate<Any> { true }
-
-fun <T> alwaysTruePredicate(): (T) -> Boolean = { true }

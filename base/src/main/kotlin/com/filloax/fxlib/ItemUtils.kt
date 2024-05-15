@@ -19,14 +19,28 @@ import net.minecraft.world.item.component.ItemLore
 import net.minecraft.world.item.component.WritableBookContent
 import net.minecraft.world.item.component.WrittenBookContent
 
-fun itemFromId(id: String): Item {
-    return itemFromId(ResourceLocation(id))
+object ItemUtils {
+    @JvmStatic
+    fun itemFromId(id: String): Item {
+        return itemFromId(ResourceLocation(id))
+    }
+
+    @JvmStatic
+    fun itemFromId(id: ResourceLocation): Item {
+        return BuiltInRegistries.ITEM.get(id)
+    }
+
+    @JvmStatic
+    fun createWrittenBook(title: Component, author: Component, pages: List<Component>): ItemStack {
+        val book = ItemStack(Items.WRITTEN_BOOK)
+        book.setBookTags(title, author, pages)
+        return book
+    }
 }
 
-fun itemFromId(id: ResourceLocation): Item {
-    return BuiltInRegistries.ITEM.get(id)
-}
-
+fun itemFromId(id: String) = ItemUtils.itemFromId(id)
+fun itemFromId(id: ResourceLocation) = ItemUtils.itemFromId(id)
+fun createWrittenBook(title: Component, author: Component, pages: List<Component>) = ItemUtils.createWrittenBook(title, author, pages)
 
 /**
  * Get lore lines as mutable list string, whose changes are reflected on the item tags
@@ -58,11 +72,6 @@ private class LoreListProxy(val itemStack: ItemStack): AbstractMutableList<Compo
     override fun add(index: Int, element: Component) = updateLore { it.add(index, element) }
 }
 
-fun createWrittenBook(title: Component, author: Component, pages: List<Component>): ItemStack {
-    val book = ItemStack(Items.WRITTEN_BOOK)
-    book.setBookTags(title, author, pages)
-    return book
-}
 
 fun ItemStack.setBookTags(title: String?, author: String?, pages: List<Component>) {
     if (`is`(Items.WRITABLE_BOOK)) {
