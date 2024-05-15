@@ -1,6 +1,6 @@
 package com.filloax.fxlib.mixin;
 
-import com.filloax.fxlib.structure.FixablePosition;
+import com.filloax.fxlib.api.structure.FixablePosition;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;

@@ -1,8 +1,8 @@
 package com.filloax.fxlib.mixin.structuretrack;
 
 import com.filloax.fxlib.FxLib;
-import com.filloax.fxlib.structure.tracking.CustomPlacedStructureTracker;
-import com.filloax.fxlib.structure.tracking.FixedStructurePlacement;
+import com.filloax.fxlib.api.structure.tracking.CustomPlacedStructureTracker;
+import com.filloax.fxlib.api.structure.tracking.FixedStructurePlacement;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import com.filloax.fxlib.structure.tracking.PlacedStructureData;
+import com.filloax.fxlib.api.structure.tracking.PlacedStructureData;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;

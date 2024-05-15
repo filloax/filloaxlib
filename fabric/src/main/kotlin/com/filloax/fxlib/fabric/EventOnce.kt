@@ -1,8 +1,7 @@
 package com.filloax.fxlib.fabric
 
 import com.filloax.fxlib.*
-import com.filloax.fxlib.nbt.*
-import com.filloax.fxlib.codec.*
+import com.filloax.fxlib.api.removeAllCountDuplicates
 import net.fabricmc.fabric.api.event.Event
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents

@@ -1,7 +1,7 @@
 package com.filloax.fxlib.structure
 
-import com.filloax.fxlib.FXLibUtils
-import com.filloax.fxlib.platform.getPlatformAbstractions
+import com.filloax.fxlib.InternalUtils
+import com.filloax.fxlib.api.structure.ForcePosJigsawStructure
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.StructureType
@@ -13,7 +13,7 @@ object FXLibStructures {
     val JIGSAW_FORCE_POS = makeType("jigsaw_forced_pos") { ForcePosJigsawStructure.CODEC }
 
     private fun <T : Structure> makeType(name: String, type: StructureType<T>): StructureType<T> {
-        val id = FXLibUtils.resLoc(name)
+        val id = InternalUtils.resLoc(name)
         allTypes[id] = type
         return type
     }
