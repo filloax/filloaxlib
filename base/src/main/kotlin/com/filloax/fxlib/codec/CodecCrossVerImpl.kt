@@ -1,5 +1,6 @@
 package com.filloax.fxlib.codec
 
+import com.filloax.fxlib.api.codec.CodecCrossVer
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import java.util.*

@@ -1,6 +1,5 @@
 package com.filloax.fxlib.api.platform
 
-import com.filloax.fxlib.platform.ServiceUtil
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity

@@ -3,7 +3,7 @@ package com.filloax.fxlib.api.structure
 import com.filloax.fxlib.*
 import com.filloax.fxlib.api.codec.forNullableGetter
 import com.filloax.fxlib.api.rotate
-import com.filloax.fxlib.codec.*
+import com.filloax.fxlib.api.codec.*
 import com.filloax.fxlib.structure.FXLibStructures
 import com.google.common.collect.Lists
 import com.mojang.serialization.Codec

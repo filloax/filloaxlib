@@ -1,7 +1,7 @@
 package com.filloax.fxlib.api.entity
 
 import com.filloax.fxlib.entity.SynchedEntityDataDelegate
-import com.filloax.fxlib.interfaces.WithPersistentData
+import com.filloax.fxlib.api.interfaces.WithPersistentData
 import com.filloax.fxlib.api.platform.getPlatformAbstractions
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor

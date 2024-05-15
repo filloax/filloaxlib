@@ -1,4 +1,4 @@
-package com.filloax.fxlib.fabric
+package com.filloax.fxlib.api.fabric
 
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.minecraft.resources.ResourceLocation

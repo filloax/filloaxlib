@@ -1,7 +1,8 @@
-package com.filloax.fxlib.codec;
+package com.filloax.fxlib.api.codec;
 
 import com.mojang.serialization.Codec;
 import kotlin.reflect.KCallable;
+import kotlin.reflect.KClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;

@@ -12,7 +12,7 @@ import net.minecraft.world.item.component.ItemLore
 import net.minecraft.world.item.component.WritableBookContent
 import net.minecraft.world.item.component.WrittenBookContent
 
-object ItemUtils {
+object FxItemUtils {
     @JvmStatic
     fun itemFromId(id: String): Item {
         return itemFromId(ResourceLocation(id))
@@ -31,10 +31,10 @@ object ItemUtils {
     }
 }
 
-fun itemFromId(id: String) = ItemUtils.itemFromId(id)
-fun itemFromId(id: ResourceLocation) = ItemUtils.itemFromId(id)
+fun itemFromId(id: String) = FxItemUtils.itemFromId(id)
+fun itemFromId(id: ResourceLocation) = FxItemUtils.itemFromId(id)
 fun createWrittenBook(title: Component, author: Component, pages: List<Component>) =
-    ItemUtils.createWrittenBook(title, author, pages)
+    FxItemUtils.createWrittenBook(title, author, pages)
 
 /**
  * Get lore lines as mutable list string, whose changes are reflected on the item tags

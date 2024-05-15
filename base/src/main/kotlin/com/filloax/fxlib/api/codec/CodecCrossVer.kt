@@ -1,6 +1,7 @@
-package com.filloax.fxlib.codec
+package com.filloax.fxlib.api.codec
 
-import com.filloax.fxlib.platform.ServiceUtil
+import com.filloax.fxlib.api.platform.ServiceUtil
+import com.filloax.fxlib.codec.CodecCrossVerImpl
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.MapCodec
 import java.util.*
@@ -12,6 +13,6 @@ interface CodecCrossVer {
     fun <T> validateCodec(codec: MapCodec<T>, checker: (T) -> DataResult<T>): MapCodec<T>
 
     companion object {
-        val inst = ServiceUtil.findService(CodecCrossVer::class.java)
+        val inst = CodecCrossVerImpl()
     }
 }

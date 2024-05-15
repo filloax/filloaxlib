@@ -1,6 +1,7 @@
 package com.filloax.fxlib.api.structure
 
-import com.filloax.fxlib.platform.ServiceUtil
+import com.filloax.fxlib.api.platform.ServiceUtil
+import com.filloax.fxlib.structure.FixedStructureGenerationImpl
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceKey
@@ -71,4 +72,4 @@ data class StructureSpawnData(
     val force: Boolean = false
 )
 
-fun getFixedStructureGeneration(): FixedStructureGeneration = ServiceUtil.findService(FixedStructureGeneration::class.java)
+fun getFixedStructureGeneration(): FixedStructureGeneration = FixedStructureGenerationImpl
