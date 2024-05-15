@@ -1,4 +1,4 @@
-package com.filloax.fxlib.interfaces;
+package com.filloax.fxlib.api.interfaces;
 
 import net.minecraft.nbt.CompoundTag;
 

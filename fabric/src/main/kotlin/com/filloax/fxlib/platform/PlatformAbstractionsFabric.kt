@@ -2,7 +2,7 @@ package com.filloax.fxlib.platform
 
 import com.filloax.fxlib.MixinHelpersFabric
 import com.filloax.fxlib.api.platform.PlatformAbstractions
-import com.filloax.fxlib.fabric.EventOnce
+import com.filloax.fxlib.api.fabric.EventOnce
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.loader.api.FabricLoader

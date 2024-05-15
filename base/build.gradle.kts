@@ -1,81 +1,44 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    id("org.spongepowered.gradle.vanilla")
-    id("com.github.johnrengelman.shadow")
+    id("multiloader-convention")
+
+    alias(libs.plugins.vanillagradle)
 }
 
-val minecraftVersion: String by project
+val modid: String by project
+val modVersion = libs.versions.modversion.get()
+val minecraftVersion = libs.versions.minecraft.asProvider().get()
+
+version = "$modVersion-${minecraftVersion}-base"
+
+base {
+    archivesName = modid
+}
 
 minecraft {
     version(minecraftVersion)
-
-    // Used only in dev, in actual mod uses the platform AW
-    accessWideners("src/main/resources/fxlib_base.accesswidener")
-}
-
-repositories {
-    mavenCentral()
-    maven("https://api.modrinth.com/maven")
-    maven {
-        name = "ParchmentMC"
-        url = uri("https://maven.parchmentmc.org")
-    }
-}
-
-val modVersion: String by project
-val mavenGroup: String by project
-val modid: String by project
-val baseName: String by project
-val author: String by project
-
-val mixinVersion: String by project
-val mixinExtrasVersion: String by project
-val kotlinVersion: String by project
-val kotlinxSerializationVersion: String by project
-
-version = "$modVersion-${minecraftVersion}-base"
-group = mavenGroup
-
-base {
-    archivesName = baseName
+    accessWideners(file("src/main/resources/${modid}.accesswidener"))
 }
 
 dependencies {
-    compileOnly("org.spongepowered:mixin:$mixinVersion")
+    implementation( libs.jsr305 )
 
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
+    implementation( libs.kotlin.stdlib )
+    implementation( libs.kotlin.reflect )
+    implementation( libs.kotlin.serialization )
 
-    compileOnly("io.github.llamalad7:mixinextras-common:$mixinExtrasVersion")
+    compileOnly( libs.mixin )
+    compileOnly( libs.mixinextras.common )
 }
 
-tasks.processResources {
-    exclude(".cache")
-    inputs.property("version", project.version)
-}
-
-// Figure this out when needed
-//sourceSets.main.get().resources {
-//    source(SourceDirectorySet("src/generated/resources"))
-//}
-
-//tasks.named("modrinth") {
-//    enabled = false
-//}
-
-tasks.named<Jar>("jar") {
-    manifest {
-        attributes(
-            mapOf(
-                "Specification-Title" to modid,
-                "Specification-Version" to modVersion,
-                "Specification-Vendor" to author,
-                "Implementation-Title" to modid,
-                "Implementation-Version" to version,
-                "Implementation-Vendor" to author,
-            )
-        )
+publishing {
+    publishing {
+        publications {
+            create<MavenPublication>(modid) {
+                from(components["java"])
+                artifactId = base.archivesName.get()
+            }
+        }
     }
 }
+
+sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/resources"))

@@ -1,6 +1,6 @@
 package com.filloax.fxlib
 
-import com.filloax.fxlib.fabric.EventOnce
+import com.filloax.fxlib.api.fabric.EventOnce
 import com.filloax.fxlib.platform.fxLibEvents
 import com.filloax.fxlib.structure.FXLibStructurePlacementTypes
 import com.filloax.fxlib.structure.FXLibStructures

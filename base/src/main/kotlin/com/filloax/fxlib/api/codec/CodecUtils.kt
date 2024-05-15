@@ -1,8 +1,6 @@
 package com.filloax.fxlib.api.codec
 
 import com.filloax.fxlib.FxLib
-import com.filloax.fxlib.codec.CodecCrossVer
-import com.filloax.fxlib.codec.CodecUtils
 import com.google.gson.JsonElement
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
@@ -91,12 +89,15 @@ fun <T: Any, O> MapCodec<Optional<T>>.forNullableGetter(getter: (O) -> T?): Reco
     return forGetter{ Optional.ofNullable(getter(it)) }
 }
 
-/** Easier way to call the JVM one, uses the primary constructor */
-fun <T: Any> constructorWithOptionals(kClass: KClass<T>): CodecUtils.ConstructorProxy<T> {
+private fun <T: Any> constructorWithOptionalsProxy(kClass: KClass<T>): CodecUtils.ConstructorProxy<T> {
     return CodecUtils.constructorWithOptionals(kClass.primaryConstructor?.javaConstructor
         ?: throw java.lang.IllegalArgumentException("No primary constructor in class! $kClass")
     )
 }
+
+/** Easier way to call the JVM one, uses the primary constructor */
+fun <T: Any> KClass<T>.constructorWithOptionals() =
+    constructorWithOptionalsProxy(this)
 
 fun simpleCodecErr(name: String): (String) -> Unit = {
     FxLib.logger.error("Error in codec $name: $it")

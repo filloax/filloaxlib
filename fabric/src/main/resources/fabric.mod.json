@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "id": "fxlib",
-  "version": "${version}",
-  "name": "FxLib",
-  "description": "Assorted utilities for Filloax's mods",
-  "authors": ["Filloax"],
+  "id": "${mod_id}",
+  "version": "${version_prefix}-fabric",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": ["${author}"],
   "contributors": [],
   "contact": {},
-  "license": "MIT",
+  "license": "${license}",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -18,15 +18,16 @@
     ]
   },
   "mixins": [
-    "fxlib.mixins.json"
+    "${mod_id}.base.mixins.json",
+    "${mod_id}.mixins.json"
   ],
   "depends": {
-    "fabric-language-kotlin": ">=1.10.19+kotlin.1.9.23",
-    "fabricloader": ">=0.15.11",
-    "fabric-api": ">=0.97.8+1.20.6",
+    "fabric-language-kotlin": ">=${fabric_kotlin_version}",
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": ">=${fabric_api_version}",
     "fabric": "*"
   },
-  "accessWidener": "fxlib.accesswidener",
+  "accessWidener": "${mod_id}.accesswidener",
   "custom": {
     "modmenu": {
       "badges": [ "library" ]

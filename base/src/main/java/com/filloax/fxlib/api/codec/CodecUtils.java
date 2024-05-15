@@ -1,7 +1,8 @@
-package com.filloax.fxlib.codec;
+package com.filloax.fxlib.api.codec;
 
 import com.mojang.serialization.Codec;
 import kotlin.reflect.KCallable;
+import kotlin.reflect.KClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Constructor;
@@ -19,7 +20,7 @@ public class CodecUtils {
     }
 
     /**
-     * Java version of {@link CodecUtilsSharedKt#constructorWithOptionals(KCallable)} to
+     * Java version of {@link com.filloax.fxlib.api.codec.CodecUtilsKt#constructorWithOptionals(KClass)} to
      * work with mappings, as kotlin reflections seem to have issues with those at runtime.
      * Needs to have all parameters specified even if some would be optional, as a side effect.
      */

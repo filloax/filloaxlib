@@ -1,4 +1,4 @@
-package com.filloax.fxlib.platform;
+package com.filloax.fxlib.api.platform;
 
 // Originally from Botania https://botaniamod.net/license.html
 // Specifically https://github.com/VazkiiMods/Botania/blob/1.20.x/Xplat/src/main/java/vazkii/botania/api/ServiceUtil.java

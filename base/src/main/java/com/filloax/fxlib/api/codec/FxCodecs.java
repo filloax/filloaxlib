@@ -1,4 +1,4 @@
-package com.filloax.fxlib.codec;
+package com.filloax.fxlib.api.codec;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.Util;

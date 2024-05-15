@@ -1,6 +1,6 @@
 package com.filloax.fxlib.mixin.edata;
 
-import com.filloax.fxlib.interfaces.WithPersistentData;
+import com.filloax.fxlib.api.interfaces.WithPersistentData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
