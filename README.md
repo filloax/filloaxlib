@@ -35,24 +35,4 @@ JitPack still needs to build it.
 
 ## Source code structure
 
-Base module is shared code between fabric and in the future forge. Used to use a multi-version setup, canned for simplicity, we now have a branch per version. (Below details of old version)
-
-<details>
-
-Uses template [Paramita](https://github.com/3TUSK/Paramita) as base, and also Botania's structure for
-cross-loader development. Feel free to use this as a Kotlin multi-version/loader minecraft mod project template, 
-even if it's not comprehensive at the moment (but adding new versions should be simple enough).
-
-- **shared** contains code that does not depend on a specific Minecraft version (and so, Minecraft classes in general).
-  So, classes that are only used by other modules without referencing MC directly.
-- **\<version>-base** includes non mod-loader specific code that ideally should contain as much logic as possible
-- **\<version>-\<loader>** contains loader specific code.
-
-Use java 21 as the gradle JVM.
-
-## TODO
-
-Internally: rework the multi-project layout to use a common 
-plugin to configure subprojects instead of a huge subprojects {}
-block in the root build.gradle.kts
-</details>
+Uses [Favouriteless's template](https://github.com/Favouriteless/ML-Template), with added kotlin mod stuff.

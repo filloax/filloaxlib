@@ -1,20 +1,41 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("fabric-loom")
-    id("maven-publish")
+    id("multiloader-convention")
+
+    alias(libs.plugins.minotaur)
+    alias(libs.plugins.curseforgegradle)
+    alias(libs.plugins.loom)
+    alias(libs.plugins.kotlinserialization)
 }
 
-val minecraftVersion: String by project
 val modid: String by project
+val minecraftVersion = libs.versions.minecraft.asProvider().get()
 
 loom {
     splitEnvironmentSourceSets()
 
-    accessWidenerPath = file("src/main/resources/fxlib.accesswidener")
-    mixin.defaultRefmapName = "fxlib.refmap.json"
+    accessWidenerPath = project(":base").file("src/main/resources/${modid}.accesswidener")
+    mixin.defaultRefmapName = "${modid}.refmap.json"
 
+    runs {
+        named("client") {
+            configName = "Fabric Client"
+
+            client()
+            ideConfigGenerated(true)
+            runDir("runs/" + name)
+            programArg("--username=Dev")
+        }
+
+        named("server") {
+            configName = "Fabric Server"
+
+            server()
+            ideConfigGenerated(true)
+            runDir("runs/" + name)
+        }
+    }
 
     mods {
         register(modid) {
@@ -25,50 +46,41 @@ loom {
 }
 
 repositories {
-    mavenCentral()
-    maven("https://api.modrinth.com/maven")
     maven {
         name = "ParchmentMC"
         url = uri("https://maven.parchmentmc.org")
+        content {
+            includeGroupAndSubgroups("org.parchmentmc")
+        }
     }
 }
 
-val modVersion: String by project
-val mavenGroup: String by project
-val baseName: String by project
-val author: String by project
-
-val fabricKotlinVersion: String by project
-val parchmentVersion: String by project
-val fabricApiVersion: String by project
-val fabricLoaderVersion: String by project
+val modVersion = libs.versions.modversion.get()
+val parchmentMcVersion = libs.versions.parchment.minecraft.get()
+val parchmentVersion = libs.versions.parchment.asProvider().get()
 
 version = "$modVersion-${minecraftVersion}-fabric"
-group = mavenGroup
 
 base {
-    archivesName = baseName
+    archivesName = modid
 }
+
 
 val baseProject = project(":base")
 
 dependencies {
-    minecraft("com.mojang:minecraft:${minecraftVersion}")
-    //mappings("net.fabricmc:yarn:${property("yarnMappings")}:v2")
-    mappings(loom.layered() {
+    minecraft( libs.minecraft )
+    implementation( libs.jsr305 )
+    mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchmentVersion}@zip")
+        parchment("org.parchmentmc.data:parchment-${parchmentMcVersion}:${parchmentVersion}@zip")
     })
-
-    compileOnly(baseProject)
-
-    modImplementation("net.fabricmc:fabric-loader:${fabricLoaderVersion}")
-    modImplementation("net.fabricmc:fabric-language-kotlin:${fabricKotlinVersion}")
-    // include("net.fabricmc:fabric-language-kotlin:${property("fabricKotlinVersion")}")
-
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}") {
+    modImplementation( libs.fabric )
+    modImplementation( libs.fabric.api ) {
         exclude(module = "fabric-api-deprecated")
     }
+    modImplementation( libs.fabric.kotlin )
+    compileOnly(baseProject)
 }
 
 tasks.compileJava {
@@ -79,7 +91,6 @@ tasks.compileKotlin  {
     source(baseProject.sourceSets.getByName("main").allSource)
 }
 
-
 tasks.getByName<Jar>("sourcesJar") {
     val mainSourceSet = baseProject.sourceSets.getByName("main")
     from(mainSourceSet.allSource)
@@ -89,65 +100,21 @@ tasks.kotlinSourcesJar {
     from(mainSourceSet.allSource)
 }
 
+tasks.withType<Javadoc>().configureEach {
+    source(baseProject.sourceSets.getByName("main").allJava)
+}
+
 tasks.processResources {
-    exclude(".cache")
-    inputs.property("version", project.version)
-
     from(baseProject.sourceSets.getByName("main").resources)
-    exclude(
-        "fxlib_base.accesswidener",
-        "fxlib_base.mixins.json",
-    )
-
-    filesMatching("fabric.mod.json") {
-        expand(mapOf("version" to project.version))
-    }
 }
 
 publishing {
     publications {
-        create<MavenPublication>("mavenJava") {
+        create<MavenPublication>(modid) {
             from(components["java"])
             groupId = project.group.toString()
             artifactId = project.archivesName.get()
             version = project.version.toString()
-            println("MAVEN: $groupId $artifactId $version")
         }
-    }
-
-    // select the repositories you want to publish to
-    repositories {
-        // uncomment to publish to the local maven
-        mavenLocal()
-    }
-}
-
-/*
-tasks.register("curseforge", TaskPublishCurseForge::class) {
-    disableVersionDetection()
-    apiToken = System.getenv("CURSEFORGE_TOKEN")
-    val projectId = System.getenv("CURSEFORGE_PROJECT_ID")
-    val mainFile = upload(projectId, if (useLoom != null) remapJar else jar)
-    mainFile.addModLoader(projectExt.platform.get())
-    projectExt.supportedMinecraftVersions.getOrElse(emptyList()).forEach {
-        mainFile.addGameVersion(it)
-    }
-    mainFile.releaseType = "release"
-    mainFile.changelog = "Bug fixes"
-}
-*/
-
-tasks.named<Jar>("jar") {
-    manifest {
-        attributes(
-            mapOf(
-                "Specification-Title" to modid,
-                "Specification-Version" to modVersion,
-                "Specification-Vendor" to author,
-                "Implementation-Title" to "$modid-fabric",
-                "Implementation-Version" to version,
-                "Implementation-Vendor" to author,
-            )
-        )
     }
 }

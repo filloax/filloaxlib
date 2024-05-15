@@ -4,33 +4,50 @@
 
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         mavenCentral()
         // Loom (Fabric)
         maven {
             name = "Fabric"
             url = uri("https://maven.fabricmc.net/")
+            content {
+                includeGroupAndSubgroups("net.fabricmc")
+                includeGroup("fabric-loom")
+            }
         }
-        // MixinGradle, VanillaGradle
         maven {
-            name = "Sponge Snapshots"
-            url = uri("https://repo.spongepowered.org/repository/maven-public/")
+            name = "Forge"
+            url = uri("https://maven.minecraftforge.net/")
+            content {
+                includeGroupAndSubgroups("net.minecraftforge")
+            }
         }
-        gradlePluginPortal()
+        maven {
+            name = "Parchment"
+            url = uri("https://maven.parchmentmc.org")
+            content {
+                includeGroupAndSubgroups("org.parchmentmc")
+            }
+        }
+        maven {
+            name = "Sponge"
+            url = uri("https://repo.spongepowered.org/repository/maven-public/")
+            content {
+                includeGroupAndSubgroups("org.spongepowered")
+            }
+        }
     }
 
     val kotlinVersion: String by settings
-    val vanillaGradleVersion: String by settings
-    val shadowVersion: String by settings
-    val loomVersion: String by settings
 
     plugins {
-        java apply false
         kotlin("jvm") version kotlinVersion apply false
         kotlin("plugin.serialization") version kotlinVersion apply false
-        id("org.spongepowered.gradle.vanilla") version vanillaGradleVersion apply false
-        id("com.github.johnrengelman.shadow") version shadowVersion apply false
-        id("fabric-loom") version loomVersion apply false
     }
+}
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 val modid: String by settings
