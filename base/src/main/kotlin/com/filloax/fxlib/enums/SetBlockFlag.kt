@@ -1,4 +1,4 @@
-package com.filloax.fxlib
+package com.filloax.fxlib.enums
 
 enum class SetBlockFlag(val flag: Int) {
     /*
