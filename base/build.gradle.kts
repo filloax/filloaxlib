@@ -30,15 +30,4 @@ dependencies {
     compileOnly( libs.mixinextras.common )
 }
 
-publishing {
-    publishing {
-        publications {
-            create<MavenPublication>(modid) {
-                from(components["java"])
-                artifactId = base.archivesName.get()
-            }
-        }
-    }
-}
-
 sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/resources"))
