@@ -3,6 +3,7 @@ package com.filloax.fxlib
 import com.filloax.fxlib.api.fabric.EventOnce
 import com.filloax.fxlib.platform.fxLibEvents
 import com.filloax.fxlib.structure.FXLibStructurePlacementTypes
+import com.filloax.fxlib.structure.FXLibStructurePoolElements
 import com.filloax.fxlib.structure.FXLibStructures
 import net.fabricmc.api.ModInitializer
 import net.minecraft.core.Registry
@@ -25,6 +26,12 @@ object FxLibFabric : ModInitializer, VersionFxLib() {
     override fun initRegistryStructurePlacementType() {
         FXLibStructurePlacementTypes.registerStructurePlacementTypes { id, value ->
             Registry.register(BuiltInRegistries.STRUCTURE_PLACEMENT, id, value)
+        }
+    }
+
+    override fun initRegistryStructurePoolElementType() {
+        FXLibStructurePoolElements.registerStructurePoolElementTypes { id, value ->
+            Registry.register(BuiltInRegistries.STRUCTURE_POOL_ELEMENT, id, value)
         }
     }
 
