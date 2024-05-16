@@ -15,6 +15,12 @@
         "value": "com.filloax.fxlib.FxLibFabric",
         "adapter": "kotlin"
       }
+    ],
+    "client": [
+      {
+        "value": "com.filloax.fxlib.client.FxLibClientFabric",
+        "adapter": "kotlin"
+      }
     ]
   },
   "mixins": [

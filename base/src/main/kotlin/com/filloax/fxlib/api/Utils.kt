@@ -1,5 +1,6 @@
 package com.filloax.fxlib.api
 
+import com.filloax.fxlib.InternalUtils
 import com.mojang.datafixers.util.Either
 import net.minecraft.core.BlockPos
 import net.minecraft.core.BlockPos.MutableBlockPos
@@ -48,6 +49,14 @@ object FxUtils {
     @JvmStatic
     fun <T> concatIterators(firstIterator: Iterator<T>, vararg iterators: Iterator<T>): Iterator<T> {
         return ConcatenatedIterator(firstIterator, *iterators)
+    }
+
+    /**
+     * Variant of Screen.hasShiftDown() that is also available from common side (will return false if server),
+     * to be used for things like item tooltips that might need to know this but are coded in the common side
+     */
+    fun hasShiftDown(): Boolean {
+        return InternalUtils.shiftDownClientHook?.let { it() } ?: false
     }
 
     @JvmField
