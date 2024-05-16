@@ -27,8 +27,10 @@ abstract class VersionFxLib : FxLib() {
     final override fun initRegistries() {
         initRegistryStructureType()
         initRegistryStructurePlacementType()
+        initRegistryStructurePoolElementType()
     }
 
     abstract fun initRegistryStructureType()
     abstract fun initRegistryStructurePlacementType()
+    abstract fun initRegistryStructurePoolElementType()
 }
