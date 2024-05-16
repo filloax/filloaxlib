@@ -13,7 +13,7 @@ val modid: String by project
 val minecraftVersion = libs.versions.minecraft.asProvider().get()
 
 loom {
-    splitEnvironmentSourceSets()
+//    splitEnvironmentSourceSets()
 
     accessWidenerPath = project(":base").file("src/main/resources/${modid}.accesswidener")
     mixin.defaultRefmapName = "${modid}.refmap.json"
@@ -40,7 +40,7 @@ loom {
     mods {
         register(modid) {
             sourceSet(sourceSets.main.get())
-            sourceSet(sourceSets["client"])
+//            sourceSet(sourceSets["client"])
         }
     }
 }

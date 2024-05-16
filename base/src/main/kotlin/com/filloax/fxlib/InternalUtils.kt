@@ -11,4 +11,11 @@ object InternalUtils {
     fun resLoc(path: String): ResourceLocation {
         return ResourceLocation(FxLib.MOD_ID, path)
     }
+
+    var shiftDownClientHook: (() -> Boolean)? = null
+        private set
+
+    fun clientInitShiftDownHook(producer: () -> Boolean) {
+        shiftDownClientHook = producer
+    }
 }
