@@ -2,6 +2,7 @@ plugins {
     id("multiloader-convention")
 
     alias(libs.plugins.vanillagradle)
+    alias(libs.plugins.kotlinserialization)
 }
 
 val modid: String by project
@@ -28,6 +29,8 @@ dependencies {
 
     compileOnly( libs.mixin )
     compileOnly( libs.mixinextras.common )
+
+    testImplementation( libs.junit )
 }
 
 sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/resources"))
