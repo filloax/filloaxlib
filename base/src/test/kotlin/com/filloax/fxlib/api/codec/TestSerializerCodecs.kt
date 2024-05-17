@@ -6,6 +6,10 @@ import com.google.gson.JsonPrimitive
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.UnboundedMapCodec
 import kotlinx.serialization.Serializable
+import net.minecraft.nbt.ByteTag
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.IntTag
+import net.minecraft.nbt.StringTag
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -29,7 +33,7 @@ class TestSerializerCodecs {
         val obj = SampleDataClass(10, "TestFoo", null)
         val codec = SampleDataClass.serializer().codec()
 
-        val jsonElement = codec.encodeJson(obj).getOrThrow { Exception("Couldn't encode!") }
+        val jsonElement = codec.encodeJson(obj).getOrThrow { Exception("Couldn't encode: $it") }
         val referenceJsonElement = JsonObject()
         referenceJsonElement.add("b", JsonPrimitive("TestFoo"))
         referenceJsonElement.add("a", JsonPrimitive(10))
@@ -43,7 +47,7 @@ class TestSerializerCodecs {
         val jsonElementCorrect = JsonObject()
         jsonElementCorrect.add("a", JsonPrimitive(20))
         jsonElementCorrect.add("b", JsonPrimitive("TestBar"))
-        val parsedJsonElement = codec.decodeJson(jsonElementCorrect).getOrThrow { Exception("Couldn't decode!") }.first
+        val parsedJsonElement = codec.decodeJson(jsonElementCorrect).getOrThrow { Exception("Couldn't decode: $it") }.first
 
         assertEquals(parsedJsonElement, SampleDataClass(20, "TestBar"))
 
@@ -63,7 +67,7 @@ class TestSerializerCodecs {
             foo = "Maremma"
         ))
 
-        val jsonElement = codec.encodeJson(obj).getOrThrow { Exception("Couldn't encode!") }
+        val jsonElement = codec.encodeJson(obj).getOrThrow { Exception("Couldn't encode: $it") }
         val referenceJsonElement = JsonObject()
         referenceJsonElement.add("b", JsonPrimitive("TestInner"))
         referenceJsonElement.add("a", JsonPrimitive(30))
@@ -81,7 +85,7 @@ class TestSerializerCodecs {
             SampleDataClass(1, "AMO"),
             SampleDataClass(2, "GUS", SampleDataInnerClass("hi", true)),
         )
-        val jsonElement = codec.encodeJson(sampleList).getOrThrow { Exception("Couldn't encode!") }
+        val jsonElement = codec.encodeJson(sampleList).getOrThrow { Exception("Couldn't encode: $it") }
         val referenceJsonElement = JsonArray().apply {
             add(JsonObject().apply {
                 add("a", JsonPrimitive(1))
@@ -118,7 +122,7 @@ class TestSerializerCodecs {
                 })
             })
         }
-        val list = codec.decodeJson(jsonElement).getOrThrow { Exception("Couldn't decode!") }.first
+        val list = codec.decodeJson(jsonElement).getOrThrow { Exception("Couldn't decode: $it") }.first
 
         assertEquals(list, listOf(
             SampleDataClass(1, "AMO"),
@@ -134,7 +138,7 @@ class TestSerializerCodecs {
             "first" to SampleDataClass(1, "AMO"),
             "second" to SampleDataClass(2, "GUS", SampleDataInnerClass("hi", true)),
         )
-        val jsonElement = codec.encodeJson(sampleMap).getOrThrow { Exception("Couldn't encode!") }
+        val jsonElement = codec.encodeJson(sampleMap).getOrThrow { Exception("Couldn't encode: $it") }
         val referenceJsonElement = JsonObject().apply {
             add("first", JsonObject().apply {
                 add("a", JsonPrimitive(1))
@@ -171,7 +175,7 @@ class TestSerializerCodecs {
                 })
             })
         }
-        val list = codec.decodeJson(jsonElement).getOrThrow { Exception("Couldn't decode!") }.first
+        val list = codec.decodeJson(jsonElement).getOrThrow { Exception("Couldn't decode: $it") }.first
 
         assertEquals(list, mapOf(
             "first" to SampleDataClass(1, "AMO"),
@@ -189,8 +193,33 @@ class TestSerializerCodecs {
         jsonElementCorrect.add("c", JsonObject().apply {
             add("foo", JsonPrimitive("test"))
         })
-        val parsedJsonElement = codec.decodeJson(jsonElementCorrect).getOrThrow { Exception("Couldn't decode!") }.first
+        val parsedJsonElement = codec.decodeJson(jsonElementCorrect).getOrThrow { Exception("Couldn't decode: $it") }.first
 
         assertEquals(parsedJsonElement, SampleDataClass(20, "TestBar", SampleDataInnerClass("test", false)))
+    }
+
+    @Test
+    fun testConvertNbt() {
+        val codec = SampleDataClass.serializer().codec()
+
+        val tagCompoundSimple = CompoundTag().apply {
+            put("a", IntTag.valueOf(10))
+            put("b", StringTag.valueOf("CIAO"))
+        }
+        val parsedObj = codec.decodeNbt(tagCompoundSimple).getOrThrow { Exception("Couldn't decode NBT: $it") }.first
+
+        assertEquals(parsedObj, SampleDataClass(10, "CIAO"))
+
+        val tagCompoundComplex = CompoundTag().apply {
+            put("a", IntTag.valueOf(20))
+            put("b", StringTag.valueOf("MAMMA"))
+            put("c", CompoundTag().apply {
+                // Nbt defines booleans as bytes
+                put("bar", ByteTag.valueOf(1))
+            })
+        }
+        val parsedComplexObj = codec.decodeNbt(tagCompoundComplex).getOrThrow { Exception("Couldn't decode NBT complex: $it") }.first
+
+        assertEquals(parsedComplexObj, SampleDataClass(20, "MAMMA", SampleDataInnerClass(bar = true)))
     }
 }
