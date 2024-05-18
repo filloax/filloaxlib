@@ -1,6 +1,10 @@
 package com.filloax.fxlib.api
 
 import com.filloax.fxlib.InternalUtils
+import com.filloax.fxlib.utils.MapWithNullableDefault
+import com.filloax.fxlib.utils.MapWithNullableDefaultImpl
+import com.filloax.fxlib.utils.MutableMapWithNullableDefault
+import com.filloax.fxlib.utils.MutableMapWithNullableDefaultImpl
 import com.mojang.datafixers.util.Either
 import net.minecraft.core.BlockPos
 import net.minecraft.core.BlockPos.MutableBlockPos
@@ -247,6 +251,22 @@ fun <T> MutableCollection<T>.removeAllCountDuplicates(other: Collection<T>) {
         }
     }
 }
+
+fun <K, V> Map<K, V>.withNullableDefault(defaultValue: (K) -> V?): Map<K, V> {
+    return when (this) {
+        is MapWithNullableDefault -> this.map.withNullableDefault(defaultValue)
+        else -> MapWithNullableDefaultImpl(this, defaultValue)
+    }
+}
+
+@JvmName("withNullableDefaultMutable")
+fun <K, V> MutableMap<K, V>.withNullableDefault(defaultValue: (K) -> V?): MutableMap<K, V> {
+    return when (this) {
+        is MutableMapWithNullableDefault -> this.map.withNullableDefault(defaultValue)
+        else -> MutableMapWithNullableDefaultImpl(this, defaultValue)
+    }
+}
+
 
 fun <A, B, X, Y> Pair<A, B>.map(firstMap: (A) -> X, secondMap: (B) -> Y): Pair<X, Y> {
     return Pair(firstMap(first), secondMap(second))
