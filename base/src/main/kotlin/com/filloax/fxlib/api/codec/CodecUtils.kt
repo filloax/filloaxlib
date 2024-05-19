@@ -1,6 +1,7 @@
 package com.filloax.fxlib.api.codec
 
 import com.filloax.fxlib.FxLib
+import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
@@ -20,6 +21,12 @@ import kotlin.reflect.jvm.javaConstructor
 
 fun <A> Codec<A>.decodeJson(jsonElement: JsonElement): DataResult<com.mojang.datafixers.util.Pair<A, JsonElement>> {
     return decode(JsonOps.INSTANCE, jsonElement)
+}
+
+private val gson = Gson()
+
+fun <A> Codec<A>.decodeJson(jsonString: String): DataResult<com.mojang.datafixers.util.Pair<A, JsonElement>> {
+    return decode(JsonOps.INSTANCE, gson.fromJson(jsonString, JsonElement::class.java))
 }
 
 fun <A> Codec<A>.encodeJson(value: A): DataResult<JsonElement> {

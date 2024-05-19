@@ -7,9 +7,12 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.ComponentSerialization
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.levelgen.structure.BoundingBox
@@ -42,6 +45,23 @@ class SimpleComponentSerializer : KSerializer<Component> {
 
     override fun serialize(encoder: Encoder, value: Component) {
         encoder.encodeString(value.string)
+    }
+}
+
+class ComponentSerializer : KSerializer<Component> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("fxlib.Component", PrimitiveKind.STRING)
+    val codec = ComponentSerialization.CODEC
+
+    override fun serialize(encoder: Encoder, value: Component) {
+        val json = codec.encodeJson(value)
+            .getOrThrow { SerializationException("Couldn't serialize component: $it") }
+            .toKotlin()
+        encoder.encodeSerializableValue(JsonElement.serializer(), json)
+    }
+
+    override fun deserialize(decoder: Decoder): Component {
+        val json = decoder.decodeSerializableValue(JsonElement.serializer())
+        return codec.decodeJson(json.toGson()).result().map{it.first}.orElseThrow()
     }
 }
 
