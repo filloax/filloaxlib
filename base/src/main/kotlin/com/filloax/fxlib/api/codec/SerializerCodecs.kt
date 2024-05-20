@@ -14,6 +14,8 @@ import net.minecraft.nbt.ByteTag
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.Tag
+import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.codec.StreamCodec
 
 private val JSON = Json
 
@@ -23,10 +25,18 @@ private val JSON = Json
  * WIP (currently doesn't work with boolean fields when passing through NBT as it gets converted from Byte
  * to Number in json objects
  */
-fun <T> KSerializer<T>.codec(
+fun <T : Any> KSerializer<T>.codec(
     json: Json = JSON,
 ): Codec<T> {
     return Codec.of(K2DfuEncoder(this, json), K2DfuDecoder(this, json))
+}
+
+fun <T : Any> KSerializer<T>.streamCodec(json: Json = JSON): StreamCodec<RegistryFriendlyByteBuf, T> {
+    return StreamCodec.of({ byteBuf, obj ->
+        byteBuf.writeUtf(json.encodeToString(this, obj))
+    }, { byteBuf ->
+        json.decodeFromString(this, byteBuf.readUtf())
+    })
 }
 
 private class K2DfuDecoder<A>(
