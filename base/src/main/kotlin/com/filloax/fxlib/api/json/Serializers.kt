@@ -5,14 +5,17 @@ import com.filloax.fxlib.api.codec.encodeJson
 import com.filloax.fxlib.api.codec.throwableCodecErr
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonTransformingSerializer
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.levelgen.structure.BoundingBox
@@ -32,6 +35,19 @@ class RotationSerializer : KSerializer<Rotation> {
 
     override fun serialize(encoder: Encoder, value: Rotation) {
         encoder.encodeString(value.serializedName)
+    }
+}
+
+@Serializer(forClass = ResourceLocation::class)
+class ResourceLocationSerializer : KSerializer<ResourceLocation> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("fxlib.ResourceLocation", PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): ResourceLocation {
+        return ResourceLocation(decoder.decodeString())
+    }
+
+    override fun serialize(encoder: Encoder, value: ResourceLocation) {
+        encoder.encodeString(value.toString())
     }
 }
 
