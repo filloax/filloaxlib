@@ -72,6 +72,7 @@ jobs:
         github-tag: "v${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}-fabric"
         github-token: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
         github-generate-changelog: true
+        github-commitish: 'release/1.21'
 
         name: "FxLib ${{ steps.get_version.outputs.VERSION }} - Fabric ${{env.MINECRAFT_VERSION}}"
         version: "${{env.MINECRAFT_VERSION}}-fabric-${{ steps.get_version.outputs.VERSION }}"
