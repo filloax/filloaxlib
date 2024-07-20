@@ -43,10 +43,10 @@ object FxUtils {
     @JvmStatic
     fun getStructTagOrKey(structureId: String): Either<TagKey<Structure>, ResourceKey<Structure>> {
         return if (structureId.startsWith("#")) {
-            Either.left(TagKey.create(Registries.STRUCTURE, ResourceLocation(structureId.replaceFirst("#", ""))))
+            Either.left(TagKey.create(Registries.STRUCTURE, ResourceLocation.parse(structureId.replaceFirst("#", ""))))
         }
         else {
-            Either.right(ResourceKey.create(Registries.STRUCTURE, ResourceLocation(structureId)))
+            Either.right(ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse(structureId)))
         }
     }
 

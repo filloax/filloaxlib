@@ -43,7 +43,7 @@ class ResourceLocationSerializer : KSerializer<ResourceLocation> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("fxlib.ResourceLocation", PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): ResourceLocation {
-        return ResourceLocation(decoder.decodeString())
+        return ResourceLocation.parse(decoder.decodeString())
     }
 
     override fun serialize(encoder: Encoder, value: ResourceLocation) {

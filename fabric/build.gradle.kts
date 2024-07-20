@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
-
 plugins {
     id("multiloader-convention")
 
@@ -113,7 +111,7 @@ publishing {
         create<MavenPublication>(modid) {
             from(components["java"])
             groupId = project.group.toString()
-            artifactId = project.archivesName.get()
+            artifactId = tasks.named<Jar>("jar").get().archiveFileName.get().replace(".jar", "")
             version = project.version.toString()
         }
     }

@@ -1,16 +1,14 @@
 package com.filloax.fxlib.platform
 
 import com.filloax.fxlib.MixinHelpersFabric
-import com.filloax.fxlib.api.platform.PlatformAbstractions
 import com.filloax.fxlib.api.fabric.EventOnce
-import net.fabricmc.fabric.api.dimension.v1.FabricDimensions
+import com.filloax.fxlib.api.platform.PlatformAbstractions
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ChunkPos
-import net.minecraft.world.level.portal.PortalInfo
 import java.util.*
 
 class PlatformAbstractionsFabric : PlatformAbstractions {
@@ -19,10 +17,6 @@ class PlatformAbstractionsFabric : PlatformAbstractions {
     }
 
     override fun getServer() = MixinHelpersFabric.SERVER_HOLDER.get()
-
-    override fun fixedChangeDimension(entity: Entity, level: ServerLevel, target: PortalInfo) {
-        FabricDimensions.teleport(entity, level, target)
-    }
 
     /**
      * Run the action on the entity immediately if loaded, as soon as it's loaded

@@ -1,9 +1,8 @@
 package com.filloax.fxlib.api.structure
 
 import com.filloax.fxlib.*
-import com.filloax.fxlib.api.codec.forNullableGetter
-import com.filloax.fxlib.api.rotate
 import com.filloax.fxlib.api.codec.*
+import com.filloax.fxlib.api.rotate
 import com.filloax.fxlib.structure.FXLibStructures
 import com.google.common.collect.Lists
 import com.mojang.serialization.Codec
@@ -15,6 +14,7 @@ import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
 import net.minecraft.core.Vec3i
 import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.level.biome.Biome
@@ -30,16 +30,22 @@ import net.minecraft.world.level.levelgen.structure.Structure.GenerationStub
 import net.minecraft.world.level.levelgen.structure.StructureSpawnOverride
 import net.minecraft.world.level.levelgen.structure.StructureType
 import net.minecraft.world.level.levelgen.structure.TerrainAdjustment
+import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilder
+import net.minecraft.world.level.levelgen.structure.pools.DimensionPadding
 import net.minecraft.world.level.levelgen.structure.pools.EmptyPoolElement
 import net.minecraft.world.level.levelgen.structure.pools.JigsawPlacement
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool
 import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasBinding
 import net.minecraft.world.level.levelgen.structure.pools.alias.PoolAliasLookup
 import net.minecraft.world.level.levelgen.structure.structures.JigsawStructure
+import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSettings
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.shapes.BooleanOp
 import net.minecraft.world.phys.shapes.Shapes
 import java.util.*
+import java.util.function.Consumer
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Variant of Jigsaw structure that forces it to be placed at the exact position instead of chunk start when placed
@@ -62,13 +68,15 @@ class ForcePosJigsawStructure(
     projectStartToHeightmap: Optional<Heightmap.Types>,
     maxDistanceToCenter: Int,
     poolAliases: List<PoolAliasBinding>,
+    dimensionPadding: DimensionPadding,
+    liquidSettings: LiquidSettings,
     private val defaultForcePosUsesY: Boolean = false,
     val forcePosOffset: Vec3i = Vec3i.ZERO,
     override val defaultRotation: Rotation? = null,
     val useRotationInDefaultPlacement: Boolean = false,
 ) : JigsawStructure(
     settings, startPool, startJigsawName, maxDepth, startHeight, useExpansionHack, projectStartToHeightmap,
-    maxDistanceToCenter, poolAliases
+    maxDistanceToCenter, poolAliases, dimensionPadding, liquidSettings
 ), FixablePosition, FixableRotation {
     private var nextPlacePosition: BlockPos? = null
     private var nextPlaceRotation: Rotation? = null
@@ -92,6 +100,8 @@ class ForcePosJigsawStructure(
             projectStartToHeightmap: Heightmap.Types? = Heightmap.Types.WORLD_SURFACE_WG,
             maxDistanceToCenter: Int = 80,
             poolAliases: List<PoolAliasBinding> = listOf(),
+            dimensionPadding: DimensionPadding,
+            liquidSettings: LiquidSettings,
             forcePosUsesY: Boolean = true,
             forcePosOffset: Vec3i = Vec3i.ZERO,
             defaultRotation: Rotation? = null,
@@ -100,8 +110,9 @@ class ForcePosJigsawStructure(
             return ForcePosJigsawStructure(
                 StructureSettings(biomes, spawnOverrides, step, terrainAdaptation),
                 startPool, Optional.ofNullable(startJigsawName), size, startHeight, useExpansionHack,
-                Optional.ofNullable(projectStartToHeightmap), maxDistanceToCenter, poolAliases, forcePosUsesY,
-                forcePosOffset, defaultRotation, useRotationInDefaultPlacement
+                Optional.ofNullable(projectStartToHeightmap), maxDistanceToCenter, poolAliases,
+                dimensionPadding, liquidSettings,
+                forcePosUsesY, forcePosOffset, defaultRotation, useRotationInDefaultPlacement
             )
         }
 
@@ -117,7 +128,9 @@ class ForcePosJigsawStructure(
                     Codec.BOOL.fieldOf("use_expansion_hack").forGetter(JigsawStructure::useExpansionHack),
                     Heightmap.Types.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter(JigsawStructure::projectStartToHeightmap),
                     Codec.intRange(1, 128).fieldOf("max_distance_from_center").forGetter(JigsawStructure::maxDistanceFromCenter),
-                    Codec.list(PoolAliasBinding.CODEC).optionalFieldOf("pool_aliases", listOf()).forGetter(JigsawStructure::getPoolAliases),
+                    Codec.list(PoolAliasBinding.CODEC).optionalFieldOf("pool_aliases", listOf()).forGetter { it.poolAliases },
+                    DimensionPadding.CODEC.optionalFieldOf("dimension_padding", DEFAULT_DIMENSION_PADDING).forGetter { it.dimensionPadding },
+                    LiquidSettings.CODEC.optionalFieldOf("liquid_settings", DEFAULT_LIQUID_SETTINGS).forGetter { it.liquidSettings },
                     Codec.BOOL.optionalFieldOf("force_pos_uses_y").forGetter{ Optional.of(it.nextPlaceUseY) },
                     Vec3i.CODEC.optionalFieldOf("force_pos_offset").forGetter { Optional.of(it.forcePosOffset) },
                     Rotation.CODEC.optionalFieldOf("default_rotation").forNullableGetter(ForcePosJigsawStructure::defaultRotation),
@@ -125,11 +138,13 @@ class ForcePosJigsawStructure(
                 ).apply(builder) {
                         settings, startPool, startJigsawName, maxDepth, startHeight,
                         useExpansionHack, projectStartToHeightmap, maxDistanceToCenter, poolAliases,
+                        dimensionPadding, liquidSettings,
                         forcePosUseYOpt, forcePosOffsetOpt, defaultRotationOpt, useRotationInDefaultPlacementOpt,
                     ->
                     ForcePosJigsawStructure(
                         settings, startPool, startJigsawName, maxDepth, startHeight,
                         useExpansionHack, projectStartToHeightmap, maxDistanceToCenter, poolAliases,
+                        dimensionPadding, liquidSettings,
                         forcePosUseYOpt.orElse(false),
                         forcePosOffsetOpt.orElse(Vec3i.ZERO),
                         defaultRotationOpt.orElse(Rotation.NONE),
@@ -179,6 +194,7 @@ class ForcePosJigsawStructure(
                 if (thisGenUsesForcedY) Optional.empty() else projectStartToHeightmap,
                 maxDistanceFromCenter,
                 PoolAliasLookup.create(this.poolAliases, pos, context.seed()),
+                dimensionPadding, liquidSettings,
                 rotation,
             )
         }
@@ -213,6 +229,8 @@ object JigsawPlacementExtra {
         projectStartToHeightmap: Optional<Heightmap.Types>,
         maxDistanceFromCenter: Int,
         aliasLookup: PoolAliasLookup,
+        dimensionPadding: DimensionPadding,
+        liquidSettings: LiquidSettings,
         rotation: Rotation,
     ): Optional<GenerationStub> {
         //after this its more or less an exact copy of og function, just instead of setting rotation here its passed as arg
@@ -223,14 +241,21 @@ object JigsawPlacementExtra {
         val levelHeightAccessor = context.heightAccessor()
         val worldgenRandom = context.random()
         val registry = registryAccess.registryOrThrow(Registries.TEMPLATE_POOL)
-        val structureTemplatePool = startPool.unwrapKey().flatMap { resourceKey ->
-                registry.getOptional(aliasLookup.lookup(resourceKey))
-            }.orElse(startPool.value())
+        val structureTemplatePool = startPool.unwrapKey()
+            .flatMap { resourceKey: ResourceKey<StructureTemplatePool?>? ->
+                registry.getOptional(
+                    aliasLookup.lookup(
+                        resourceKey!!
+                    )
+                )
+            }
+            .orElse(startPool.value()) as StructureTemplatePool
         val structurePoolElement = structureTemplatePool.getRandomTemplate(worldgenRandom)
         if (structurePoolElement === EmptyPoolElement.INSTANCE) {
             return Optional.empty()
         } else {
-            val blockPos = if (startJigsawName.isPresent) {
+            val blockPos: BlockPos
+            if (startJigsawName.isPresent) {
                 val resourceLocation = startJigsawName.get()
                 val optional = JigsawPlacement.getRandomNamedJigsaw(
                     structurePoolElement, resourceLocation, pos, rotation, structureTemplateManager, worldgenRandom
@@ -239,17 +264,19 @@ object JigsawPlacementExtra {
                     FxLib.logger.error(
                         "No starting jigsaw {} found in start pool {}",
                         resourceLocation,
-                        startPool.unwrapKey().map { resourceKey -> resourceKey.location().toString() }.orElse("<unregistered>")
+                        startPool.unwrapKey().map { resourceKey: ResourceKey<StructureTemplatePool?> ->
+                            resourceKey.location().toString()
+                        }.orElse("<unregistered>")
                     )
                     return Optional.empty()
                 }
 
-                optional.get()
+                blockPos = optional.get()
             } else {
-                pos
+                blockPos = pos
             }
 
-            val vec3i = blockPos.subtract(pos)
+            val vec3i: Vec3i = blockPos.subtract(pos)
             val blockPos2 = pos.subtract(vec3i)
             val poolElementStructurePiece = PoolElementStructurePiece(
                 structureTemplateManager,
@@ -257,35 +284,43 @@ object JigsawPlacementExtra {
                 blockPos2,
                 structurePoolElement.groundLevelDelta,
                 rotation,
-                structurePoolElement.getBoundingBox(structureTemplateManager, blockPos2, rotation)
+                structurePoolElement.getBoundingBox(structureTemplateManager, blockPos2, rotation),
+                liquidSettings
             )
             val boundingBox = poolElementStructurePiece.boundingBox
             val i = (boundingBox.maxX() + boundingBox.minX()) / 2
             val j = (boundingBox.maxZ() + boundingBox.minZ()) / 2
-            val k = if (projectStartToHeightmap.isPresent) {
-                pos.y + chunkGenerator.getFirstFreeHeight(
-                    i, j, projectStartToHeightmap.get() as Heightmap.Types, levelHeightAccessor, context.randomState()
+            val k: Int
+            if (projectStartToHeightmap.isPresent) {
+                k = pos.y + chunkGenerator.getFirstFreeHeight(
+                    i, j, projectStartToHeightmap.get(), levelHeightAccessor, context.randomState()
                 )
             } else {
-                blockPos2.y
+                k = blockPos2.y
             }
 
             val l = boundingBox.minY() + poolElementStructurePiece.groundLevelDelta
             poolElementStructurePiece.move(0, k - l, 0)
             val m = k + vec3i.y
-            return Optional.of(
+            return Optional.of<GenerationStub>(
                 GenerationStub(
                     BlockPos(i, m, j)
-                ) { structurePiecesBuilder ->
+                ) { structurePiecesBuilder: StructurePiecesBuilder ->
                     val list: MutableList<PoolElementStructurePiece> = Lists.newArrayList()
                     list.add(poolElementStructurePiece)
                     if (maxDepth > 0) {
                         val aABB = AABB(
                             (i - maxDistanceFromCenter).toDouble(),
-                            (m - maxDistanceFromCenter).toDouble(),
+                            max(
+                                (m - maxDistanceFromCenter).toDouble(),
+                                (levelHeightAccessor.getMinBuildHeight() + dimensionPadding.bottom()).toDouble()
+                            ),
                             (j - maxDistanceFromCenter).toDouble(),
                             (i + maxDistanceFromCenter + 1).toDouble(),
-                            (m + maxDistanceFromCenter + 1).toDouble(),
+                            min(
+                                (m + maxDistanceFromCenter + 1).toDouble(),
+                                (levelHeightAccessor.getMaxBuildHeight() - dimensionPadding.top()).toDouble()
+                            ),
                             (j + maxDistanceFromCenter + 1).toDouble()
                         )
                         val voxelShape = Shapes.join(
@@ -305,9 +340,15 @@ object JigsawPlacementExtra {
                             poolElementStructurePiece,
                             list,
                             voxelShape,
-                            aliasLookup
+                            aliasLookup,
+                            liquidSettings
                         )
-                        list.forEach(structurePiecesBuilder::addPiece)
+                        list.forEach(
+                            Consumer { `$$0`: PoolElementStructurePiece? ->
+                                structurePiecesBuilder.addPiece(
+                                    `$$0`!!
+                                )
+                            })
                     }
                 }
             )

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.ApiStatus
 @ApiStatus.Internal
 object InternalUtils {
     fun resLoc(path: String): ResourceLocation {
-        return ResourceLocation(FxLib.MOD_ID, path)
+        return ResourceLocation.fromNamespaceAndPath(FxLib.MOD_ID, path)
     }
 
     var shiftDownClientHook: (() -> Boolean)? = null
