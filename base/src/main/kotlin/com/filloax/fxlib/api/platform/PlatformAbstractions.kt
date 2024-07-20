@@ -4,7 +4,7 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ChunkPos
-import net.minecraft.world.level.portal.PortalInfo
+import net.minecraft.world.level.portal.DimensionTransition
 import java.util.*
 import org.jetbrains.annotations.*
 
@@ -25,6 +25,8 @@ interface PlatformAbstractions {
      * <p>When teleporting to another dimension, the entity may be replaced with a new entity in the target
      * dimension. This is not the case for players, but needs to be accounted for by the caller.
      *
+     * Since 1.21, superseded by Entity.changeDimension, keep for backwards compat
+     *
      * @param destination the dimension the entity will be teleported to
      * @param target      where the entity will be placed in the target world.
      *                    As in Vanilla, the target's velocity is not applied to players.
@@ -33,7 +35,10 @@ interface PlatformAbstractions {
      * depending on the entity type.
      * @apiNote this method must be called from the main server thread
      */
-    fun fixedChangeDimension(entity: Entity, level: ServerLevel, target: PortalInfo)
+    @Deprecated("Superseded by entity.changeDimension in 1.21, keep for backwards compat")
+    fun fixedChangeDimension(entity: Entity, level: ServerLevel, target: DimensionTransition) {
+        entity.changeDimension(target)
+    }
 
     /**
      * Run the action on the entity immediately if loaded, as soon as it's loaded

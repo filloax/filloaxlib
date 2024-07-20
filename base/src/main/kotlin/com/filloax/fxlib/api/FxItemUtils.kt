@@ -15,7 +15,7 @@ import net.minecraft.world.item.component.WrittenBookContent
 object FxItemUtils {
     @JvmStatic
     fun itemFromId(id: String): Item {
-        return itemFromId(ResourceLocation(id))
+        return itemFromId(ResourceLocation.parse(id))
     }
 
     @JvmStatic
@@ -93,9 +93,9 @@ fun ItemStack.setBookTags(title: Component, author: Component, pages: List<Compo
 
 fun ItemStack.getBookText(): List<Component> {
     return if (`is`(Items.WRITABLE_BOOK)) {
-        this.getOrDefault(DataComponents.WRITABLE_BOOK_CONTENT, WritableBookContent.EMPTY).pages.map{Component.literal(it.raw)}
+        this.getOrDefault(DataComponents.WRITABLE_BOOK_CONTENT, WritableBookContent.EMPTY).pages().map{Component.literal(it.raw)}
     } else if (`is`(Items.WRITTEN_BOOK)) {
-        this.getOrDefault(DataComponents.WRITTEN_BOOK_CONTENT, WrittenBookContent.EMPTY).pages.map{it.raw}
+        this.getOrDefault(DataComponents.WRITTEN_BOOK_CONTENT, WrittenBookContent.EMPTY).pages().map{it.raw}
     } else {
         throw IllegalStateException("Cannot get pages of non-book item stack $this")
     }

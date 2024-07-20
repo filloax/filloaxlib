@@ -9,7 +9,7 @@ import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.entity.EntityTypeTest
-import net.minecraft.world.level.portal.PortalInfo
+import net.minecraft.world.level.portal.DimensionTransition
 
 private val platformAbstractions = getPlatformAbstractions()
 
@@ -30,8 +30,9 @@ private val platformAbstractions = getPlatformAbstractions()
  * depending on the entity type.
  * @apiNote this method must be called from the main server thread
  */
-fun Entity.fixedChangeDimension(level: ServerLevel, target: PortalInfo) {
-    platformAbstractions.fixedChangeDimension(this, level, target)
+@Deprecated("Superseded by entity.changeDimension in 1.21, keep for backwards compat")
+fun Entity.fixedChangeDimension(level: ServerLevel, target: DimensionTransition) {
+    changeDimension(target)
 }
 
 fun getData(entity: Entity): CompoundTag {
