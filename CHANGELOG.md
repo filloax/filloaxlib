@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.28
+## 0.28 [1.21]
 
 Changed
 - Update to 1.21, which led to next changes:
