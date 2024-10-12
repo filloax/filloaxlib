@@ -33,6 +33,7 @@
 
 # Test
     junit = "5.8.1"
+    gson = "2.11.0"
 
 # Plugins
 # Fill minotaur, curseforge, forge stuff when needed
@@ -70,6 +71,7 @@
 
 # Test
     junit = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
+    gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 [plugins]
 # Kotlin
