@@ -9,7 +9,7 @@ val modid: String by project
 val modVersion = libs.versions.modversion.get()
 val minecraftVersion = libs.versions.minecraft.asProvider().get()
 
-version = "$modVersion-${minecraftVersion}-base"
+version = "$modVersion-${minecraftVersion}-common"
 
 base {
     archivesName = modid
