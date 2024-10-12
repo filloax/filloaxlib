@@ -22,6 +22,7 @@ minecraft {
 
 dependencies {
     implementation( libs.jsr305 )
+    implementation( libs.log4j )
 
     implementation( libs.kotlin.stdlib )
     implementation( libs.kotlin.reflect )
@@ -31,6 +32,12 @@ dependencies {
     compileOnly( libs.mixinextras.common )
 
     testImplementation( libs.junit )
+    testImplementation( libs.gson )
 }
 
 sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/resources"))
+
+// Test
+tasks.test {
+    useJUnitPlatform()
+}

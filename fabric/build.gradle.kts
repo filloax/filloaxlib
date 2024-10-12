@@ -43,16 +43,6 @@ loom {
     }
 }
 
-repositories {
-    maven {
-        name = "ParchmentMC"
-        url = uri("https://maven.parchmentmc.org")
-        content {
-            includeGroupAndSubgroups("org.parchmentmc")
-        }
-    }
-}
-
 val modVersion = libs.versions.modversion.get()
 val parchmentMcVersion = libs.versions.parchment.minecraft.get()
 val parchmentVersion = libs.versions.parchment.asProvider().get()
