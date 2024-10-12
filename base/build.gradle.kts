@@ -41,3 +41,15 @@ sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/reso
 tasks.test {
     useJUnitPlatform()
 }
+
+
+publishing {
+    publications {
+        create<MavenPublication>("${modid}-common") {
+            from(components["java"])
+            groupId = project.group.toString()
+            artifactId = this.name
+            version = "$modVersion-$minecraftVersion"
+        }
+    }
+}
