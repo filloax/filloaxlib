@@ -21,6 +21,39 @@ java {
     targetCompatibility = javaVersionEnum
 }
 
+repositories {
+    mavenCentral()
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Sponge"
+                url = uri("https://repo.spongepowered.org/repository/maven-public")
+            }
+        }
+        filter { includeGroupAndSubgroups("org.spongepowered") }
+    }
+
+    exclusiveContent {
+        forRepositories(
+            maven {
+                name = "ParchmentMC"
+                url = uri("https://maven.parchmentmc.org/")
+            },
+            maven {
+                name = "NeoForge"
+                url = uri("https://maven.neoforged.net/releases")
+            }
+        )
+        filter { includeGroup("org.parchmentmc.data") }
+    }
+
+    maven {
+        name = "BlameJared"
+        url = uri("https://maven.blamejared.com")
+    }
+}
+
 val libs = project.versionCatalogs.find("libs")
 
 val modid: String by project
