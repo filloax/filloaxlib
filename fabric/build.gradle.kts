@@ -98,11 +98,11 @@ tasks.processResources {
 
 publishing {
     publications {
-        create<MavenPublication>(modid) {
+        create<MavenPublication>("${modid}-fabric") {
             from(components["java"])
             groupId = project.group.toString()
-            artifactId = tasks.named<Jar>("jar").get().archiveFileName.get().replace(".jar", "")
-            version = project.version.toString()
+            artifactId = this.name
+            version = "$modVersion-$minecraftVersion"
         }
     }
 }
