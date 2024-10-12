@@ -2,7 +2,6 @@ package com.filloax.fxlib.api.json
 
 import com.filloax.fxlib.api.concatIterators
 import com.google.gson.Gson
-import com.mojang.logging.LogUtils
 import com.google.gson.JsonElement
 import net.minecraft.resources.FileToIdConverter
 import net.minecraft.resources.ResourceLocation
@@ -10,6 +9,7 @@ import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener
 import net.minecraft.util.profiling.ProfilerFiller
 import org.apache.commons.lang3.SerializationException
+import org.apache.logging.log4j.LogManager
 import java.io.BufferedReader
 import java.io.IOException
 import java.lang.StringBuilder
@@ -34,7 +34,7 @@ abstract class ImprovedJsonResourceReloadListener(
     }
 
     companion object {
-        private val LOGGER = LogUtils.getLogger()
+        private val LOGGER = LogManager.getLogger()
 
         fun scanDirectory(
             resourceManager: ResourceManager, dirPath: String, gson: Gson, map: MutableMap<ResourceLocation, JsonElement>,

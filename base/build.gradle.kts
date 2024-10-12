@@ -15,10 +15,11 @@ base {
     archivesName = modid
 }
 
-minivan {
-    version(minecraftVersion)
-    accessWideners(file("src/main/resources/${modid}.accesswidener"))
-}
+val mc = minivan.minecraftBuilder()
+    .version(minecraftVersion)
+    .accessWideners("src/main/resources/${modid}.accesswidener")
+    .build()
+    .minecraft;
 
 dependencies {
     implementation( libs.jsr305 )
@@ -34,6 +35,18 @@ dependencies {
     compileOnly( libs.mixinextras.common )
 
     testImplementation( libs.junit )
+    testImplementation( libs.gson )
 }
 
+project.dependencies.add("compileOnly", project.files(mc.minecraft))
+mc.dependencies.forEach { project.dependencies.add("compileOnly", it) }
+
 sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/resources"))
+
+// Test
+tasks.test {
+    useJUnitPlatform()
+}
+// Fix minivan not adding minecraft to test classpath
+project.dependencies.add("testImplementation", project.files(mc.minecraft))
+mc.dependencies.forEach { project.dependencies.add("testImplementation", it) }
