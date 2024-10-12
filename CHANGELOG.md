@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.28.1
+
+Internal
+- Switch from VanillaGradle to Minivan, should speed up first/github build
+
 ## 0.27.1 [1.20.6]
 
 Fixed
