@@ -76,7 +76,7 @@ jobs:
         make_latest: false
         tag_name: "v${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}-fabric"
         files: |
-          fabric/build/libs/*-@(dev|sources|javadoc).jar
+          fabric/build/libs/*.jar
       
     - name: Publish (Common)
       uses: softprops/action-gh-release@v2
@@ -87,4 +87,4 @@ jobs:
         make_latest: true
         tag_name: "v${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}-common"
         files: |
-          base/build/libs/*-@(dev|sources|javadoc).jar
+          base/build/libs/*.jar
