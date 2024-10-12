@@ -73,9 +73,9 @@ jobs:
         name: FxLib ${{ steps.get_version.outputs.VERSION }} - Fabric ${{ env.MC_VER }}
         body_path: latest_changelog.txt
         token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
+        make_latest: false
         tag_name: "v${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}-fabric"
         files: |
-          fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
           fabric/build/libs/*-@(dev|sources|javadoc).jar
       
     - name: Publish (Common)
@@ -84,7 +84,7 @@ jobs:
         name: FxLib ${{ steps.get_version.outputs.VERSION }} - Common ${{ env.MC_VER }}
         body_path: latest_changelog.txt
         token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
+        make_latest: false
         tag_name: "v${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}-common"
         files: |
-          base/build/libs/!(*-@(dev|sources|javadoc)).jar
           base/build/libs/*-@(dev|sources|javadoc).jar
