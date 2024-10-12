@@ -61,8 +61,29 @@ jobs:
       run: ./gradlew build
 
     # - name: Publish (JitPack source)
+
+    - name: Publish (Common)
+      uses: Kir-Antipov/mc-publish@v3.3
+      with:
+        files: |
+          base/build/libs/!(*-@(dev|sources|javadoc)).jar
+          base/build/libs/*-@(dev|sources|javadoc).jar
+
+        github-tag: "v${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}-common"
+        github-token: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
+        github-generate-changelog: true
+
+        name: "FxLib ${{ steps.get_version.outputs.VERSION }} - Common ${{env.MINECRAFT_VERSION}}"
+        version: "${{env.MINECRAFT_VERSION}}-common-${{ steps.get_version.outputs.VERSION }}"
+        version-type: release
+
+        game-versions: "${{env.MINECRAFT_VERSION}}"
+        java: "${{env.JAVA_VERSION}}"
+      env:
+        USERNAME: ${{ github.actor }}
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
-    - name: Publish
+    - name: Publish (Fabric)
       uses: Kir-Antipov/mc-publish@v3.3
       with:
         files: |
