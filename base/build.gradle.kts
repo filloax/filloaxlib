@@ -1,7 +1,7 @@
 plugins {
     id("multiloader-convention")
 
-    alias(libs.plugins.vanillagradle)
+    alias(libs.plugins.minivan)
     alias(libs.plugins.kotlinserialization)
 }
 
@@ -15,13 +15,16 @@ base {
     archivesName = modid
 }
 
-minecraft {
+minivan {
     version(minecraftVersion)
     accessWideners(file("src/main/resources/${modid}.accesswidener"))
 }
 
 dependencies {
     implementation( libs.jsr305 )
+    implementation( libs.log4j )
+
+    compileOnly( libs.jetbrains.annotations )
 
     implementation( libs.kotlin.stdlib )
     implementation( libs.kotlin.reflect )
