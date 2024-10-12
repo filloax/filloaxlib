@@ -70,7 +70,7 @@ jobs:
     - name: Publish (Fabric)
       uses: softprops/action-gh-release@v2
       with:
-        name: FxLib ${{ steps.get_version.outputs.VERSION }} - Fabric ${{ env.MC_VER }}
+        name: FxLib ${{ steps.get_version.outputs.VERSION }} - Fabric ${{ env.MINECRAFT_VERSION }}
         body_path: latest_changelog.txt
         token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
         make_latest: false
@@ -81,7 +81,7 @@ jobs:
     - name: Publish (Common)
       uses: softprops/action-gh-release@v2
       with:
-        name: FxLib ${{ steps.get_version.outputs.VERSION }} - Common ${{ env.MC_VER }}
+        name: FxLib ${{ steps.get_version.outputs.VERSION }} - Common ${{ env.MINECRAFT_VERSION }}
         body_path: latest_changelog.txt
         token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
         make_latest: true
