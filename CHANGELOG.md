@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.29.0
+
+Added
+- Simple networking API
+
+Internal
+- Switch from Minivan to ModDevGradle, actually works when using common module outside
+
 ## 0.28.1
 
 Internal
