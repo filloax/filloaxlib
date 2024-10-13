@@ -68,9 +68,6 @@ val displayUrl: String by project
 
 val version = libs.get().findVersion("modversion").get()
 val minecraftVersion = libs.get().findVersion("minecraft").get()
-val forgeVersion = libs.get().findVersion("forge").get()
-val forgeVersionRange = libs.get().findVersion("forge.range").get()
-val fmlVersionRange = libs.get().findVersion("forge.fml.range").get()
 val minecraftVersionRange = libs.get().findVersion("minecraft.range").get()
 val fapiVersion = libs.get().findVersion("fabric.api").get()
 val fabricVersion = libs.get().findVersion("fabric").get()
@@ -114,9 +111,6 @@ tasks.withType<ProcessResources>().configureEach {
             "group" to project.group, // Else we target the task's group.
             "display_url" to displayUrl, // Else we target the task's group.
             "minecraft_version" to minecraftVersion,
-            "forge_version" to forgeVersion,
-            "fml_version_range" to fmlVersionRange,
-            "forge_version_range" to forgeVersionRange,
             "minecraft_version_range" to minecraftVersionRange,
             "fabric_api_version" to fapiVersion,
             "fabric_loader_version" to fabricVersion,
