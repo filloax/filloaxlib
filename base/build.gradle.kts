@@ -1,7 +1,7 @@
 plugins {
     id("multiloader-convention")
 
-    alias(libs.plugins.minivan)
+    alias(libs.plugins.moddevgradle)
     alias(libs.plugins.kotlinserialization)
 }
 
@@ -15,17 +15,34 @@ base {
     archivesName = modid
 }
 
-val mc = minivan.minecraftBuilder()
-    .version(minecraftVersion)
-    .accessWideners("src/main/resources/${modid}.accesswidener")
-    .build()
-    .minecraft;
+neoForge {
+    neoFormVersion = libs.versions.neoform
+
+    validateAccessTransformers = true
+
+    parchment {
+        minecraftVersion = libs.versions.parchment.minecraft
+        mappingsVersion = libs.versions.parchment.asProvider()
+    }
+
+    mods {
+        register(modid) {
+            sourceSet(sourceSets.main.get())
+        }
+    }
+
+    // currently broken https://github.com/neoforged/ModDevGradle/issues/171
+//    unitTest {
+//        enable()
+//        testedMod = mods.getByName(modid)
+//    }
+
+    // access transformers use default path so no need to config
+}
 
 dependencies {
     implementation( libs.jsr305 )
     implementation( libs.log4j )
-
-    compileOnly( libs.jetbrains.annotations )
 
     implementation( libs.kotlin.stdlib )
     implementation( libs.kotlin.reflect )
@@ -34,12 +51,10 @@ dependencies {
     compileOnly( libs.mixin )
     compileOnly( libs.mixinextras.common )
 
-    testImplementation( libs.junit )
+    testImplementation( libs.junit.jupiter )
     testImplementation( libs.gson )
+    testRuntimeOnly( libs.junit.launcher )
 }
-
-project.dependencies.add("compileOnly", project.files(mc.minecraft))
-mc.dependencies.forEach { project.dependencies.add("compileOnly", it) }
 
 sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/resources"))
 
@@ -47,6 +62,15 @@ sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/reso
 tasks.test {
     useJUnitPlatform()
 }
-// Fix minivan not adding minecraft to test classpath
-project.dependencies.add("testImplementation", project.files(mc.minecraft))
-mc.dependencies.forEach { project.dependencies.add("testImplementation", it) }
+
+
+publishing {
+    publications {
+        create<MavenPublication>("${modid}-common") {
+            from(components["java"])
+            groupId = project.group.toString()
+            artifactId = this.name
+            version = "$modVersion-$minecraftVersion"
+        }
+    }
+}

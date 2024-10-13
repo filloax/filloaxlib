@@ -1,5 +1,8 @@
 package com.filloax.fxlib.api.codec
 
+// Currently broken tests https://github.com/neoforged/ModDevGradle/issues/171
+
+/*
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -223,3 +226,5 @@ class TestSerializerCodecs {
         assertEquals(parsedComplexObj, SampleDataClass(20, "MAMMA", SampleDataInnerClass(bar = true)))
     }
 }
+
+ */

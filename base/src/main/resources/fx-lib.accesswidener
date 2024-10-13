@@ -1,5 +1,5 @@
 accessWidener	v1	named
-#note: must be copied in loader-specific AW
+#note: not used in this module, but used in fabric-like modules
 extendable class net/minecraft/world/level/levelgen/structure/structures/JigsawStructure
 accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure startPool Lnet/minecraft/core/Holder;
 accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure startJigsawName Ljava/util/Optional;
