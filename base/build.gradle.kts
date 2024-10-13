@@ -1,7 +1,7 @@
 plugins {
     id("multiloader-convention")
 
-    alias(libs.plugins.minivan)
+    alias(libs.plugins.vanillagradle)
     alias(libs.plugins.kotlinserialization)
 }
 
@@ -15,17 +15,14 @@ base {
     archivesName = modid
 }
 
-val mc = minivan.minecraftBuilder()
-    .version(minecraftVersion)
-    .accessWideners("src/main/resources/${modid}.accesswidener")
-    .build()
-    .minecraft;
+minecraft {
+    version(minecraftVersion)
+    accessWideners(file("src/main/resources/${modid}.accesswidener"))
+}
 
 dependencies {
     implementation( libs.jsr305 )
     implementation( libs.log4j )
-
-    compileOnly( libs.jetbrains.annotations )
 
     implementation( libs.kotlin.stdlib )
     implementation( libs.kotlin.reflect )
@@ -38,15 +35,9 @@ dependencies {
     testImplementation( libs.gson )
 }
 
-project.dependencies.add("compileOnly", project.files(mc.minecraft))
-mc.dependencies.forEach { project.dependencies.add("compileOnly", it) }
-
 sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/resources"))
 
 // Test
 tasks.test {
     useJUnitPlatform()
 }
-// Fix minivan not adding minecraft to test classpath
-project.dependencies.add("testImplementation", project.files(mc.minecraft))
-mc.dependencies.forEach { project.dependencies.add("testImplementation", it) }

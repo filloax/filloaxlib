@@ -29,7 +29,6 @@
     mixinextras-range = "[0.4.0,)"
     jsr305 = "3.0.1"
     log4j = "2.17.0"
-    jetbrains-annotations = "24.0.1"
 
 # Test
     junit = "5.8.1"
@@ -44,7 +43,7 @@
     plugin-mixin = "0.7.+"
     plugin-parchment-forge-gradle = "1.+"
     plugin-loom = "1.7-SNAPSHOT"
-    plugin-minivan = "0.5"
+    plugin-vanilla-gradle = "0.2.1-SNAPSHOT"
 
 [libraries]
 # Mixin
@@ -67,7 +66,6 @@
 # Misc
     jsr305 = { group = "com.google.code.findbugs", name = "jsr305", version.ref = "jsr305" }
     log4j = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
-    jetbrains-annotations = { group = "org.jetbrains", name = "annotations", version.ref = "jetbrains-annotations" }
 
 # Test
     junit = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit" }
@@ -82,8 +80,10 @@
     curseforgegradle = { id = "net.darkhax.curseforgegradle", version.ref = "plugin-curseforge-gradle" }
 
 # Platform
-    minivan = { id = "agency.highlysuspect.minivan", version.ref = "plugin-minivan" }
+    vanillagradle = { id = "org.spongepowered.gradle.vanilla", version.ref = "plugin-vanilla-gradle" }
+    forgegradle = { id = "net.minecraftforge.gradle", version.ref = "plugin-forge-gradle" }
     loom = { id = "fabric-loom", version.ref = "plugin-loom" }
+    parchmentforgegradle = { id = "org.parchmentmc.librarian.forgegradle", version.ref = "plugin-parchment-forge-gradle" }
 
 # Misc
     ideaext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "plugin-idea-ext" }
