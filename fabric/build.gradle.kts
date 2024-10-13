@@ -1,8 +1,6 @@
 plugins {
     id("multiloader-convention")
 
-    alias(libs.plugins.minotaur)
-    alias(libs.plugins.curseforgegradle)
     alias(libs.plugins.loom)
     alias(libs.plugins.kotlinserialization)
 }
