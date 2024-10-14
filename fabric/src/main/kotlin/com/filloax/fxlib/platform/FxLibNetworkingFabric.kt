@@ -1,4 +1,4 @@
-package com.filloax.fxlib.networking
+package com.filloax.fxlib.platform
 
 import com.filloax.fxlib.api.networking.FxLibNetworking
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
@@ -21,8 +21,8 @@ class FxLibNetworkingFabric : FxLibNetworking {
             ClientPlayNetworking.send(payload)
             callback?.onSuccess()
         } catch (e: Exception) {
-            e.printStackTrace()
             callback?.onFailure()
+            throw e
         }
     }
 }

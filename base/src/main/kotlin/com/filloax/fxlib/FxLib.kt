@@ -18,10 +18,8 @@ abstract class FxLib {
     abstract fun initCallbacks()
 
     companion object {
-        @JvmField
-        val MOD_ID = "fxlib"
-        @JvmField
-        val MOD_NAME = "FXLib"
+        const val MOD_ID = "filloaxlib"
+        const val MOD_NAME = "FilloaxLib"
 
         @JvmField
         val logger: Logger = LogManager.getLogger()

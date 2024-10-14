@@ -56,5 +56,6 @@ rootProject.name = modid
 
 listOf(
     "base",
-    "fabric"
+    "fabric",
+    "neoforge",
 ).forEach { include(it) }

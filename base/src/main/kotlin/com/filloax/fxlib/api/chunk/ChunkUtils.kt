@@ -52,9 +52,9 @@ inline fun <reified T : Entity> LevelChunk.getEntities(
 ) {
     val aabb = this.getAABB()
     if (limit != null)
-        this.level.getEntities(entityTypeTest, aabb, predicate, output, limit)
+        this.level!!.getEntities(entityTypeTest, aabb, predicate, output, limit)
     else
-        this.level.getEntities(entityTypeTest, aabb, predicate, output)
+        this.level!!.getEntities(entityTypeTest, aabb, predicate, output)
 }
 
 inline fun <reified T : Entity> LevelChunk.getEntities(
