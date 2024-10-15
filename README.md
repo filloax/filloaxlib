@@ -4,7 +4,7 @@ Simple Kotlin library for Minecraft Fabric that contains some handy functions fo
 IMPORTANT: jitpack in current version doesn't seem to work properly, its version doesn't properly work in some inheritances (like FxSavedData)
 while local versions do.
 
-To use in your project use [JitPack](https://jitpack.io/#filloax/fx-lib), like this:
+To use in your project use [JitPack](https://jitpack.io/#filloax/filloaxlib), like this:
 
 1. Add Jitpack repository to build.gradle.
 
@@ -22,9 +22,9 @@ dependencyResolutionManagement {
 
 ```kt
 dependencies {
-  implementation("com.github.filloax:fx-lib:Tag")
+  implementation("com.github.filloax:filloaxlib:Tag")
   // for example
-  implementation("com.github.filloax:fx-lib:v0.10.0-1.20.4-fabric")
+  implementation("com.github.filloax:filloaxlib:v0.30.0-1.21-fabric")
 }
 ```
 
