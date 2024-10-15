@@ -13,11 +13,11 @@ $neoforgedUrl = "https://jitpack.io/com/github/filloax/filloaxlib/v$version-neof
 $fabricUrl = "https://jitpack.io/com/github/filloax/filloaxlib/v$version-fabric/filloaxlib-v$version-fabric.pom"
 
 # Start async curl calls
-Write-Host "Starting common build"
+Write-Host "Starting common build to $commonUrl"
 Invoke-RestMethod -Uri $commonUrl &
 
-Write-Host "Starting neoforged build"
-Invoke-RestMethod -Uri $neoforgedUrl &
+# Write-Host "Starting neoforged build"
+# Invoke-RestMethod -Uri $neoforgedUrl &
 
-Write-Host "Starting fabric build"
-Invoke-RestMethod -Uri $fabricUrl &
+# Write-Host "Starting fabric build"
+# Invoke-RestMethod -Uri $fabricUrl &
