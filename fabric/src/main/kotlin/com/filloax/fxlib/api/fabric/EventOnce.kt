@@ -82,8 +82,7 @@ object EventOnce {
             clearOnServerShutdown,
             // predicateHandler,
             throwOnFail,
-        )
-        )
+        ))
     }
 
     fun runOnEntityWhenPossible(level: ServerLevel, entityUUID: UUID, action: (Entity) -> Unit) {

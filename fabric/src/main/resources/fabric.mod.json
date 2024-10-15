@@ -18,14 +18,14 @@
     ],
     "client": [
       {
-        "value": "com.filloax.fxlib.client.FxLibClientFabric",
+        "value": "com.filloax.fxlib.platform.FxLibClientFabric",
         "adapter": "kotlin"
       }
     ]
   },
   "mixins": [
-    "${mod_id}.base.mixins.json",
-    "${mod_id}.mixins.json"
+    "${mod_id}.mixins.json",
+    "${mod_id}.fabric.mixins.json"
   ],
   "depends": {
     "fabric-language-kotlin": ">=${fabric_kotlin_version}",

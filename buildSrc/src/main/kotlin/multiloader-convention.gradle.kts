@@ -71,6 +71,11 @@ val minecraftVersionRange = libs.get().findVersion("minecraft.range").get()
 val fapiVersion = libs.get().findVersion("fabric.api").get()
 val fabricVersion = libs.get().findVersion("fabric").get()
 val fabricKotlinVersion = libs.get().findVersion("fabric.language.kotlin").get()
+val neoforgeVersion = libs.get().findVersion("neoforge").get()
+val neoforgeVersionRange = libs.get().findVersion("neoforge.range").get()
+val fmlVersionRange = libs.get().findVersion("fml.range").get()
+val kotlinforgeVersion = libs.get().findVersion("kotlinforge").get()
+val kotlinforgeVersionRange = libs.get().findVersion("kotlinforge.range").get()
 
 tasks.withType<Jar>().configureEach {
     from(rootProject.file("LICENSE")) {
@@ -114,6 +119,11 @@ tasks.withType<ProcessResources>().configureEach {
             "fabric_api_version" to fapiVersion,
             "fabric_loader_version" to fabricVersion,
             "fabric_kotlin_version" to fabricKotlinVersion,
+            "neoforge_version" to neoforgeVersion,
+            "neoforge_version_range" to neoforgeVersionRange,
+            "fml_version_range" to fmlVersionRange,
+            "kotlinforge_version" to kotlinforgeVersion,
+            "kotlinforge_version_range" to kotlinforgeVersionRange,
             "mod_name" to modName,
             "author" to author,
             "mod_id" to modid,
@@ -121,7 +131,7 @@ tasks.withType<ProcessResources>().configureEach {
             "description" to modDescription
     )
 
-    filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "META-INF/mods.toml", "*.mixins.json")) {
+    filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "META-INF/neoforge.mods.toml", "*.mixins.json")) {
         expand(expandProps)
     }
 

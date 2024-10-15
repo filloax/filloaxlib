@@ -1,5 +1,5 @@
 [versions]
-    modversion = "0.29.0"
+    modversion = "0.30.0"
 
 # General Dependencies
     minecraft-range = "[1.21]"
@@ -20,7 +20,11 @@
     fabric-language-kotlin = "1.11.0+kotlin.2.0.0"
 
 # Neoforge Settings
-
+    neoforge = "21.0.167"
+    neoforge-range = "[21.0.0,)"
+    kotlinforge = "5.3.0"
+    kotlinforge-range = "[5.3,)"
+    fml-range = "[4,)"
 
 # Dependencies
     mixin = "0.8.5"
@@ -54,6 +58,7 @@
     fabric = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fabric" }
     fabric-api = { group = "net.fabricmc.fabric-api", name = "fabric-api", version.ref = "fabric-api" }
     fabric-kotlin = { group = "net.fabricmc", name = "fabric-language-kotlin", version.ref = "fabric-language-kotlin" }
+    kotlinforge = { group = "thedarkcolour", name = "kotlinforforge-neoforge", version.ref = "kotlinforge" }
     minecraft = { group = "com.mojang", name = "minecraft", version.ref = "minecraft" }
 
 # Misc

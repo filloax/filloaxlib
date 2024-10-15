@@ -1,5 +1,6 @@
-package com.filloax.fxlib.client
+package com.filloax.fxlib.platform
 
+import com.filloax.fxlib.client.FxLibClient
 import net.fabricmc.api.ClientModInitializer
 
 class FxLibClientFabric : ClientModInitializer, FxLibClient() {
