@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.30.0
+
+Major change
+- Neoforge support! Tentative, will need further testing
+- Rename to FilloaxLib (except package names for sanity)
+
 ## 0.29.0
 
 Added
