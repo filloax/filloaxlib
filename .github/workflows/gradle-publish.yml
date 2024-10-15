@@ -67,28 +67,8 @@ jobs:
         latest_changelog=$(sed -n "/## $latest_version/,/## /p" CHANGELOG.md | sed '$d')
         echo "$latest_changelog" > latest_changelog.txt
 
-    - name: Publish (Fabric)
-      uses: softprops/action-gh-release@v2
-      with:
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - Fabric ${{ env.MINECRAFT_VERSION }}
-        body_path: latest_changelog.txt
-        token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
-        make_latest: false
-        tag_name: "v${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}-fabric"
-        files: |
-          fabric/build/libs/*.jar
+    # TODO: modrinth publish
 
-    - name: Publish (Neoforged)
-      uses: softprops/action-gh-release@v2
-      with:
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - Neoforged ${{ env.MINECRAFT_VERSION }}
-        body_path: latest_changelog.txt
-        token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
-        make_latest: false
-        tag_name: "v${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}-neoforged"
-        files: |
-          neoforge/build/libs/*.jar
-      
     - name: Publish (Common)
       uses: softprops/action-gh-release@v2
       with:
