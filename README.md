@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/filloax/filloaxlib.svg)](https://jitpack.io/#filloax/filloaxlib)
+
 ![](./logo.png)
 
 Simple Kotlin library for Minecraft Fabric that contains some handy functions for mods I worked in.
