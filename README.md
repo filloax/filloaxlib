@@ -36,7 +36,7 @@ dependencyResolutionManagement {
 dependencies {
   implementation("com.github.filloax.filloaxlib:filloaxlib-${loader}:Tag")
   // for example
-  implementation("com.github.filloax.filloaxlib:filloaxlib-fabric:0.31.0-1.21")
+  implementation("com.github.filloax.filloaxlib:filloaxlib-common:0.31.0-1.21")
 }
 ```
 
