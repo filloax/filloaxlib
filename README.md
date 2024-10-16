@@ -81,7 +81,9 @@ dependencies {
 }
 ```
 
-
+Additionally, if you want to include the jar for this library, you'll either need to
+also include kotlin-events or use shadow jar or similar plugins to include transitive
+dependencies.
 
 </details>
 
