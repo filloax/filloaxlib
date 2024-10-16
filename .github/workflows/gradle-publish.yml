@@ -108,3 +108,9 @@ jobs:
         files: |
           neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
           neoforge/build/libs/*-@(dev|sources|javadocs).jar
+
+    - name: Trigger Jitpack build
+      run: |
+        curl -L https://jitpack.io/com/github/filloax/filloaxlib/${{ env.TAG }}/filloaxlib-${{ env.TAG }}.pom &
+      env:
+        TAG: "${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION }}"

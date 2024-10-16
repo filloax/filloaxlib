@@ -34,9 +34,9 @@ dependencyResolutionManagement {
 
 ```kt
 dependencies {
-  implementation("com.github.filloax:filloaxlib:Tag")
+  implementation("com.github.filloax.filloaxlib:filloaxlib-${loader}:Tag")
   // for example
-  implementation("com.github.filloax:filloaxlib:v0.30.0-1.21-fabric")
+  implementation("com.github.filloax.filloaxlib:filloaxlib-fabric:0.31.0-1.21")
 }
 ```
 
