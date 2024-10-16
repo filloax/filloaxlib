@@ -2,7 +2,7 @@
     modversion = "0.31.0"
 
 # General Dependencies
-    minecraft-range = "[1.21]"
+    minecraft-range = "[1.21, 1.21.1]"
     minecraft = "1.21"
     # Get versions from https://parchmentmc.org/docs/getting-started
     parchment-minecraft = "1.21"
