@@ -4,13 +4,8 @@ on:
     branches:
       - 'release/1.21'
 
-#Environment variables that can later be referenced using ${{ env.MINECRAFT_VERSION }}. These are useful for repeating information and allow for quick changes for new mod updates
 env: 
-  JAVA_VERSION: 21                   
-  # RELEASE_NAME: FxLib
   GITHUB_TOKEN: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
-  MINECRAFT_VERSION: 1.21
-  MC_VER_EXTRA: 1.21.1    # Minor releases that are still compatible
 
 permissions:
   contents: write
@@ -25,11 +20,32 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      
-    - name: Set up JDK 21
+
+    - name: "Read Java version"
+      uses: BrycensRanch/read-properties-action@latest
+      id: java_version
+      with:
+        file: gradle.properties
+        property: javaVersion
+
+    - name: "Read MC version"
+      uses: SebRollen/toml-action@v1.2.0
+      id: mc_version
+      with:
+        file: 'gradle/libs.versions.toml'
+        field: 'versions.minecraft'
+
+    - name: "Read MC version range"
+      uses: SebRollen/toml-action@v1.2.0
+      id: mc_version_range
+      with:
+        file: 'gradle/libs.versions.toml'
+        field: 'versions.minecraft.range'
+        
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: '21'
+        java-version: ${{ steps.java_version.outputs.javaVersion }}
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
@@ -58,11 +74,11 @@ jobs:
     - name: Publish (Github)
       uses: softprops/action-gh-release@v2
       with:
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ env.MINECRAFT_VERSION }}
+        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }}
         body_path: latest_changelog.txt
         token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
         make_latest: true
-        tag_name: "${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION}}"
+        tag_name: "${{ steps.get_version.outputs.VERSION }}-${{steps.mc_version.outputs.value}}"
         target_commitish: ${{ env.GITHUB_SHA }}
         files: |
           base/build/libs/*.jar
@@ -74,16 +90,14 @@ jobs:
       with:
         modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
 
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ env.MINECRAFT_VERSION }} Fabric
+        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }} Fabric
         version-type: beta
 
-        game-versions: |
-          ${{ env.MINECRAFT_VERSION }}
-          ${{ env.MC_VER_EXTRA }}
+        game-versions: ${{ steps.mc_version_range.outputs.value }}
         dependencies: |
           fabric-language-kotlin(required)
           fabric-api(required)
-        java: 21
+        java: ${{ steps.java_version.outputs.javaVersion }}
 
         changelog-file: latest_changelog.txt
         files: |
@@ -95,14 +109,16 @@ jobs:
       with:
         modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
 
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ env.MINECRAFT_VERSION }} Neoforged
+        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }} Neoforged
         version-type: beta
 
-        game-versions: |
-          ${{ env.MINECRAFT_VERSION }}
-          ${{ env.MC_VER_EXTRA }}
+        loaders: |
+          neoforge
+        modrinth-id: JAKPaut3
+
+        game-versions: ${{ steps.mc_version_range.outputs.value }}
         dependencies:
-        java: 21
+        java: ${{ steps.java_version.outputs.javaVersion }}
 
         changelog-file: latest_changelog.txt
         files: |
@@ -113,4 +129,4 @@ jobs:
       run: |
         curl -L https://jitpack.io/com/github/filloax/filloaxlib/${{ env.TAG }}/filloaxlib-${{ env.TAG }}.pom &
       env:
-        TAG: "${{ steps.get_version.outputs.VERSION }}-${{env.MINECRAFT_VERSION }}"
+        TAG: "${{ steps.get_version.outputs.VERSION }}-${{steps.mc_version.outputs.value }}"
