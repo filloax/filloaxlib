@@ -21,34 +21,67 @@ You can also find the common versions in the [Releases](https://github.com/fillo
 1. Add [JitPack](https://jitpack.io/#filloax/filloaxlib) repository to build.gradle.
 
 ```kt
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
-    }
+// this uses the kotlin DSL, adapt it if you use a classic Groovy build.gradle
+repositories {
+  maven("https://jitpack.io")
 }
 ```
 
 2. Add dependency to build.gradle
 
 ```kt
+// this uses the kotlin DSL, adapt it if you use a classic Groovy build.gradle
 dependencies {
-  implementation("com.github.filloax:filloaxlib:Tag")
+  implementation("com.github.filloax.filloaxlib:filloaxlib-common:tag")
   // for example
-  implementation("com.github.filloax:filloaxlib:v0.30.0-1.21-fabric")
+  implementation("com.github.filloax.filloaxlib:filloaxlib-common:0.31.0-1.21")
 }
 ```
-
-Guide is also in the JitPack link. The first time a version gets downloaded (globally) it will likely time out as
-JitPack still needs to build it.
 </details>
 
 
 <details>
 <summary>Modrinth maven (Fabric/Neoforge)</summary>
 
-TODO
+The recommended way to depend on the loader-specific versions of the mod is using [Modrinth Maven](https://support.modrinth.com/en/articles/8801191-modrinth-maven).
+
+1. Add the Maven repository to build.gradle.
+
+```kt
+// this uses the kotlin DSL, adapt it if you use a classic Groovy build.gradle
+repositories {
+  exclusiveContent {
+    forRepository {
+        maven {
+            name = "Modrinth"
+            url = uri("https://api.modrinth.com/maven")
+        }
+    }
+    filter { includeGroup("maven.modrinth") }
+  }
+  // this is needed for kotlinevents, see below
+  maven("https://jitpack.io")
+}
+```
+
+2. Add dependency to build.gradle (including compile libraries)
+
+```kt
+// this uses the kotlin DSL, adapt it if you use a classic Groovy build.gradle
+dependencies {
+  implementation("maven.modrinth:filloaxlib:<version>-<loader>")
+  // for example
+  implementation("maven.modrinth:filloaxlib:0.31.0-1.21-neoforge")
+  // loom notation
+  modImplementation("maven.modrinth:filloaxlib:0.31.0-1.21-fabric")
+
+  // this is needed only with the loader-specific modules until I find out how
+  // to fix it
+  compileOnly("com.github.stuhlmeier:kotlin-events:v2.0")
+}
+```
+
+
 
 </details>
 
