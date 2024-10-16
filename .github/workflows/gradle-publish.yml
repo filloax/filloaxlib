@@ -41,9 +41,6 @@ jobs:
       with:
         file: 'gradle/libs.versions.toml'
         field: 'versions.minecraft-range'
-
-    - name: "Show environment variables"
-      run: "echo java_version=${{ steps.java_version.outputs.javaVersion }} mc_version=${{ steps.mc_version.outputs.value }} mc_version_range=${{ steps.mc_version_range.outputs.value }}"
         
     - name: Set up JDK
       uses: actions/setup-java@v4
@@ -63,6 +60,9 @@ jobs:
     - name: Get version from gradle
       id: get_version
       run: echo "VERSION=$(./gradlew modVersion | grep VERSION | awk -F'=' '{print $2}')" >> $GITHUB_OUTPUT
+
+    - name: "Show environment variables"
+      run: "echo version=${{steps.get_version.outputs.VERSION}} java_version=${{ steps.java_version.outputs.javaVersion }} mc_version=${{ steps.mc_version.outputs.value }} mc_version_range=${{ steps.mc_version_range.outputs.value }}"
 
     - name: Build with Gradle
       run: ./gradlew build
