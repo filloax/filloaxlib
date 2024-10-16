@@ -1,8 +1,13 @@
+[![](https://jitpack.io/v/filloax/filloaxlib.svg)](https://jitpack.io/#filloax/filloaxlib)
+
 <img src="logo.png" width="300px">
 
 Simple Kotlin library for Minecraft Fabric that contains some handy functions for mods I worked in.
 
 You can find Fabric and Neoforge versions on [Modrinth](https://modrinth.com/mod/filloaxlib).
+
+Includes [kotlin-events](https://github.com/svby/kotlin-events) to use as a common event system in 
+the loader-less modules in my mods.
 
 To use in your project either use [JitPack](https://jitpack.io/#filloax/filloaxlib) or [Modrinth Maven](https://support.modrinth.com/en/articles/8801191-modrinth-maven), depending on if you want the 
 common version (to use in the loader-less common project in cross-loader mods) or the loader-specific

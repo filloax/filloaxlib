@@ -66,6 +66,12 @@ dependencies {
         exclude(module = "fabric-api-deprecated")
     }
     modImplementation( libs.fabric.kotlin )
+
+    includeLibs.forEach {
+        api(it)
+        include(it)
+    }
+
     compileOnly(baseProject)
 }
 

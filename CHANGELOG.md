@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.31.0
+
+Added
+- Included [kotlin-events](https://github.com/svby/kotlin-events)
+- Custom event utilities
+
 ## 0.30.0
 
 Major change

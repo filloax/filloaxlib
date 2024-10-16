@@ -41,18 +41,20 @@ neoForge {
 }
 
 dependencies {
-    implementation( libs.jsr305 )
-    implementation( libs.log4j )
+    compileOnly( libs.jsr305 )
+    compileOnly( libs.log4j )
 
-    implementation( libs.kotlin.stdlib )
-    implementation( libs.kotlin.reflect )
-    implementation( libs.kotlin.serialization )
+    compileOnly( libs.kotlin.stdlib )
+    compileOnly( libs.kotlin.reflect )
+    compileOnly( libs.kotlin.serialization )
 
     compileOnly( libs.mixin )
     compileOnly( libs.mixinextras.common )
 
-    testImplementation( libs.junit.jupiter )
-    testImplementation( libs.gson )
+    includeLibs.forEach { api(it) }
+
+    testCompileOnly( libs.junit.jupiter )
+    testCompileOnly( libs.gson )
     testRuntimeOnly( libs.junit.launcher )
 }
 
