@@ -1,6 +1,6 @@
 [![](https://jitpack.io/v/filloax/filloaxlib.svg)](https://jitpack.io/#filloax/filloaxlib)
 
-![](./logo.png)
+<img src="logo.png" width="300px">
 
 Simple Kotlin library for Minecraft Fabric that contains some handy functions for mods I worked in.
 

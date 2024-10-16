@@ -39,6 +39,9 @@
   "custom": {
     "modmenu": {
       "badges": [ "library" ]
+    },
+    "mc-publish": {
+      "modrinth": "JAKPaut3"
     }
   }
 }

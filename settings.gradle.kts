@@ -29,6 +29,7 @@ pluginManagement {
                 includeGroupAndSubgroups("org.parchmentmc")
             }
         }
+        maven { url = uri("https://repo.sleeping.town/") }
         maven {
             name = "Sponge"
             url = uri("https://repo.spongepowered.org/repository/maven-public/")

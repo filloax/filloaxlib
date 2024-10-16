@@ -65,6 +65,7 @@ val libs = project.versionCatalogs.find("libs").get()
 val modid: String by project
 val modName: String by project
 val modDescription: String by project
+val modIcon: String by project
 val mavenGroup: String by project
 val baseName: String by project
 val author: String by project
@@ -134,7 +135,8 @@ tasks.withType<ProcessResources>().configureEach {
             "author" to author,
             "mod_id" to modid,
             "license" to license,
-            "description" to modDescription
+            "description" to modDescription,
+            "mod_icon" to modIcon,
     )
 
     filesMatching(listOf("pack.mcmeta", "fabric.mod.json", "META-INF/neoforge.mods.toml", "*.mixins.json")) {
