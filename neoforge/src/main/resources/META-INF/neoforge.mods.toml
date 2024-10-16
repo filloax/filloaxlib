@@ -17,7 +17,10 @@ displayName="${mod_name}"
 displayURL="https://github.com/filloax/filloax-lib"
 #logoFile="examplemod.png" #optional
 #credits=""
-authors="${author}"
+authors='''${author}
+Contributions
+kotlin-events by svby
+'''
 description='''${description}'''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.

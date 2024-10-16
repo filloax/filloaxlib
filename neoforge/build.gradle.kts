@@ -91,6 +91,11 @@ dependencies {
     implementation( libs.kotlinforge )
     implementation( libs.kotlin.serialization )
 
+    includeLibs.forEach {
+        api(it)
+        jarJar(it)
+    }
+
     compileOnly(baseProject)
 }
 

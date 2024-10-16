@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -52,9 +53,14 @@ repositories {
         name = "BlameJared"
         url = uri("https://maven.blamejared.com")
     }
+
+    exclusiveContent {
+        forRepositories(maven { url = uri("https://jitpack.io") })
+        filter { includeGroup("com.github.stuhlmeier") }
+    }
 }
 
-val libs = project.versionCatalogs.find("libs")
+val libs = project.versionCatalogs.find("libs").get()
 
 val modid: String by project
 val modName: String by project
@@ -65,17 +71,17 @@ val author: String by project
 val license: String by project
 val displayUrl: String by project
 
-val version = libs.get().findVersion("modversion").get()
-val minecraftVersion = libs.get().findVersion("minecraft").get()
-val minecraftVersionRange = libs.get().findVersion("minecraft.range").get()
-val fapiVersion = libs.get().findVersion("fabric.api").get()
-val fabricVersion = libs.get().findVersion("fabric").get()
-val fabricKotlinVersion = libs.get().findVersion("fabric.language.kotlin").get()
-val neoforgeVersion = libs.get().findVersion("neoforge").get()
-val neoforgeVersionRange = libs.get().findVersion("neoforge.range").get()
-val fmlVersionRange = libs.get().findVersion("fml.range").get()
-val kotlinforgeVersion = libs.get().findVersion("kotlinforge").get()
-val kotlinforgeVersionRange = libs.get().findVersion("kotlinforge.range").get()
+val version = libs.findVersion("modversion").get()
+val minecraftVersion = libs.findVersion("minecraft").get()
+val minecraftVersionRange = libs.findVersion("minecraft.range").get()
+val fapiVersion = libs.findVersion("fabric.api").get()
+val fabricVersion = libs.findVersion("fabric").get()
+val fabricKotlinVersion = libs.findVersion("fabric.language.kotlin").get()
+val neoforgeVersion = libs.findVersion("neoforge").get()
+val neoforgeVersionRange = libs.findVersion("neoforge.range").get()
+val fmlVersionRange = libs.findVersion("fml.range").get()
+val kotlinforgeVersion = libs.findVersion("kotlinforge").get()
+val kotlinforgeVersionRange = libs.findVersion("kotlinforge.range").get()
 
 tasks.withType<Jar>().configureEach {
     from(rootProject.file("LICENSE")) {
@@ -96,8 +102,8 @@ tasks.withType<Jar>().configureEach {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = javaVersion.toString()
+    compilerOptions {
+        jvmTarget.set(JvmTarget.valueOf("JVM_$javaVersion"))
     }
 }
 

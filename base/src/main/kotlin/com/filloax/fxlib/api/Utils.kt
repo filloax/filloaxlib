@@ -37,6 +37,9 @@ object FxUtils {
     @JvmStatic
     fun getServer() = FxLibServices.platform.getServer()
 
+    @JvmStatic
+    fun isDevEnvironment() = FxLibServices.platform.isDevEnvironment()
+
     /**
      * Decode structure key/tag string as found in commands, data, etc.
      */

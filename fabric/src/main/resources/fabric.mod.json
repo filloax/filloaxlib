@@ -5,7 +5,9 @@
   "name": "${mod_name}",
   "description": "${description}",
   "authors": ["${author}"],
-  "contributors": [],
+  "contributors": [
+    "kotlin-events by svby"
+  ],
   "contact": {},
   "license": "${license}",
   "environment": "*",
