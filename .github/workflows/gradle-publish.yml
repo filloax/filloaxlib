@@ -10,6 +10,7 @@ env:
   # RELEASE_NAME: FxLib
   GITHUB_TOKEN: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
   MINECRAFT_VERSION: 1.21
+  MC_VER_EXTRA: 1.21.1    # Minor releases that are still compatible
 
 permissions:
   contents: write
@@ -73,11 +74,11 @@ jobs:
       with:
         modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
 
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ env.MC_VER }} Fabric
+        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ env.MINECRAFT_VERSION }} Fabric
         version-type: beta
 
         game-versions: |
-          ${{ env.MC_VER }}
+          ${{ env.MINECRAFT_VERSION }}
           ${{ env.MC_VER_EXTRA }}
         dependencies: |
           fabric-language-kotlin(required)
@@ -94,11 +95,11 @@ jobs:
       with:
         modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
 
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ env.MC_VER }} Neoforged
+        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ env.MINECRAFT_VERSION }} Neoforged
         version-type: beta
 
         game-versions: |
-          ${{ env.MC_VER }}
+          ${{ env.MINECRAFT_VERSION }}
           ${{ env.MC_VER_EXTRA }}
         dependencies:
         java: 21
