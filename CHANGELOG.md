@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.32.0
+
+Added
+- Networking registrator, to support cross-loader packet and handler registration
+
 ## 0.31.0
 
 Added
