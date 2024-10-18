@@ -33,8 +33,9 @@
     "fabric-language-kotlin": ">=${fabric_kotlin_version}",
     "fabricloader": ">=${fabric_loader_version}",
     "fabric-api": ">=${fabric_api_version}",
-    "fabric": "*"
-  },
+    "fabric": "*",
+    "minecraft": ${fabric_minecraft_version_range}
+},
   "accessWidener": "${mod_id}.accesswidener",
   "custom": {
     "modmenu": {

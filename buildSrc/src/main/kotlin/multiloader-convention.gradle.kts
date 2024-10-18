@@ -75,6 +75,7 @@ val displayUrl: String by project
 val version = libs.findVersion("modversion").get()
 val minecraftVersion = libs.findVersion("minecraft").get()
 val minecraftVersionRange = libs.findVersion("minecraft.range").get()
+val fabricMinecraftVersionRange = libs.findVersion("minecraft.range.fabric").get()
 val fapiVersion = libs.findVersion("fabric.api").get()
 val fabricVersion = libs.findVersion("fabric").get()
 val fabricKotlinVersion = libs.findVersion("fabric.language.kotlin").get()
@@ -123,6 +124,7 @@ tasks.withType<ProcessResources>().configureEach {
             "display_url" to displayUrl, // Else we target the task's group.
             "minecraft_version" to minecraftVersion,
             "minecraft_version_range" to minecraftVersionRange,
+            "fabric_minecraft_version_range" to fabricMinecraftVersionRange,
             "fabric_api_version" to fapiVersion,
             "fabric_loader_version" to fabricVersion,
             "fabric_kotlin_version" to fabricKotlinVersion,
