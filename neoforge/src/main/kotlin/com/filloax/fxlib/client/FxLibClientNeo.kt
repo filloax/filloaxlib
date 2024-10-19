@@ -1,13 +1,11 @@
 package com.filloax.fxlib.client
 
 import com.filloax.fxlib.FxLib
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.IEventBus
-import net.neoforged.fml.common.Mod
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 
-@Mod(value = FxLib.MOD_ID, dist = [Dist.CLIENT])
-class FxLibClientNeo(bus: IEventBus) : FxLibClient() {
-    init {
+object FxLibClientNeo : FxLibClient() {
+    fun initializeClient(event: FMLClientSetupEvent) {
+        FxLib.logger.info("Initializing client...")
         initialize()
     }
 }

@@ -12,18 +12,20 @@ import net.minecraft.network.protocol.PacketFlow
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.server.level.ServerPlayer
 import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.network.PacketDistributor
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
 import net.neoforged.neoforge.network.registration.PayloadRegistrar
 import net.neoforged.neoforge.server.ServerLifecycleHooks
 
 class FxLibNetworkingNeo : FxLibNetworking {
+    @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
     companion object {
         val registrator = DelegatingPacketRegistrator()
 
         @SubscribeEvent
-        @JvmStatic
         fun registerPayloadsEvent(event: RegisterPayloadHandlersEvent) {
+            FxLib.logger.info("Setting up networking...")
             val registrar = event.registrar(FxLib.MOD_ID)
             registrator.setDelegate(PacketRegistratorNeo(registrar))
         }

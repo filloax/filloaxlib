@@ -1,20 +1,26 @@
 package com.filloax.fxlib
 
+import com.filloax.fxlib.api.neoforge.EventOnce
+import com.filloax.fxlib.client.FxLibClientNeo
+import com.filloax.fxlib.platform.fxLibEvents
 import com.filloax.fxlib.structure.FXLibStructurePlacementTypes
 import com.filloax.fxlib.structure.FXLibStructurePoolElements
 import com.filloax.fxlib.structure.FXLibStructures
+import net.minecraft.client.Minecraft
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.neoforged.bus.api.IEventBus
+import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.registries.DeferredRegister
 import java.util.function.Supplier
-
+import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
+import thedarkcolour.kotlinforforge.neoforge.forge.runForDist
 
 @Mod(FxLib.MOD_ID)
-class FxLibNeo(bus: IEventBus) : VersionFxLib() {
+object FxLibNeo : VersionFxLib() {
     //region registries
     private val registries = mutableListOf<DeferredRegister<*>>()
 
@@ -25,7 +31,25 @@ class FxLibNeo(bus: IEventBus) : VersionFxLib() {
 
     init {
         initialize()
-        registerRegistries(bus)
+
+        runForDist(
+            clientTarget = {
+                MOD_BUS.addListener(FxLibClientNeo::initializeClient)
+                Minecraft.getInstance()
+            },
+            serverTarget = {
+                logger.info("Starting server...")
+                "filloaxlib"
+            }
+        )
+
+        registerRegistries(MOD_BUS)
+    }
+
+    override fun initPlatformCallbacks() {
+        fxLibEvents.onServerStopped { server ->
+            EventOnce.Callbacks.onServerShutdown(server)
+        }
     }
 
     override fun initRegistryStructurePlacementType() {

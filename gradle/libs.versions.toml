@@ -23,8 +23,8 @@
 # Neoforge Settings
     neoforge = "21.0.167"
     neoforge-range = "[21.0.0,)"
-    kotlinforge = "5.3.0"
-    kotlinforge-range = "[5.3,)"
+    kotlinforge = "5.5.0"
+    kotlinforge-range = "[5.5,)"
     fml-range = "[4,)"
 
 # Dependencies

@@ -6,12 +6,12 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ChunkPos
 import net.neoforged.bus.api.Event
-import net.neoforged.neoforge.common.NeoForge
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent
 import net.neoforged.neoforge.event.level.ChunkEvent
 import net.neoforged.neoforge.event.server.ServerStartedEvent
 import java.util.*
 import java.util.function.Consumer
+import thedarkcolour.kotlinforforge.neoforge.forge.FORGE_BUS
 
 object EventOnce {
     // Do not use actual queue classes, due to implementation of iteration below
@@ -19,7 +19,7 @@ object EventOnce {
 
     object Callbacks {
         fun onServerShutdown(server: MinecraftServer) {
-            clearOnShutdown.forEach(NeoForge.EVENT_BUS::unregister)
+            clearOnShutdown.forEach(FORGE_BUS::unregister)
             clearOnShutdown.clear()
         }
     }
@@ -43,10 +43,10 @@ object EventOnce {
         var autoRemovingListener: Consumer<T>? = null
         autoRemovingListener = Consumer { x ->
             listener.accept(x)
-            NeoForge.EVENT_BUS.unregister(autoRemovingListener)
+            FORGE_BUS.unregister(autoRemovingListener)
         }
 
-        NeoForge.EVENT_BUS.addListener(autoRemovingListener)
+        FORGE_BUS.addListener(autoRemovingListener)
 
         if (clearOnServerShutdown) {
             clearOnShutdown.add(autoRemovingListener)
