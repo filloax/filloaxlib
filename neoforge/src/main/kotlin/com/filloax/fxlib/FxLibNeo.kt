@@ -11,6 +11,7 @@ import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
+import net.minecraft.resources.ResourceLocation
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
@@ -54,24 +55,24 @@ object FxLibNeo : VersionFxLib() {
 
     override fun initRegistryStructurePlacementType() {
         FXLibStructurePlacementTypes.registerStructurePlacementTypes { id, value ->
-            STRUCTURE_PLACEMENT.doRegister(id.path, value)
+            STRUCTURE_PLACEMENT.doRegister(id, value)
         }
     }
 
     override fun initRegistryStructurePoolElementType() {
         FXLibStructurePoolElements.registerStructurePoolElementTypes { id, value ->
-            STRUCTURE_POOL_ELEMENT.doRegister(id.path, value)
+            STRUCTURE_POOL_ELEMENT.doRegister(id, value)
         }
     }
 
     override fun initRegistryStructureType() {
         FXLibStructures.registerStructureTypes { id, value ->
-            STRUCTURE_TYPE.doRegister(id.path, value)
+            STRUCTURE_TYPE.doRegister(id, value)
         }
     }
 
-    private fun <T> DeferredRegister<T>.doRegister(name: String, value: T) {
-        register(name, Supplier { value })
+    private fun <T> DeferredRegister<T>.doRegister(name: ResourceLocation, value: T) {
+        register(name.path, Supplier { value })
     }
 
     private fun <T> createReg(key: ResourceKey<Registry<T>>): DeferredRegister<T> {
