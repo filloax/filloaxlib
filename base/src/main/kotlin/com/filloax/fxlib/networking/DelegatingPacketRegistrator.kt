@@ -11,7 +11,7 @@ class DelegatingPacketRegistrator() : PacketRegistrator {
     private var delegate: PacketRegistrator? = null
 
     fun setDelegate(value: PacketRegistrator) {
-        if (delegate != null) {
+        if (delegate == null) {
             delegate = value
             queuedCalls.forEach { it(value) }
             queuedCalls.clear()

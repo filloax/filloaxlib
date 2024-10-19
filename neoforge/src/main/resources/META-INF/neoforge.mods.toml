@@ -1,4 +1,4 @@
-modLoader="javafml"
+modLoader="kotlinforforge"
 loaderVersion="${fml_version_range}"
 
 license="${license}"

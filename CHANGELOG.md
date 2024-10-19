@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.32.1
+
+Fixed
+- Neoforge event registration
+
 ## 0.32.0
 
 Added
