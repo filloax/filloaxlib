@@ -1,7 +1,7 @@
 val kotlinVersion: String by project
 
 plugins {
-//    alias(libs.plugins.ideaext)
+    alias(libs.plugins.ideaext)
 }
 
 // For common build.gradle, do not load plugin but use catalogs directly

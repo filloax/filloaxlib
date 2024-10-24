@@ -2,18 +2,14 @@ plugins {
     id("multiloader-convention")
 
     alias(libs.plugins.moddevgradle)
-    alias(libs.plugins.kotlinserialization)
 }
+val utils = project.utils(versionCatalogs, ext)
 
 val modid: String by project
 val modVersion = libs.versions.modversion.get()
 val minecraftVersion = libs.versions.minecraft.asProvider().get()
 
 version = "$modVersion-${minecraftVersion}-common"
-
-base {
-    archivesName = modid
-}
 
 neoForge {
     neoFormVersion = libs.versions.neoform
@@ -51,28 +47,33 @@ dependencies {
     compileOnly( libs.mixin )
     compileOnly( libs.mixinextras.common )
 
-    includeLibs.forEach { api(it) }
+    utils.includeLibs.forEach { api(it) }
 
     testCompileOnly( libs.junit.jupiter )
     testCompileOnly( libs.gson )
     testRuntimeOnly( libs.junit.launcher )
 }
 
-sourceSets.main.get().resources.srcDir(project(":base").file("src/generated/resources"))
+sourceSets.main.get().resources.srcDir(project.file("src/generated/resources"))
+
+configurations {
+    create(COMMON_JAVA) {
+        isCanBeResolved = false
+        isCanBeConsumed = true
+    }
+    create(COMMON_RESOURCES) {
+        isCanBeResolved = false
+        isCanBeConsumed = true
+    }
+}
+
+artifacts {
+    sourceSets.main.get().java.sourceDirectories.forEach { add(COMMON_JAVA, it) }
+    sourceSets.main.get().kotlin.sourceDirectories.forEach { add(COMMON_JAVA, it) }
+    sourceSets.main.get().resources.sourceDirectories.forEach { add(COMMON_RESOURCES, it) }
+}
 
 // Test
 tasks.test {
     useJUnitPlatform()
-}
-
-
-publishing {
-    publications {
-        create<MavenPublication>("${modid}-common") {
-            from(components["java"])
-            groupId = project.group.toString()
-            artifactId = this.name
-            version = "$modVersion-$minecraftVersion"
-        }
-    }
 }
