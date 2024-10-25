@@ -8,5 +8,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.0.0")
+    implementation(libs.plugin.kotlin.jvm)
+    implementation(libs.plugin.kotlin.serialization)
+    implementation(libs.plugin.dokka)
 }

@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
     java
@@ -7,19 +8,23 @@ plugins {
     idea
 
     kotlin("jvm")
+    kotlin("plugin.serialization")
+
+    // kotlin-compatible javadoc, cannot use base as it errors with kotlin
+    id("org.jetbrains.dokka")
 }
 
 val javaVersion: Int = (property("javaVersion")!! as String).toInt()
-val javaVersionEnum = JavaVersion.values().find { it.majorVersion == javaVersion.toString() } ?: throw Exception("Cannot find java version for $javaVersion")
+
+base {
+    archivesName = property("archives_base_name") as String
+}
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
 
     withSourcesJar()
-    withJavadocJar()
-
-    sourceCompatibility = javaVersionEnum
-    targetCompatibility = javaVersionEnum
+//    withJavadocJar() // uses dokka for kotlin compat
 }
 
 repositories {
@@ -49,17 +54,18 @@ repositories {
         filter { includeGroup("org.parchmentmc.data") }
     }
 
-    maven {
-        name = "BlameJared"
-        url = uri("https://maven.blamejared.com")
-    }
-
     exclusiveContent {
         forRepositories(maven { url = uri("https://jitpack.io") })
         filter { includeGroup("com.github.stuhlmeier") }
     }
+
+    maven {
+        name = "Kotlin for Forge"
+        setUrl("https://thedarkcolour.github.io/KotlinForForge/")
+    }
 }
 
+//region Libs and props
 val libs = project.versionCatalogs.find("libs").get()
 
 val modid: String by project
@@ -81,11 +87,48 @@ val fabricVersion = libs.findVersion("fabric").get()
 val fabricKotlinVersion = libs.findVersion("fabric.language.kotlin").get()
 val neoforgeVersion = libs.findVersion("neoforge").get()
 val neoforgeVersionRange = libs.findVersion("neoforge.range").get()
-val fmlVersionRange = libs.findVersion("fml.range").get()
 val kotlinforgeVersion = libs.findVersion("kotlinforge").get()
 val kotlinforgeVersionRange = libs.findVersion("kotlinforge.range").get()
+//endregion
 
-tasks.withType<Jar>().configureEach {
+//region Artifacts and publishing
+// Declare capabilities on the outgoing configurations.
+// Read more about capabilities here: https://docs.gradle.org/current/userguide/component_capabilities.html#sec:declaring-additional-capabilities-for-a-local-component
+listOf("apiElements", "runtimeElements", "sourcesElements"/*, "javadocElements"*/).forEach { variant ->
+    configurations.getByName(variant).outgoing {
+        capability("$group:${base.archivesName.get()}:$version")
+        capability("$group:$modid-${project.name}-${minecraftVersion}:$version")
+        capability("$group:$modid:$version")
+    }
+    publishing.publications.withType<MavenPublication>().configureEach {
+        suppressPomMetadataWarningsFor(variant)
+    }
+}
+
+
+// Publishing
+publishing {
+    repositories {
+        mavenLocal()
+    }
+
+    publications {
+        register<MavenPublication>("mavenJava") {
+            artifactId = base.archivesName.get()
+            from(components.findByName("java"))
+        }
+    }
+}
+//endregion
+
+//region Task configuration
+tasks.named<Jar>("sourcesJar") {
+    from(rootProject.file("LICENSE")) {
+        rename { "${it}_${modName}" }
+    }
+}
+
+tasks.jar {
     from(rootProject.file("LICENSE")) {
         rename { "${it}_${modName}" }
     }
@@ -100,12 +143,6 @@ tasks.withType<Jar>().configureEach {
                 "Implementation-Vendor"   to author,
                 "Built-On-Minecraft"      to minecraftVersion
         ))
-    }
-}
-
-tasks.withType<KotlinCompile> {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.valueOf("JVM_$javaVersion"))
     }
 }
 
@@ -130,7 +167,6 @@ tasks.withType<ProcessResources>().configureEach {
             "fabric_kotlin_version" to fabricKotlinVersion,
             "neoforge_version" to neoforgeVersion,
             "neoforge_version_range" to neoforgeVersionRange,
-            "fml_version_range" to fmlVersionRange,
             "kotlinforge_version" to kotlinforgeVersion,
             "kotlinforge_version_range" to kotlinforgeVersionRange,
             "mod_name" to modName,
@@ -147,12 +183,7 @@ tasks.withType<ProcessResources>().configureEach {
 
     inputs.properties(expandProps)
 }
-
-publishing {
-    repositories {
-        mavenLocal()
-    }
-}
+//endregion
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 idea {
@@ -160,4 +191,17 @@ idea {
         isDownloadSources = true
         isDownloadJavadoc = true
     }
+}
+
+// Use dokka for kotlin-compatible javadoc
+
+// Make sure our token replacement runs first
+val dokkaJavadocJar = tasks.register<Jar>("dokkaJavadocJar") {
+    dependsOn(tasks.dokkaJavadoc)
+    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
+    archiveClassifier.set("javadoc")
+}
+
+tasks.build {
+    dependsOn(dokkaJavadocJar)
 }

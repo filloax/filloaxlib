@@ -37,3 +37,51 @@ class RegistryHolderDelegate<T>(val id: ResourceLocation, val value: T) {
         return holder ?: throw IllegalStateException("Not initialized holder yet for $id")
     }
 }
+
+/**
+ * Simpler version of [RegistryHolderDelegate], for when you simply need a
+ * direct value instead of a Holder but different loaders may init it later.
+ * (For example: EntityTypes).
+ *
+ * Usage:
+ * ```kt
+ *    private fun <T : LivingEntity> make(
+ *         name: String,
+ *         entityTypeBuilder: EntityType.Builder<T>,
+ *     ) = registryDelegate<EntityType<T>> {
+ *         val id = resLoc(name)
+ *         all[id] = {
+ *             val entityType = entityTypeBuilder.build(id.toString())
+ *             init(entityType)
+ *
+ *             entityType
+ *         }
+ *     }
+ *
+ *     fun registerEntityTypes(registrator: (ResourceLocation, EntityType<*>) -> Unit) {
+ *         all.forEach {
+ *             registrator(it.key, it.value())
+ *         }
+ *     }
+ * ```
+ */
+class RegistryDelegate<T>() {
+    var value: T? = null
+
+    fun init(value: T) {
+        this.value = value
+    }
+
+    operator fun getValue(owner: Any, property: KProperty<*>): T {
+        return value ?: throw IllegalStateException("Not initialized registry delegate value yet!")
+    }
+}
+
+/**
+ * See [RegistryDelegate]
+ */
+fun <T> registryDelegate(block: RegistryDelegate<T>.() -> Unit) = RegistryDelegate<T>().also(block)
+/**
+ * See [RegistryDelegate]
+ */
+fun <T> registryDelegate() = RegistryDelegate<T>()

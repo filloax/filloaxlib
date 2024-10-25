@@ -1,5 +1,5 @@
 [versions]
-    modversion = "0.32.1"
+    modversion = "0.33.0"
 
 # General Dependencies
     minecraft-range = "[1.21, 1.21.1]"
@@ -23,9 +23,8 @@
 # Neoforge Settings
     neoforge = "21.0.167"
     neoforge-range = "[21.0.0,)"
-    kotlinforge = "5.5.0"
-    kotlinforge-range = "[5.5,)"
-    fml-range = "[4,)"
+    kotlinforge = "5.6.0"
+    kotlinforge-range = "[5.6,)"
 
 # Dependencies
     mixin = "0.8.5"
@@ -41,9 +40,11 @@
     gson = "2.11.0"
 
 # Plugins
+    plugin-dokka = "2.0.0-Beta"
     plugin-mixin = "0.7.+"
     plugin-loom = "1.7-SNAPSHOT"
     plugin-moddev = "2.0.36-beta"
+    plugin-idea-ext = "1.1.8"
 
 [libraries]
 # Mixin
@@ -73,10 +74,19 @@
     junit-launcher = { group = "org.junit.platform", name = "junit-platform-launcher", version.ref = "junit-launcher" }
     gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
+# Plugin dependencies (for buildSrc)
+    plugin-kotlin-jvm = { group = "org.jetbrains.kotlin.jvm", name = "org.jetbrains.kotlin.jvm.gradle.plugin", version.ref = "kotlin" }
+    plugin-kotlin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
+    plugin-dokka = { group = "org.jetbrains.dokka", name = "dokka-gradle-plugin", version.ref = "plugin-dokka" }
+
 [plugins]
 # Kotlin
-    kotlinserialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+    kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+    kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 # Platform
     moddevgradle = { id = "net.neoforged.moddev", version.ref = "plugin-moddev" }
     loom = { id = "fabric-loom", version.ref = "plugin-loom" }
+    mixin = { id = "org.spongepowered.mixin", version.ref = "plugin-mixin" }
+
+    ideaext = { id = "org.jetbrains.gradle.plugin.idea-ext", version.ref = "plugin-idea-ext" }

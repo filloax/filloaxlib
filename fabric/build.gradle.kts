@@ -1,9 +1,9 @@
 plugins {
-    id("multiloader-convention")
+    id("multiloader-loader")
 
     alias(libs.plugins.loom)
-    alias(libs.plugins.kotlinserialization)
 }
+val utils = project.utils(versionCatalogs, ext)
 
 val modid: String by project
 val minecraftVersion = libs.versions.minecraft.asProvider().get()
@@ -11,7 +11,7 @@ val minecraftVersion = libs.versions.minecraft.asProvider().get()
 loom {
 //    splitEnvironmentSourceSets()
 
-    accessWidenerPath = project(":base").file("src/main/resources/${modid}.accesswidener")
+    accessWidenerPath = project(COMMON_PROJECT).file("src/main/resources/${modid}.accesswidener")
     mixin.defaultRefmapName = "${modid}.refmap.json"
 
     runs {
@@ -47,13 +47,6 @@ val parchmentVersion = libs.versions.parchment.asProvider().get()
 
 version = "$modVersion-${minecraftVersion}-fabric"
 
-base {
-    archivesName = modid
-}
-
-
-val baseProject = project(":base")
-
 dependencies {
     minecraft( libs.minecraft )
     implementation( libs.jsr305 )
@@ -67,46 +60,8 @@ dependencies {
     }
     modImplementation( libs.fabric.kotlin )
 
-    includeLibs.forEach {
+    utils.includeLibs.forEach {
         api(it)
         include(it)
-    }
-
-    compileOnly(baseProject)
-}
-
-tasks.compileJava {
-    source(baseProject.sourceSets.getByName("main").allSource)
-}
-
-tasks.compileKotlin  {
-    source(baseProject.sourceSets.getByName("main").allSource)
-}
-
-tasks.getByName<Jar>("sourcesJar") {
-    val mainSourceSet = baseProject.sourceSets.getByName("main")
-    from(mainSourceSet.allSource)
-}
-tasks.kotlinSourcesJar {
-    val mainSourceSet = baseProject.sourceSets.getByName("main")
-    from(mainSourceSet.allSource)
-}
-
-tasks.withType<Javadoc>().configureEach {
-    source(baseProject.sourceSets.getByName("main").allJava)
-}
-
-tasks.processResources {
-    from(baseProject.sourceSets.getByName("main").resources)
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("${modid}-fabric") {
-            from(components["java"])
-            groupId = project.group.toString()
-            artifactId = this.name
-            version = "$modVersion-$minecraftVersion"
-        }
     }
 }

@@ -38,13 +38,6 @@ pluginManagement {
             }
         }
     }
-
-    val kotlinVersion: String by settings
-
-    plugins {
-        kotlin("jvm") version kotlinVersion apply false
-        kotlin("plugin.serialization") version kotlinVersion apply false
-    }
 }
 
 plugins {
@@ -56,7 +49,7 @@ val modid: String by settings
 rootProject.name = modid
 
 listOf(
-    "base",
+    "common",
     "fabric",
     "neoforge",
 ).forEach { include(it) }
