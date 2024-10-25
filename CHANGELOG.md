@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.33.0
+
+Added
+- `RegistryDelegate` and `registryDelegate` to simplify registration cross-loader
+
+Fixed
+- Neoforge networking service
+
 ## 0.32.1
 
 Fixed
