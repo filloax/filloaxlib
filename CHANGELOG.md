@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.33.1
+
+Changed
+- `RegistryDelegate` logs registrations
+
 ## 0.33.0
 
 Added
