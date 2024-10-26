@@ -1,7 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.dokka.gradle.DokkaTask
-
 plugins {
     java
     `maven-publish`
@@ -78,7 +74,7 @@ val author: String by project
 val license: String by project
 val displayUrl: String by project
 
-val version = libs.findVersion("modversion").get()
+val modversion = libs.findVersion("modversion").get()
 val minecraftVersion = libs.findVersion("minecraft").get()
 val minecraftVersionRange = libs.findVersion("minecraft.range").get()
 val fabricMinecraftVersionRange = libs.findVersion("minecraft.range.fabric").get()
@@ -96,9 +92,9 @@ val kotlinforgeVersionRange = libs.findVersion("kotlinforge.range").get()
 // Read more about capabilities here: https://docs.gradle.org/current/userguide/component_capabilities.html#sec:declaring-additional-capabilities-for-a-local-component
 listOf("apiElements", "runtimeElements", "sourcesElements"/*, "javadocElements"*/).forEach { variant ->
     configurations.getByName(variant).outgoing {
-        capability("$group:${base.archivesName.get()}:$version")
-        capability("$group:$modid-${project.name}-${minecraftVersion}:$version")
-        capability("$group:$modid:$version")
+        capability("$group:${base.archivesName.get()}:$modversion-${minecraftVersion}")
+        capability("$group:$modid-${project.name}:$modversion-${minecraftVersion}")
+        capability("$group:$modid:$modversion")
     }
     publishing.publications.withType<MavenPublication>().configureEach {
         suppressPomMetadataWarningsFor(variant)
@@ -113,8 +109,9 @@ publishing {
     }
 
     publications {
-        register<MavenPublication>("mavenJava") {
-            artifactId = base.archivesName.get()
+        register<MavenPublication>(project.name) {
+            artifactId = "${base.archivesName.get()}-${this.name}"
+            version = "$modversion-$minecraftVersion"
             from(components.findByName("java"))
         }
     }
@@ -137,9 +134,9 @@ tasks.jar {
         attributes(mapOf(
                 "Specification-Title"     to modName,
                 "Specification-Vendor"    to author,
-                "Specification-Version"   to version,
+                "Specification-Version"   to modversion,
                 "Implementation-Title"    to modName,
-                "Implementation-Version"  to version,
+                "Implementation-Version"  to modversion,
                 "Implementation-Vendor"   to author,
                 "Built-On-Minecraft"      to minecraftVersion
         ))
@@ -156,7 +153,7 @@ tasks.withType<ProcessResources>().configureEach {
     exclude(".cache")
 
     val expandProps = mapOf(
-            "version_prefix" to "$version-$minecraftVersion",
+            "version_prefix" to "$modversion-$minecraftVersion",
             "group" to project.group, // Else we target the task's group.
             "display_url" to displayUrl, // Else we target the task's group.
             "minecraft_version" to minecraftVersion,
