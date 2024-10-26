@@ -1,5 +1,6 @@
 package com.filloax.fxlib.api.registration
 
+import com.filloax.fxlib.FxLib
 import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceLocation
 import kotlin.reflect.KProperty
@@ -48,8 +49,7 @@ class RegistryHolderDelegate<T>(val id: ResourceLocation, val value: T) {
  *    private fun <T : LivingEntity> make(
  *         name: String,
  *         entityTypeBuilder: EntityType.Builder<T>,
- *     ) = registryDelegate<EntityType<T>> {
- *         val id = resLoc(name)
+ *     ) = registryDelegate(ResourceLocation.fromNamespaceAndPath("test", name)) {
  *         all[id] = {
  *             val entityType = entityTypeBuilder.build(id.toString())
  *             init(entityType)
@@ -65,11 +65,12 @@ class RegistryHolderDelegate<T>(val id: ResourceLocation, val value: T) {
  *     }
  * ```
  */
-class RegistryDelegate<T>() {
+class RegistryDelegate<T>(val id: ResourceLocation, val clazz: Class<T>) {
     var value: T? = null
 
     fun init(value: T) {
         this.value = value
+        FxLib.logger.debug("Initialized registry delegate $id of class $clazz")
     }
 
     operator fun getValue(owner: Any, property: KProperty<*>): T {
@@ -80,8 +81,8 @@ class RegistryDelegate<T>() {
 /**
  * See [RegistryDelegate]
  */
-fun <T> registryDelegate(block: RegistryDelegate<T>.() -> Unit) = RegistryDelegate<T>().also(block)
+inline fun <reified T> registryDelegate(id: ResourceLocation, block: RegistryDelegate<T>.() -> Unit) = RegistryDelegate(id, T::class.java).also(block)
 /**
  * See [RegistryDelegate]
  */
-fun <T> registryDelegate() = RegistryDelegate<T>()
+inline fun <reified T> registryDelegate(id: ResourceLocation) = RegistryDelegate(id, T::class.java)
