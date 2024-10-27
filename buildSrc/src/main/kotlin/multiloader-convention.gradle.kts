@@ -109,8 +109,9 @@ publishing {
     }
 
     publications {
-        register<MavenPublication>(project.name) {
-            artifactId = "${base.archivesName.get()}-${this.name}"
+        val pubName = "${base.archivesName.get()}-${project.name}"
+        register<MavenPublication>(pubName) {
+            artifactId = pubName
             version = "$modversion-$minecraftVersion"
             from(components.findByName("java"))
         }
