@@ -130,6 +130,6 @@ jobs:
 
     - name: Trigger Jitpack build
       run: |
-        curl -L https://jitpack.io/com/github/filloax/filloaxlib/${{ env.TAG }}/filloaxlib-${{ env.TAG }}.pom &
+        curl -L https://jitpack.io/com/github/filloax/filloaxlib/filloaxlib-common/${{ env.TAG }}/filloaxlib-common-${{ env.TAG }}.pom &
       env:
         TAG: "${{ steps.get_version.outputs.VERSION }}-${{steps.mc_version.outputs.value }}"
