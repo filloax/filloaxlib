@@ -4,28 +4,18 @@ loaderVersion="${kotlinforge_version_range}"
 license="${license}"
 issueTrackerURL="https://github.com/filloax/filloax-lib"
 
-# A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]]
     modId="${mod_id}"
     version="${version_prefix}-neoforge"
     displayName="${mod_name}"
 
-    # A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
-    #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
-
     displayURL="${display_url}"
     logoFile="${mod_icon}"
-    #credits=""
     authors='''${author}
     Contributions
     kotlin-events by svby
     '''
     description='''${description}'''
-
-[[mixins]]
-    config="${mod_id}.mixins.json"
-
-#ATs from default path
 
 [[dependencies]]
     modId="neoforge"

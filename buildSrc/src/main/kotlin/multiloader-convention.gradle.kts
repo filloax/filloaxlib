@@ -68,8 +68,6 @@ val modid: String by project
 val modName: String by project
 val modDescription: String by project
 val modIcon: String by project
-val mavenGroup: String by project
-val baseName: String by project
 val author: String by project
 val license: String by project
 val displayUrl: String by project
@@ -141,7 +139,8 @@ tasks.jar {
                 "Implementation-Title"    to modName,
                 "Implementation-Version"  to modversion,
                 "Implementation-Vendor"   to author,
-                "Built-On-Minecraft"      to minecraftVersion
+                "Built-On-Minecraft"      to minecraftVersion,
+                "FMLModType"              to "GAMELIBRARY",
         ))
     }
 }

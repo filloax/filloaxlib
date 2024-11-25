@@ -52,4 +52,5 @@ listOf(
     "common",
     "fabric",
     "neoforge",
+    "test-neoforge",
 ).forEach { include(it) }
