@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.33.2
+
+Fixed
+- `EventOnce` related methods work properly in Neoforge
+
 ## 0.33.1
 
 Changed
