@@ -41,9 +41,13 @@ object EventOnce {
         listener: Consumer<T>,
     ) {
         var autoRemovingListener: Consumer<T>? = null
-        autoRemovingListener = Consumer { x ->
-            listener.accept(x)
-            FORGE_BUS.unregister(autoRemovingListener)
+        // lambda notation won't work with neoforge
+        @Suppress("ObjectLiteralToLambda")
+        autoRemovingListener = object : Consumer<T> {
+            override fun accept(t: T) {
+                listener.accept(t)
+                FORGE_BUS.unregister(autoRemovingListener)
+            }
         }
 
         FORGE_BUS.addListener(autoRemovingListener)

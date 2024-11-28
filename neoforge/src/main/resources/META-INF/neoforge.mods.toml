@@ -13,7 +13,7 @@ issueTrackerURL="https://github.com/filloax/filloax-lib"
     # A URL to query for updates for this mod. See the JSON update specification https://docs.neoforged.net/docs/misc/updatechecker/
     #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 
-    displayURL="https://github.com/filloax/filloax-lib"
+    displayURL="${display_url}"
     logoFile="${mod_icon}"
     #credits=""
     authors='''${author}
