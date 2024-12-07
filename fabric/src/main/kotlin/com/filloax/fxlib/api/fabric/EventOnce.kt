@@ -103,17 +103,13 @@ object EventOnce {
         }
     }
 
-    fun runWhenServerStarted(server: MinecraftServer, action: (MinecraftServer) -> Unit) {
-        runWhenServerStarted(server, false, action)
-    }
-
-    fun runWhenServerStarted(server: MinecraftServer, onServerThread: Boolean, action: (MinecraftServer) -> Unit) {
+    fun runWhenServerStarted(server: MinecraftServer?, onServerThread: Boolean, action: (MinecraftServer) -> Unit) {
         val callback = if (onServerThread) {
             ServerLifecycleEvents.ServerStarted { srv -> srv.submit { action(srv) } }
         } else {
             ServerLifecycleEvents.ServerStarted { srv -> action(srv) }
         }
-        if (server.isReady) {
+        if (server?.isReady == true) {
             callback.onServerStarted(server)
         } else {
             runEventOnce(ServerLifecycleEvents.SERVER_STARTED, callback)

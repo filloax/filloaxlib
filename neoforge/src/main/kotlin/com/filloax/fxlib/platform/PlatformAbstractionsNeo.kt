@@ -26,7 +26,7 @@ class PlatformAbstractionsNeo : PlatformAbstractions {
     }
 
     override fun runWhenServerStarted(
-        server: MinecraftServer,
+        server: MinecraftServer?,
         onServerThread: Boolean,
         action: (MinecraftServer) -> Unit
     ) {

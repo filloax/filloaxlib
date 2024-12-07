@@ -75,21 +75,26 @@ object EventUtil {
     /**
      * Run now if server started, or wait for server to start then run otherwise.
      */
-    fun runWhenServerStarted(server: MinecraftServer, action: (MinecraftServer) -> Unit)
+    fun runWhenServerStarted(action: (MinecraftServer) -> Unit)
+            = runWhenServerStarted(FxUtils.getServer(), false, action)
+    /**
+     * Run now if server started, or wait for server to start then run otherwise.
+     */
+    fun runWhenServerStarted(server: MinecraftServer?, action: (MinecraftServer) -> Unit)
             = runWhenServerStarted(server, false, action)
+    /**
+     * Run now if server started, or wait for server to start then run otherwise.
+     * @param onServerThread If set, run on server thread, in case you want to be
+     *  safe around multithreaded messing.
+     */
+    fun runWhenServerStarted(server: MinecraftServer?, onServerThread: Boolean, action: (MinecraftServer) -> Unit)
+            = platformAbstractions.runWhenServerStarted(server, onServerThread, action)
 
     fun runAtServerTickEnd(action: (MinecraftServer) -> Unit)
             = platformAbstractions.runAtServerTickEnd(action)
     fun runAtNextServerTickStart(action: (MinecraftServer) -> Unit)
             = platformAbstractions.runAtNextServerTickStart(action)
 
-    /**
-     * Run now if server started, or wait for server to start then run otherwise.
-     * @param onServerThread If set, run on server thread, in case you want to be
-     *  safe around multithreaded messing.
-     */
-    fun runWhenServerStarted(server: MinecraftServer, onServerThread: Boolean, action: (MinecraftServer) -> Unit)
-            = platformAbstractions.runWhenServerStarted(server, onServerThread, action)
     fun runWhenChunkLoaded(level: ServerLevel, chunkPos: ChunkPos, action: (ServerLevel) -> Unit)
             = platformAbstractions.runWhenChunkLoaded(level, chunkPos, action)
 
