@@ -1,6 +1,7 @@
 package com.filloax.fxlib.api.neoforge
 
 import com.filloax.fxlib.*
+import com.filloax.fxlib.api.FxUtils
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
@@ -75,17 +76,13 @@ object EventOnce {
         }
     }
 
-    fun runWhenServerStarted(server: MinecraftServer, action: (MinecraftServer) -> Unit) {
-        runWhenServerStarted(server, false, action)
-    }
-
-    fun runWhenServerStarted(server: MinecraftServer, onServerThread: Boolean, action: (MinecraftServer) -> Unit) {
+    fun runWhenServerStarted(server: MinecraftServer?, onServerThread: Boolean, action: (MinecraftServer) -> Unit) {
         val callback = if (onServerThread) {
             { srv: MinecraftServer -> srv.submit { action(srv) } }
         } else {
             { srv: MinecraftServer -> action(srv) }
         }
-        if (server.isReady) {
+        if (server?.isReady == true) {
             callback(server)
         } else {
             runEventOnce { event: ServerStartedEvent -> callback(event.server) }

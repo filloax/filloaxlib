@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.34
+
+Changed
+- Add variant of `runWhenServerStarted' without requirement of server instance
+- FxSavedData: add deprecated files check option and preload hook option
+
 ## 0.33.2
 
 Fixed

@@ -32,7 +32,7 @@ class PlatformAbstractionsFabric : PlatformAbstractions {
      *  safe around multithreaded messing.
      */
     override fun runWhenServerStarted(
-        server: MinecraftServer,
+        server: MinecraftServer?,
         onServerThread: Boolean,
         action: (MinecraftServer) -> Unit,
     ) {

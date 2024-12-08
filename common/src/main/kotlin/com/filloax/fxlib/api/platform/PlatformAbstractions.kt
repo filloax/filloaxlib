@@ -51,7 +51,7 @@ interface PlatformAbstractions {
      * Run now if server started, or wait for server to start then run otherwise.
      */
     @ApiStatus.Internal
-    fun runWhenServerStarted(server: MinecraftServer, action: (MinecraftServer) -> Unit)
+    fun runWhenServerStarted(server: MinecraftServer?, action: (MinecraftServer) -> Unit)
         = runWhenServerStarted(server, false, action)
 
     /**
@@ -60,7 +60,7 @@ interface PlatformAbstractions {
      *  safe around multithreaded messing.
      */
     @ApiStatus.Internal
-    fun runWhenServerStarted(server: MinecraftServer, onServerThread: Boolean, action: (MinecraftServer) -> Unit)
+    fun runWhenServerStarted(server: MinecraftServer?, onServerThread: Boolean, action: (MinecraftServer) -> Unit)
 
     @ApiStatus.Internal
     fun runAtServerTickEnd(action: (MinecraftServer) -> Unit)
