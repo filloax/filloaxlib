@@ -104,7 +104,15 @@ abstract class FxSavedData<T : FxSavedData<T>>(
             definition.beforeLoad?.invoke(level, dataStorage)
             if (!file.exists()) {
                 val foundFilePaths = definition.checkDeprecatedFilePaths.filter { checkFile ->
-                    val tag = dataStorage.readTagFromDisk(checkFile, factory.type, SharedConstants.getCurrentVersion().dataVersion.version)
+                    val tag = try {
+                        dataStorage.readTagFromDisk(
+                            checkFile,
+                            factory.type,
+                            SharedConstants.getCurrentVersion().dataVersion.version
+                        )
+                    } catch (e: Exception) {
+                        return@filter false
+                    }
                     return@filter try {
                         definition.codec.decodeNbt(tag)
                         true
