@@ -1,16 +1,22 @@
 package com.filloax.fxlib.api.savedata
 
+import com.filloax.fxlib.FxLib
 import com.filloax.fxlib.SaveDataTypeException
+import com.filloax.fxlib.api.codec.decodeNbt
 import com.filloax.fxlib.api.codec.decodeNbtNullable
 import com.filloax.fxlib.api.codec.encodeNbt
 import com.filloax.fxlib.api.codec.throwableCodecErr
+import com.google.common.io.Files
 import com.mojang.serialization.Codec
+import net.minecraft.SharedConstants
 import net.minecraft.core.HolderLookup
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.datafix.DataFixTypes
+import net.minecraft.world.level.levelgen.structure.structures.RuinedPortalPiece
 import net.minecraft.world.level.saveddata.SavedData
+import net.minecraft.world.level.storage.DimensionDataStorage
 
 /**
  * Utility to have a way to save data in levels/servers that
@@ -35,6 +41,19 @@ import net.minecraft.world.level.saveddata.SavedData
  * // later...
  * level.loadData(Save.DEF)
  * ```
+ *
+ * You can use optional arguments in define to configure on-load behavior:
+ * - **beforeLoad**: code to run before loading the data
+ * - **checkDeprecatedFilePaths**: list of file paths (relative to the level data folder) to check for the file existence.
+ *   If a file is found at that location, and it matches the codec, and no file is present at the current location, it will
+ *   be moved there before loading. To be used if you move a file between different versions of the mod.
+ *
+ * Example:
+ * ```kt
+ * val DEF = define("YourSaveId", ::Save, CODEC, beforeLoad={ serverLevel ->
+ *   // code here
+ * })
+ * ```
  */
 abstract class FxSavedData<T : FxSavedData<T>>(
     private val codec: Codec<T>
@@ -48,7 +67,11 @@ abstract class FxSavedData<T : FxSavedData<T>>(
          * FxLib - Load specified saved data from the level.
          */
         fun <T : FxSavedData<T>> ServerLevel.loadData(definition: Definition<T>): T {
-            return dataStorage.computeIfAbsent(makeVanillaFactory(definition.codec, definition.provider), definition.id)
+            val factory = makeVanillaFactory(definition.codec, definition.provider)
+            return dataStorage.get(factory, definition.id) ?: run {
+                preLoad(definition, this, dataStorage, factory)
+                dataStorage.computeIfAbsent(makeVanillaFactory(definition.codec, definition.provider), definition.id)
+            }
         }
 
         /**
@@ -58,14 +81,47 @@ abstract class FxSavedData<T : FxSavedData<T>>(
             return overworld().loadData(definition)
         }
 
-        fun <T : FxSavedData<T>> define(id: String, provider: () -> T, codec: Codec<T>) =
-            Definition(id, provider, codec)
+        /**
+         * @param beforeLoad Optional code to run before loading the data from file
+         * @param checkDeprecatedFilePaths List of file names (without .dat) relative to the dimension data folder to check, see [FxSavedData] javadoc
+         */
+        fun <T : FxSavedData<T>> define(
+            id: String, provider: () -> T, codec: Codec<T>,
+            beforeLoad: ((ServerLevel, DimensionDataStorage)->Unit)? = null,
+            checkDeprecatedFilePaths: List<String> = listOf(),
+        ) = Definition(id, provider, codec, beforeLoad, checkDeprecatedFilePaths)
 
 
         private fun <T : FxSavedData<T>> makeVanillaFactory(codec: Codec<T>, provider: () -> T): Factory<T> {
             return Factory(provider, { compoundTag, _ ->
                 codec.decodeNbtNullable(compoundTag) ?: provider()
             }, DataFixTypes.SAVED_DATA_COMMAND_STORAGE)
+        }
+
+        private fun <T : FxSavedData<T>> preLoad(definition: Definition<T>, level: ServerLevel, dataStorage: DimensionDataStorage, factory: Factory<T>) {
+            val file = dataStorage.getDataFile(definition.id)
+            file.parentFile.mkdirs()
+            definition.beforeLoad?.invoke(level, dataStorage)
+            if (!file.exists()) {
+                val foundFilePaths = definition.checkDeprecatedFilePaths.filter { checkFile ->
+                    val tag = dataStorage.readTagFromDisk(checkFile, factory.type, SharedConstants.getCurrentVersion().dataVersion.version)
+                    return@filter try {
+                        definition.codec.decodeNbt(tag)
+                        true
+                    } catch (e: Exception) {
+                        FxLib.logger.warn("In reading saved data ${definition.id}: found deprecated file $checkFile, but didn't match format")
+                        false
+                    }
+                }
+                if (foundFilePaths.size > 1) {
+                    FxLib.logger.warn("In reading saved data ${definition.id}: found more than one deprecated file $foundFilePaths, will move first only")
+                }
+                if (foundFilePaths.isNotEmpty()) {
+                    val oldFile = dataStorage.getDataFile(foundFilePaths.first())
+                    Files.move(oldFile, file)
+                    FxLib.logger.warn("In reading saved data ${definition.id}: moved deprecated file $oldFile to $file")
+                }
+            }
         }
     }
 
@@ -87,5 +143,7 @@ abstract class FxSavedData<T : FxSavedData<T>>(
         val id: String,
         val provider: () -> T,
         val codec: Codec<T>,
+        val beforeLoad: ((ServerLevel, DimensionDataStorage)->Unit)? = null,
+        val checkDeprecatedFilePaths: List<String> = listOf(),
     )
 }
