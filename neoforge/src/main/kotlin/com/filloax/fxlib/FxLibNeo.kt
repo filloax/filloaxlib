@@ -18,6 +18,7 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.event.AddReloadListenerEvent
 import net.neoforged.neoforge.registries.DeferredRegister
+import thedarkcolour.kotlinforforge.neoforge.forge.FORGE_BUS
 import java.util.function.Supplier
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import thedarkcolour.kotlinforforge.neoforge.forge.runForDist
