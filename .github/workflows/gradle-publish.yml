@@ -65,6 +65,7 @@ jobs:
       run: "echo version=${{steps.get_version.outputs.VERSION}} java_version=${{ steps.java_version.outputs.javaVersion }} mc_version=${{ steps.mc_version.outputs.value }} mc_version_range=${{ steps.mc_version_range.outputs.value }}"
 
     - name: Build with Gradle
+      id: build
       run: ./gradlew build
 
     - name: Extract latest changelog
@@ -76,6 +77,8 @@ jobs:
 
     - name: Publish (Github)
       uses: softprops/action-gh-release@v2
+      if: steps.build.outcome == 'success'
+      id: publish_github
       with:
         name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }}
         body_path: latest_changelog.txt
@@ -89,6 +92,7 @@ jobs:
           neoforge/build/libs/*.jar
 
     - uses: Kir-Antipov/mc-publish@v3.3
+      if: steps.build.outcome == 'success'
       name: Publish (Online, Fabric)
       with:
         modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
@@ -108,6 +112,7 @@ jobs:
           fabric/build/libs/*-@(dev|sources|javadocs).jar
 
     - uses: Kir-Antipov/mc-publish@v3.3
+      if: steps.build.outcome == 'success'
       name: Publish (Online, Neoforge)
       with:
         modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
@@ -129,7 +134,8 @@ jobs:
           neoforge/build/libs/*-@(dev|sources|javadocs).jar
 
     - name: Trigger Jitpack build
+      if: steps.publish_github.outcome == 'success'
       run: |
-        curl --max-time 0 -L https://jitpack.io/com/github/filloax/filloaxlib/filloaxlib-common/${{ env.TAG }}/filloaxlib-common-${{ env.TAG }}.pom
+        sleep 5s && curl --max-time 0 -L https://jitpack.io/com/github/filloax/filloaxlib/filloaxlib-common/${{ env.TAG }}/filloaxlib-common-${{ env.TAG }}.pom
       env:
         TAG: "${{ steps.get_version.outputs.VERSION }}-${{steps.mc_version.outputs.value }}"
