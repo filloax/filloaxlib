@@ -7,6 +7,7 @@ import com.filloax.fxlib.platform.fxLibEvents
 import com.filloax.fxlib.structure.FXLibStructurePlacementTypes
 import com.filloax.fxlib.structure.FXLibStructurePoolElements
 import com.filloax.fxlib.structure.FXLibStructures
+import com.filloax.fxlib.test.TestEventOnce
 import net.minecraft.client.Minecraft
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
@@ -17,7 +18,9 @@ import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.event.AddReloadListenerEvent
+import net.neoforged.neoforge.event.RegisterCommandsEvent
 import net.neoforged.neoforge.registries.DeferredRegister
+import thedarkcolour.kotlinforforge.neoforge.forge.FORGE_BUS
 import java.util.function.Supplier
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import thedarkcolour.kotlinforforge.neoforge.forge.runForDist
@@ -45,6 +48,10 @@ object FxLibNeo : VersionFxLib() {
                 "filloaxlib"
             }
         )
+
+        FORGE_BUS.addListener<RegisterCommandsEvent> { ev ->
+            TestEventOnce.register(ev.dispatcher, ev.buildContext, ev.commandSelection)
+        }
 
         registerRegistries(MOD_BUS)
 
