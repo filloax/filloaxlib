@@ -8,6 +8,7 @@ import com.filloax.fxlib.structure.FXLibStructurePlacementTypes
 import com.filloax.fxlib.structure.FXLibStructurePoolElements
 import com.filloax.fxlib.structure.FXLibStructures
 import com.filloax.fxlib.test.TestEventOnce
+import com.filloax.fxlib.test.TestServerLang
 import net.minecraft.client.Minecraft
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
@@ -51,6 +52,7 @@ object FxLibNeo : VersionFxLib() {
 
         FORGE_BUS.addListener<RegisterCommandsEvent> { ev ->
             TestEventOnce.register(ev.dispatcher, ev.buildContext, ev.commandSelection)
+            TestServerLang.register(ev.dispatcher, ev.buildContext, ev.commandSelection)
         }
 
         registerRegistries(MOD_BUS)

@@ -1,0 +1,19 @@
+{
+  "_foo": "bar IT (disable to check en default)",
+  "test": "Ciao test!",
+  "prova.prova1.foo": "Prova1 foo IT",
+  "prova": {
+    "prova1.bar": "Prova1 bar IT",
+    "subdir.prova2": {
+      "foo": "Foo prova2 IT",
+      "bar": "Bar prova2 IT"
+    }
+  },
+  "dot": {
+    "in.name": {
+      "0": "Mario rossi IT",
+      "1.luigi": "Luigi IT",
+      "1.wario.gialli": "Wario gialli"
+    }
+  }
+}
