@@ -1,13 +1,18 @@
 package com.filloax.fxlib
 
+import com.filloax.fxlib.InternalUtils.resLoc
 import com.filloax.fxlib.api.fabric.EventOnce
+import com.filloax.fxlib.api.fabric.FabricReloadListener
+import com.filloax.fxlib.api.lang.server.ServerLanguageManager
 import com.filloax.fxlib.platform.fxLibEvents
 import com.filloax.fxlib.structure.FXLibStructurePlacementTypes
 import com.filloax.fxlib.structure.FXLibStructurePoolElements
 import com.filloax.fxlib.structure.FXLibStructures
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.server.packs.PackType
 
 object FxLibFabric : ModInitializer, VersionFxLib() {
     /**
@@ -15,6 +20,11 @@ object FxLibFabric : ModInitializer, VersionFxLib() {
      */
     override fun onInitialize() {
         initialize()
+
+        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(FabricReloadListener(
+            resLoc(Constants.DATA_LANGUAGES_DIR),
+            ServerLanguageManager.ReloadListener(),
+        ))
     }
 
     override fun initPlatformCallbacks() {

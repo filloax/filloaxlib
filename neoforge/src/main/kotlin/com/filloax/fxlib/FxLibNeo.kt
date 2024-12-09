@@ -1,5 +1,6 @@
 package com.filloax.fxlib
 
+import com.filloax.fxlib.api.lang.server.ServerLanguageManager
 import com.filloax.fxlib.api.neoforge.EventOnce
 import com.filloax.fxlib.client.FxLibClientNeo
 import com.filloax.fxlib.platform.fxLibEvents
@@ -15,6 +16,7 @@ import net.minecraft.resources.ResourceLocation
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
+import net.neoforged.neoforge.event.AddReloadListenerEvent
 import net.neoforged.neoforge.registries.DeferredRegister
 import java.util.function.Supplier
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
@@ -45,6 +47,10 @@ object FxLibNeo : VersionFxLib() {
         )
 
         registerRegistries(MOD_BUS)
+
+        FORGE_BUS.addListener<AddReloadListenerEvent> { ev ->
+            ev.addListener(ServerLanguageManager.ReloadListener())
+        }
     }
 
     override fun initPlatformCallbacks() {
