@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.35
+
+Added
+- Allow server-side localization, by adding strings in data/lang/<lang_code>.json 
+or any combination of folders and JSON files under the data/lang/<lang_code>/ folder
+(see example in the test-neoforge branch)
+
 ## 0.34
 
 Changed

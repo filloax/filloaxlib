@@ -64,6 +64,10 @@ fun <A> Codec<A>.decodeJsonNullable(jsonElement: JsonElement): A? {
     return CodecCrossVer.inst.optionalFromDataResult(this.decodeJson(jsonElement)).map { it.first }.getOrNull()
 }
 
+fun <A> Codec<A>.decodeJsonNullable(jsonString: String): A? {
+    return CodecCrossVer.inst.optionalFromDataResult(this.decodeJson(jsonString)).map { it.first }.getOrNull()
+}
+
 /**
  * Create a mutable map codec. Note that unbounded map codecs support only string values,
  * or codecs that decode to strings (like UUIDUtil.STRING_CODEC). This cannot be checked at runtime

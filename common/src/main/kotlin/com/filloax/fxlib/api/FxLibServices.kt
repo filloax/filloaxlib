@@ -1,6 +1,7 @@
 package com.filloax.fxlib.api
 
 import com.filloax.fxlib.api.codec.CodecCrossVer
+import com.filloax.fxlib.api.lang.server.ServerLanguageManager
 import com.filloax.fxlib.api.networking.FxLibNetworking
 import com.filloax.fxlib.api.platform.PlatformAbstractions
 import com.filloax.fxlib.api.platform.getPlatformAbstractions
@@ -15,4 +16,5 @@ object FxLibServices {
     val platform: PlatformAbstractions = getPlatformAbstractions()
     fun customPlacedStructureTracker(level: ServerLevel) = CustomPlacedStructureTracker.get(level)
     val networking by lazy { FxLibNetworking.inst }
+    val serverLanguage = ServerLanguageManager
 }
