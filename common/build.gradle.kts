@@ -12,7 +12,7 @@ val minecraftVersion = libs.versions.minecraft.asProvider().get()
 version = "$modVersion-${minecraftVersion}-common"
 
 neoForge {
-    neoFormVersion = libs.versions.neoform
+    neoFormVersion = libs.versions.neoform.get()
 
     validateAccessTransformers = true
 

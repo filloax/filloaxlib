@@ -318,6 +318,10 @@ fun Int.ticksToSeconds(): Float {
     return this / 20f
 }
 
+fun Int.secondsToTicks(): Int {
+    return (this * 20)
+}
+
 fun Float.secondsToTicks(): Int {
     return floor(this * 20).toInt()
 }
