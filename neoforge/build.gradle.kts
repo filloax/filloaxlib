@@ -15,7 +15,7 @@ version = "$modVersion-${minecraftVersion}-neoforge"
 val baseProject = project(COMMON_PROJECT)
 
 neoForge {
-    version.set(libs.versions.neoforge.asProvider())
+    version = libs.versions.neoforge.asProvider().get()
 
     validateAccessTransformers = true
     accessTransformers.files.setFrom(baseProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
