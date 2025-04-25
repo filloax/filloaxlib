@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.36
+
+Added
+- int tick conversion method
+
+Fixed
+- 1.21.1 dependencies
+
 ## 0.35
 
 Added
