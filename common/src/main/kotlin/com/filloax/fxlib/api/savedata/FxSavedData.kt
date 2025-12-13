@@ -14,9 +14,10 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.datafix.DataFixTypes
-import net.minecraft.world.level.levelgen.structure.structures.RuinedPortalPiece
 import net.minecraft.world.level.saveddata.SavedData
 import net.minecraft.world.level.storage.DimensionDataStorage
+import kotlin.io.path.createDirectory
+import kotlin.io.path.exists
 
 /**
  * Utility to have a way to save data in levels/servers that
@@ -99,10 +100,10 @@ abstract class FxSavedData<T : FxSavedData<T>>(
         }
 
         private fun <T : FxSavedData<T>> preLoad(definition: Definition<T>, level: ServerLevel, dataStorage: DimensionDataStorage, factory: Factory<T>) {
-            val file = dataStorage.getDataFile(definition.id)
-            file.parentFile.mkdirs()
+            val filePath = dataStorage.getDataFile(definition.id)
+            filePath.parent.createDirectory()
             definition.beforeLoad?.invoke(level, dataStorage)
-            if (!file.exists()) {
+            if (!filePath.exists()) {
                 val foundFilePaths = definition.checkDeprecatedFilePaths.filter { checkFile ->
                     val tag = try {
                         dataStorage.readTagFromDisk(
@@ -126,8 +127,8 @@ abstract class FxSavedData<T : FxSavedData<T>>(
                 }
                 if (foundFilePaths.isNotEmpty()) {
                     val oldFile = dataStorage.getDataFile(foundFilePaths.first())
-                    Files.move(oldFile, file)
-                    FxLib.logger.warn("In reading saved data ${definition.id}: moved deprecated file $oldFile to $file")
+                    Files.move(oldFile.toFile(), filePath.toFile())
+                    FxLib.logger.warn("In reading saved data ${definition.id}: moved deprecated file $oldFile to $filePath")
                 }
             }
         }

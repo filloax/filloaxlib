@@ -20,8 +20,8 @@ fun ChunkPos.isBlockPosInChunk(blockPos: BlockPos): Boolean {
 
 fun ChunkAccess.getBoundingBox(): BoundingBox {
     val pos = this.pos
-    val minY = this.minBuildHeight
-    val maxY = this.maxBuildHeight
+    val minY = this.minY
+    val maxY = this.maxY
     return BoundingBox(pos.minBlockX, minY, pos.minBlockZ, pos.maxBlockX, maxY, pos.maxBlockZ)
 }
 

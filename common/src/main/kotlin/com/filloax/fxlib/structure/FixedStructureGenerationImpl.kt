@@ -76,7 +76,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
     }
 
     private fun tryQueueSpawnData(server: MinecraftServer, spawnData: StructureSpawnData) {
-        val structureRef = server.registryAccess().registryOrThrow(Registries.STRUCTURE).get(spawnData.structure)
+        val structureRef = server.registryAccess().lookupOrThrow(Registries.STRUCTURE).get(spawnData.structure)
         if (structureRef == null) {
             throw UnknownStructureIdException(spawnData.structure, "Cannot queue non-existent structure")
         } else {
@@ -134,7 +134,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
     private fun trySpawnStructure(server: MinecraftServer, spawnData: StructureSpawnData): Boolean {
         // Only overworld for now
         val serverLevel = server.overworld()
-        val structure = server.registryAccess().registry(Registries.STRUCTURE).get().get(spawnData.structure)
+        val structure = server.registryAccess().lookup(Registries.STRUCTURE).get().getValue(spawnData.structure)
             ?: throw UnknownStructureIdException(spawnData.structure)
 
         if (structure is FixablePosition) {
@@ -201,8 +201,8 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
                 chunkGenerator,
                 serverLevel.getRandom(),
                 BoundingBox(
-                    chunkPos.minBlockX, serverLevel.minBuildHeight, chunkPos.minBlockZ,
-                    chunkPos.maxBlockX, serverLevel.maxBuildHeight, chunkPos.maxBlockZ
+                    chunkPos.minBlockX, serverLevel.minY, chunkPos.minBlockZ,
+                    chunkPos.maxBlockX, serverLevel.maxY, chunkPos.maxBlockZ
                 ),
                 chunkPos
             )

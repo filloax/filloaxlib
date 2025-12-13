@@ -240,7 +240,7 @@ object JigsawPlacementExtra {
         val structureTemplateManager = context.structureTemplateManager()
         val levelHeightAccessor = context.heightAccessor()
         val worldgenRandom = context.random()
-        val registry = registryAccess.registryOrThrow(Registries.TEMPLATE_POOL)
+        val registry = registryAccess.lookupOrThrow(Registries.TEMPLATE_POOL)
         val structureTemplatePool = startPool.unwrapKey()
             .flatMap { resourceKey: ResourceKey<StructureTemplatePool?>? ->
                 registry.getOptional(
@@ -313,13 +313,13 @@ object JigsawPlacementExtra {
                             (i - maxDistanceFromCenter).toDouble(),
                             max(
                                 (m - maxDistanceFromCenter).toDouble(),
-                                (levelHeightAccessor.getMinBuildHeight() + dimensionPadding.bottom()).toDouble()
+                                (levelHeightAccessor.minY + dimensionPadding.bottom()).toDouble()
                             ),
                             (j - maxDistanceFromCenter).toDouble(),
                             (i + maxDistanceFromCenter + 1).toDouble(),
                             min(
                                 (m + maxDistanceFromCenter + 1).toDouble(),
-                                (levelHeightAccessor.getMaxBuildHeight() - dimensionPadding.top()).toDouble()
+                                (levelHeightAccessor.maxY - dimensionPadding.top()).toDouble()
                             ),
                             (j + maxDistanceFromCenter + 1).toDouble()
                         )

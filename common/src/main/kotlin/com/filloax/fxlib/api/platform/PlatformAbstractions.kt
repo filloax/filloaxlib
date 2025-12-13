@@ -4,7 +4,7 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ChunkPos
-import net.minecraft.world.level.portal.DimensionTransition
+import net.minecraft.world.level.portal.TeleportTransition
 import java.util.*
 import org.jetbrains.annotations.*
 
@@ -36,8 +36,8 @@ interface PlatformAbstractions {
      * @apiNote this method must be called from the main server thread
      */
     @Deprecated("Superseded by entity.changeDimension in 1.21, keep for backwards compat")
-    fun fixedChangeDimension(entity: Entity, level: ServerLevel, target: DimensionTransition) {
-        entity.changeDimension(target)
+    fun fixedChangeDimension(entity: Entity, level: ServerLevel, target: TeleportTransition) {
+        entity.teleport(target)
     }
 
     /**

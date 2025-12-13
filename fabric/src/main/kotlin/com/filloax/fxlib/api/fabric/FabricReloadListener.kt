@@ -19,8 +19,8 @@ class FabricReloadListener(private val id: ResourceLocation, private val listene
 
     override fun reload(
         barrier: PreparationBarrier, manager: ResourceManager,
-        profiler: ProfilerFiller, profiler2: ProfilerFiller, executor: Executor, executor2: Executor
+        backgroundExecutor: Executor, gameExecutor: Executor
     ): CompletableFuture<Void> {
-        return listener.reload(barrier, manager, profiler, profiler2, executor, executor2)
+        return listener.reload(barrier, manager, backgroundExecutor, gameExecutor)
     }
 }

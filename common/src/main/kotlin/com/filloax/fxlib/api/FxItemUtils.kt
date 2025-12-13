@@ -20,7 +20,7 @@ object FxItemUtils {
 
     @JvmStatic
     fun itemFromId(id: ResourceLocation): Item {
-        return BuiltInRegistries.ITEM.get(id)
+        return BuiltInRegistries.ITEM.getValue(id)
     }
 
     @JvmStatic

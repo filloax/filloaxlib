@@ -105,7 +105,7 @@ class CustomPlacedStructureTracker private constructor(val level: ServerLevel) :
     }
 
     fun getByStructure(key: ResourceKey<Structure>): List<PlacedStructureData> {
-        val structure = level.registryAccess().registryOrThrow(Registries.STRUCTURE).getOrThrow(key)
+        val structure = level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getValueOrThrow(key)
         return byStructure[structure] ?: listOf()
     }
 
