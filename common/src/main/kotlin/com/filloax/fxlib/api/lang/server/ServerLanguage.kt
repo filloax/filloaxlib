@@ -27,7 +27,7 @@ object ServerLanguageManager {
     private var languages = mapOf<String, Language>()
 
     fun get(language: String): Language {
-        return languages[language.toLowerCase()] ?: run {
+        return languages[language.lowercase()] ?: run {
             if (languages.isEmpty()) {
                 throw IllegalStateException("Server languages not loaded yet!")
             } else {
@@ -47,10 +47,10 @@ object ServerLanguageManager {
                 .openAsReader()
                 .readText()
                 .let { JSON.decodeFromString(MapSerializer(String.serializer(), LanguageInfo.serializer()), it) }
-                .mapKeys { it.key.toLowerCase() }
+                .mapKeys { it.key.lowercase() }
 
             val loadedLanguages = elements.entries
-                .groupBy { (key, _) -> Path.of(key.path).getName(0).toString().toLowerCase().also { langKey ->
+                .groupBy { (key, _) -> Path.of(key.path).getName(0).toString().lowercase().also { langKey ->
                     if (!languageInfos.containsKey(langKey)) {
                         throw Exception("Tried specifying unknown language $langKey in server lang strings! Full path is $key")
                     }

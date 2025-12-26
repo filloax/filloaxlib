@@ -134,7 +134,8 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
     private fun trySpawnStructure(server: MinecraftServer, spawnData: StructureSpawnData): Boolean {
         // Only overworld for now
         val serverLevel = server.overworld()
-        val structure = server.registryAccess().lookup(Registries.STRUCTURE).get().getValue(spawnData.structure)
+        val structureRegistry = server.registryAccess().lookup(Registries.STRUCTURE).get()
+        val structure = structureRegistry.getValue(spawnData.structure)
             ?: throw UnknownStructureIdException(spawnData.structure)
 
         if (structure is FixablePosition) {
@@ -152,7 +153,11 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
         }
 
         val chunkGenerator = serverLevel.chunkSource.generator
+
         val structureStart = alreadyGeneratedStructures[spawnData.spawnId] ?: structure.generate(
+            // todo for transition: check if these two parameters are correct
+            structureRegistry.wrapAsHolder(structure),
+            server.levelKeys().first(),
             server.registryAccess(),
             chunkGenerator,
             chunkGenerator.biomeSource,

@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
-import net.neoforged.neoforge.event.AddReloadListenerEvent
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent
 import net.neoforged.neoforge.registries.DeferredRegister
 import thedarkcolour.kotlinforforge.neoforge.forge.FORGE_BUS
 import java.util.function.Supplier
@@ -49,8 +49,10 @@ object FxLibNeo : VersionFxLib() {
 
         registerRegistries(MOD_BUS)
 
-        FORGE_BUS.addListener<AddReloadListenerEvent> { ev ->
-            ev.addListener(ServerLanguageManager.ReloadListener())
+        FORGE_BUS.addListener<AddServerReloadListenersEvent> { ev ->
+            ev.addListener(
+            ResourceLocation.fromNamespaceAndPath(MOD_ID, "server_language_manager_listener"),
+            ServerLanguageManager.ReloadListener())
         }
     }
 
