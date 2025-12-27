@@ -9,5 +9,5 @@
 # Intellij
 .idea
 *.log
-.kotlin/*
+.kotlin
 fabric/runs/*
