@@ -69,9 +69,9 @@ abstract class FxSavedData<T : FxSavedData<T>>(
          */
         fun <T : FxSavedData<T>> ServerLevel.loadData(definition: Definition<T>): T {
             val factory = makeVanillaFactory(definition.codec, definition.provider)
-            return dataStorage.get(factory, definition.id) ?: run {
+            return dataStorage.get(factory) ?: run {
                 preLoad(definition, this, dataStorage, factory)
-                dataStorage.computeIfAbsent(makeVanillaFactory(definition.codec, definition.provider), definition.id)
+                dataStorage.computeIfAbsent(makeVanillaFactory(definition.codec, definition.provider))
             }
         }
 

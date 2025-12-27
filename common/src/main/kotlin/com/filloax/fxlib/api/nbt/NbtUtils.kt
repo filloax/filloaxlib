@@ -21,7 +21,7 @@ fun CompoundTag.putIfAbsent(key: String, tag: Tag): Tag? {
  */
 fun CompoundTag.getCompoundOrNull(key: String): CompoundTag? {
     if (this.contains(key)) {
-        return this.getCompound(key)
+        return this.getCompound(key).get()
     }
     return null
 }
@@ -31,9 +31,9 @@ fun CompoundTag.getCompoundOrNull(key: String): CompoundTag? {
  * tag there. Normal behavior creates a new empty tag without
  * putting it.
  */
-fun CompoundTag.getListOrNull(key: String, type: Byte): ListTag? {
+fun CompoundTag.getListOrNull(key: String): ListTag? {
     if (this.contains(key)) {
-        return this.getList(key, type.toInt())
+        return this.getList(key).get()
     }
     return null
 }

@@ -64,13 +64,13 @@ private class K2DfuDecoder<A>(
     private fun convertNbt(tag: Tag): JsonElement {
         return if (tag is CompoundTag) {
             JsonObject().apply {
-                tag.allKeys.forEach { key ->
+                tag.keySet().forEach { key ->
                     val child = tag.get(key)!!
                     add(key, convertNbt(child))
                 }
             }
         } else if (tag is ByteTag) {
-            JsonPrimitive(tag.asByte == 1.toByte())
+            JsonPrimitive(tag.asByte().get() == 1.toByte())
         } else Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, tag)
     }
 
