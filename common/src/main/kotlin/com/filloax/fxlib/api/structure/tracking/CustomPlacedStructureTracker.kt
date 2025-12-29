@@ -50,22 +50,22 @@ class CustomPlacedStructureTracker private constructor(val level: ServerLevel) :
 
         @JvmStatic
         fun get(level: ServerLevel): CustomPlacedStructureTracker {
-            return level.dataStorage.computeIfAbsent(factory(level), "fxlib_structure_placement_tracking")
+            return level.dataStorage.computeIfAbsent(factory(level))//), "fxlib_structure_placement_tracking")
         }
 
         private fun load(compoundTag: CompoundTag, level: ServerLevel): CustomPlacedStructureTracker {
             val out = CustomPlacedStructureTracker(level)
             val ctx = StructurePieceSerializationContext.fromLevel(level)
             compoundTag.getCompoundOrNull("spawnedStructureData")?.let { tag ->
-                tag.allKeys.forEach { idStr ->
+                tag.keySet().forEach { idStr ->
                     val id = idStr.toLong()
-                    val data = PlacedStructureData.load(tag.getCompound(idStr), ctx, level)
+                    val data = PlacedStructureData.load(tag.getCompound(idStr).get(), ctx, level)
                     out.structureData[id] = data
 
                     out.cacheData(data, id)
                 }
             }
-            out.lastReference = compoundTag.getLong("references")
+            out.lastReference = compoundTag.getLong("references").get()
             return out
         }
     }
@@ -174,7 +174,8 @@ data class PlacedStructureData(
     companion object {
         fun load(tag: CompoundTag, ctx: StructurePieceSerializationContext, level: ServerLevel): PlacedStructureData {
             return PlacedStructureData(
-                StructureStart.loadStaticStart(ctx, tag.getCompound("StructureStart"), level.seed) ?: throw IllegalStateException("Couldn't load structure start from $tag"),
+                StructureStart.loadStaticStart(ctx, tag.getCompound("StructureStart").get(), level.seed)
+                    ?: throw IllegalStateException("Couldn't load structure start from $tag"),
                 BlockPos.CODEC.decode(NbtOps.INSTANCE, tag.get("BlockPos")).getOrThrow {
                     Exception("Error in decoding BlockPos: $it")
                 }.first,

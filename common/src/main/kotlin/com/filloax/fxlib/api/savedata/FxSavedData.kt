@@ -109,7 +109,7 @@ abstract class FxSavedData<T : FxSavedData<T>>(
                         dataStorage.readTagFromDisk(
                             checkFile,
                             factory.type,
-                            SharedConstants.getCurrentVersion().dataVersion.version
+                            SharedConstants.getCurrentVersion().dataVersion().version
                         )
                     } catch (e: Exception) {
                         return@filter false

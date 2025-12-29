@@ -37,7 +37,7 @@ interface FxLibNetworking {
                     s2c(packet, ToClientContext(Minecraft.getInstance(), context.player as LocalPlayer))
                 } else {
                     val serverPlayer = context.player as ServerPlayer
-                    c2s(packet, ToServerContext(serverPlayer.server, serverPlayer))
+                    c2s(packet, ToServerContext(serverPlayer.server!!, serverPlayer))
                 }
             }
         }
