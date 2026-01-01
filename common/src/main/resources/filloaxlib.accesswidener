@@ -21,3 +21,4 @@ accessible method net/minecraft/commands/synchronization/ArgumentTypeInfos regis
 accessible field net/minecraft/commands/synchronization/ArgumentTypeInfos BY_CLASS Ljava/util/Map;
 
 accessible method net/minecraft/world/level/storage/DimensionDataStorage getDataFile (Ljava/lang/String;)Ljava/nio/file/Path;
+accessible field net/minecraft/server/level/ServerPlayer server Lnet/minecraft/server/MinecraftServer;
