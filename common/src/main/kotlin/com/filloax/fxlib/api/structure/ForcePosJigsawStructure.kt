@@ -66,7 +66,7 @@ class ForcePosJigsawStructure(
     startHeight: HeightProvider,
     useExpansionHack: Boolean,
     projectStartToHeightmap: Optional<Heightmap.Types>,
-    maxDistanceToCenter: Int,
+    maxDistanceToCenter: MaxDistance,
     poolAliases: List<PoolAliasBinding>,
     dimensionPadding: DimensionPadding,
     liquidSettings: LiquidSettings,
@@ -98,7 +98,7 @@ class ForcePosJigsawStructure(
             startHeight: HeightProvider = ConstantHeight.ZERO,
             useExpansionHack: Boolean = false,
             projectStartToHeightmap: Heightmap.Types? = Heightmap.Types.WORLD_SURFACE_WG,
-            maxDistanceToCenter: Int = 80,
+            maxDistanceToCenter: MaxDistance = MaxDistance(80),
             poolAliases: List<PoolAliasBinding> = listOf(),
             dimensionPadding: DimensionPadding,
             liquidSettings: LiquidSettings,
@@ -127,7 +127,7 @@ class ForcePosJigsawStructure(
                     HeightProvider.CODEC.fieldOf("start_height").forGetter(JigsawStructure::startHeight),
                     Codec.BOOL.fieldOf("use_expansion_hack").forGetter(JigsawStructure::useExpansionHack),
                     Heightmap.Types.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter(JigsawStructure::projectStartToHeightmap),
-                    Codec.intRange(1, 128).fieldOf("max_distance_from_center").forGetter(JigsawStructure::maxDistanceFromCenter),
+                    MaxDistance.CODEC.fieldOf("max_distance_from_center").forGetter(JigsawStructure::maxDistanceFromCenter),
                     Codec.list(PoolAliasBinding.CODEC).optionalFieldOf("pool_aliases", listOf()).forGetter { it.poolAliases },
                     DimensionPadding.CODEC.optionalFieldOf("dimension_padding", DEFAULT_DIMENSION_PADDING).forGetter { it.dimensionPadding },
                     LiquidSettings.CODEC.optionalFieldOf("liquid_settings", DEFAULT_LIQUID_SETTINGS).forGetter { it.liquidSettings },
@@ -158,7 +158,7 @@ class ForcePosJigsawStructure(
                 TerrainAdjustment.NONE -> 0
                 else -> 12
             }
-            return if (structure.maxDistanceFromCenter + i > 128)
+            return if ((structure.maxDistanceFromCenter.horizontal + i > 128) || (structure.maxDistanceFromCenter.vertical + i > 128))
                 DataResult.error { "Structure size including terrain adaptation must not exceed 128" }
             else if (structure.defaultRotation == null && structure.useRotationInDefaultPlacement)
                 DataResult.error { "Must set a default_rotation if normal_placement_uses_default_rotation is true" }
@@ -192,7 +192,7 @@ class ForcePosJigsawStructure(
             JigsawPlacementExtra.addPieces(
                 context, startPool, startJigsawName, maxDepth, pos, useExpansionHack,
                 if (thisGenUsesForcedY) Optional.empty() else projectStartToHeightmap,
-                maxDistanceFromCenter,
+                maxDistanceFromCenter.horizontal,   // changed in 1.21.10, we only care about the horizontal distance at the moment
                 PoolAliasLookup.create(this.poolAliases, pos, context.seed()),
                 dimensionPadding, liquidSettings,
                 rotation,

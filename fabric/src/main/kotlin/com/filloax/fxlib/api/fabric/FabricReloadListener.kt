@@ -4,23 +4,24 @@ import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.packs.resources.PreparableReloadListener
 import net.minecraft.server.packs.resources.PreparableReloadListener.PreparationBarrier
-import net.minecraft.server.packs.resources.ResourceManager
-import net.minecraft.util.profiling.ProfilerFiller
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
 // source: https://github.com/TelepathicGrunt/RepurposedStructures
 class FabricReloadListener(private val id: ResourceLocation, private val listener: PreparableReloadListener) :
     IdentifiableResourceReloadListener {
+    // todo: base class is deprecated, see docs
 
     override fun getFabricId(): ResourceLocation {
         return id
     }
 
     override fun reload(
-        barrier: PreparationBarrier, manager: ResourceManager,
-        backgroundExecutor: Executor, gameExecutor: Executor
-    ): CompletableFuture<Void> {
-        return listener.reload(barrier, manager, backgroundExecutor, gameExecutor)
+        sharedState: PreparableReloadListener.SharedState,
+        exectutor: Executor,
+        barrier: PreparationBarrier,
+        applyExectutor: Executor
+    ): CompletableFuture<Void?> {
+        return listener.reload(sharedState, exectutor, barrier, applyExectutor)
     }
 }

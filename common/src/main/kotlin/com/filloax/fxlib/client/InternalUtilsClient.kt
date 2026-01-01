@@ -1,10 +1,10 @@
 package com.filloax.fxlib.client
 
 import com.filloax.fxlib.InternalUtils
-import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.Minecraft
 
 object InternalUtilsClient {
     fun initClientUtils() {
-        InternalUtils.clientInitShiftDownHook { Screen.hasShiftDown() }
+        InternalUtils.clientInitShiftDownHook { Minecraft.getInstance().hasShiftDown() }
     }
 }

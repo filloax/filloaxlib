@@ -6,6 +6,7 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ChunkPos
+import net.neoforged.fml.loading.FMLEnvironment
 import net.neoforged.fml.loading.FMLLoader
 import net.neoforged.neoforge.event.level.ChunkEvent
 import net.neoforged.neoforge.event.tick.ServerTickEvent
@@ -18,7 +19,7 @@ class PlatformAbstractionsNeo : PlatformAbstractions {
     }
 
     override fun isDevEnvironment(): Boolean {
-        return !FMLLoader.isProduction()
+        return !FMLEnvironment.isProduction()
     }
 
     override fun runOnEntityWhenPossible(level: ServerLevel, entityUUID: UUID, action: (Entity) -> Unit) {
