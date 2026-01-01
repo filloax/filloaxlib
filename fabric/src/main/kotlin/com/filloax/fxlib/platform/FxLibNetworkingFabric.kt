@@ -1,6 +1,7 @@
 package com.filloax.fxlib.platform
 
 import com.filloax.fxlib.api.networking.*
+import io.netty.channel.ChannelFutureListener
 import net.fabricmc.api.EnvType
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
@@ -18,20 +19,21 @@ class FxLibNetworkingFabric : FxLibNetworking {
     override fun <T : CustomPacketPayload> sendPacketToPlayer(
         player: ServerPlayer,
         payload: T,
-        callback: PacketSendListener?
+        callback: ChannelFutureListener?
     ) {
         ServerPlayNetworking.getSender(player).sendPacket(payload, callback)
     }
 
-    override fun <T : CustomPacketPayload> sendPacketToServer(payload: T, callback: PacketSendListener?) {
-        try {
-            ClientPlayNetworking.send(payload)
-            callback?.onSuccess()
-        } catch (e: Exception) {
-            callback?.onFailure()
-            throw e
-        }
-    }
+    // Removed since 1.21.6
+//    override fun <T : CustomPacketPayload> sendPacketToServer(payload: T, callback: PacketSendListener?) {
+//        try {
+//            ClientPlayNetworking.send(payload)
+//            callback?.onSuccess()
+//        } catch (e: Exception) {
+//            callback?.onFailure()
+//            throw e
+//        }
+//    }
 
     class PacketRegistratorFabric : PacketRegistrator {
         val payloadRegistryS2C = PayloadTypeRegistry.playS2C()

@@ -3,7 +3,6 @@ package com.filloax.fxlib.api.savedata
 import com.filloax.fxlib.FxLib
 import com.filloax.fxlib.SaveDataTypeException
 import com.filloax.fxlib.api.codec.decodeNbt
-import com.filloax.fxlib.api.codec.decodeNbtNullable
 import com.filloax.fxlib.api.codec.encodeNbt
 import com.filloax.fxlib.api.codec.throwableCodecErr
 import com.google.common.io.Files
@@ -15,6 +14,7 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.datafix.DataFixTypes
 import net.minecraft.world.level.saveddata.SavedData
+import net.minecraft.world.level.saveddata.SavedDataType
 import net.minecraft.world.level.storage.DimensionDataStorage
 import kotlin.io.path.createDirectory
 import kotlin.io.path.exists
@@ -68,10 +68,10 @@ abstract class FxSavedData<T : FxSavedData<T>>(
          * FxLib - Load specified saved data from the level.
          */
         fun <T : FxSavedData<T>> ServerLevel.loadData(definition: Definition<T>): T {
-            val factory = makeVanillaFactory(definition.codec, definition.provider)
+            val factory = makeSavedDataType(definition.id, definition.codec, definition.provider)
             return dataStorage.get(factory) ?: run {
                 preLoad(definition, this, dataStorage, factory)
-                dataStorage.computeIfAbsent(makeVanillaFactory(definition.codec, definition.provider))
+                dataStorage.computeIfAbsent(makeSavedDataType(definition.id, definition.codec, definition.provider))
             }
         }
 
@@ -93,13 +93,11 @@ abstract class FxSavedData<T : FxSavedData<T>>(
         ) = Definition(id, provider, codec, beforeLoad, checkDeprecatedFilePaths)
 
 
-        private fun <T : FxSavedData<T>> makeVanillaFactory(codec: Codec<T>, provider: () -> T): Factory<T> {
-            return Factory(provider, { compoundTag, _ ->
-                codec.decodeNbtNullable(compoundTag) ?: provider()
-            }, DataFixTypes.SAVED_DATA_COMMAND_STORAGE)
+        private fun <T : FxSavedData<T>> makeSavedDataType(id: String, codec: Codec<T>, provider: () -> T): SavedDataType<T> {
+            return SavedDataType(id, provider, codec, DataFixTypes.SAVED_DATA_COMMAND_STORAGE)
         }
 
-        private fun <T : FxSavedData<T>> preLoad(definition: Definition<T>, level: ServerLevel, dataStorage: DimensionDataStorage, factory: Factory<T>) {
+        private fun <T : FxSavedData<T>> preLoad(definition: Definition<T>, level: ServerLevel, dataStorage: DimensionDataStorage, savedDataType: SavedDataType<T>) {
             val filePath = dataStorage.getDataFile(definition.id)
             filePath.parent.createDirectory()
             definition.beforeLoad?.invoke(level, dataStorage)
@@ -108,7 +106,7 @@ abstract class FxSavedData<T : FxSavedData<T>>(
                     val tag = try {
                         dataStorage.readTagFromDisk(
                             checkFile,
-                            factory.type,
+                            savedDataType.dataFixType,
                             SharedConstants.getCurrentVersion().dataVersion().version
                         )
                     } catch (e: Exception) {
@@ -135,7 +133,7 @@ abstract class FxSavedData<T : FxSavedData<T>>(
     }
 
     @SuppressWarnings("unchecked")
-    override fun save(compoundTag: CompoundTag, holderLookup: HolderLookup.Provider): CompoundTag {
+    fun save(compoundTag: CompoundTag, holderLookup: HolderLookup.Provider): CompoundTag {
         return codec.encodeNbt(this as T).getOrThrow(throwableCodecErr("fxSavedData")) as CompoundTag
     }
 

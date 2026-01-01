@@ -1,6 +1,7 @@
 package com.filloax.fxlib.api.networking
 
 import com.filloax.fxlib.api.platform.ServiceUtil
+import io.netty.channel.ChannelFutureListener
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.PacketSendListener
@@ -19,11 +20,13 @@ interface FxLibNetworking {
     /**
      * Still needs to register the packets (aka the T:CustomPacketPayload used)
      */
-    fun <T : CustomPacketPayload> sendPacketToPlayer(player: ServerPlayer, payload: T, callback: PacketSendListener? = null)
-    /**
-     * Still needs to register the packets (aka the T:CustomPacketPayload used)
-     */
-    fun <T : CustomPacketPayload> sendPacketToServer(payload: T, callback: PacketSendListener? = null)
+    fun <T : CustomPacketPayload> sendPacketToPlayer(player: ServerPlayer, payload: T, callback: ChannelFutureListener ? = null)
+
+    // Removed since 1.21.6
+//    /**
+//     * Still needs to register the packets (aka the T:CustomPacketPayload used)
+//     */
+//    fun <T : CustomPacketPayload> sendPacketToServer(payload: T, callback: PacketSendListener? = null)
 
     companion object {
         val inst by lazy { ServiceUtil.findService(FxLibNetworking::class.java) }

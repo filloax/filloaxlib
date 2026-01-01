@@ -3,6 +3,7 @@ package com.filloax.fxlib.platform
 import com.filloax.fxlib.FxLib
 import com.filloax.fxlib.api.networking.*
 import com.filloax.fxlib.networking.DelegatingPacketRegistrator
+import io.netty.channel.ChannelFutureListener
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.PacketSendListener
@@ -19,7 +20,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar
 import net.neoforged.neoforge.server.ServerLifecycleHooks
 
 class FxLibNetworkingNeo : FxLibNetworking {
-    @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber
     companion object {
         val registrator = DelegatingPacketRegistrator()
 
@@ -36,26 +37,25 @@ class FxLibNetworkingNeo : FxLibNetworking {
     override fun <T : CustomPacketPayload> sendPacketToPlayer(
         player: ServerPlayer,
         payload: T,
-        callback: PacketSendListener?
+        callback: ChannelFutureListener ?
     ) {
         try {
             PacketDistributor.sendToPlayer(player, payload)
-            callback?.onSuccess()
         } catch (e: Exception) {
-            callback?.onFailure()
             throw e
         }
     }
 
-    override fun <T : CustomPacketPayload> sendPacketToServer(payload: T, callback: PacketSendListener?) {
-        try {
-            PacketDistributor.sendToServer(payload)
-            callback?.onSuccess()
-        } catch (e: Exception) {
-            callback?.onFailure()
-            throw e
-        }
-    }
+    // Removed since 1.21.6
+//    override fun <T : CustomPacketPayload> sendPacketToServer(payload: T, callback: PacketSendListener?) {
+//        try {
+//            PacketDistributor.sendToServer(payload)
+//            callback?.onSuccess()
+//        } catch (e: Exception) {
+//            callback?.onFailure()
+//            throw e
+//        }
+//    }
 
     class PacketRegistratorNeo(private val registrar: PayloadRegistrar): PacketRegistrator {
         override fun <T : CustomPacketPayload> playC2S(

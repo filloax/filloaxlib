@@ -1,12 +1,12 @@
 package com.filloax.fxlib.api.structure.tracking
 
-import com.filloax.fxlib.FxLib
 import com.filloax.fxlib.api.chunk.boundBoxChunkRange
-import com.filloax.fxlib.api.nbt.getCompoundOrNull
+import com.mojang.serialization.Codec
+import com.mojang.serialization.Dynamic
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import it.unimi.dsi.fastutil.longs.LongSet
 import net.minecraft.core.BlockPos
-import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtOps
@@ -18,15 +18,18 @@ import net.minecraft.world.level.levelgen.structure.Structure
 import net.minecraft.world.level.levelgen.structure.StructureStart
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext
 import net.minecraft.world.level.saveddata.SavedData
+import net.minecraft.world.level.saveddata.SavedDataType
 import java.lang.IllegalStateException
 
 /**
  * Allows manually tracking structures spawned outside of normal world gen,
  * and uses mixin to make them interact with /locate, achievements, etc.
  */
-class CustomPlacedStructureTracker private constructor(val level: ServerLevel) : SavedData() {
-    val structureData = mutableMapOf<Long, PlacedStructureData>()
-
+class CustomPlacedStructureTracker private constructor(
+    val level: ServerLevel,
+    val structureData: MutableMap<Long, PlacedStructureData>,
+    private var lastReference: Long
+) : SavedData() {
     // chunk positions (long) of starting chunks of the structures that pass from each chunk key, as in base game chunk structureRefs
     val chunkStructureRefs: Map<Long, Map<Structure, LongSet>>
         get() = _chunkStructureRefs
@@ -38,47 +41,46 @@ class CustomPlacedStructureTracker private constructor(val level: ServerLevel) :
     private val inverseMap = mutableMapOf<PlacedStructureData, Long>()
     // Unlike normal structure references, this doesn't refer to the starting chunk
     // but is just a unique id, allowing for repeats
-    private var lastReference = 0L
 
     companion object {
-        private val factory = { level: ServerLevel ->
-            Factory(
-                { CustomPlacedStructureTracker(level) }, { tag, _ -> load(tag, level) },
-                DataFixTypes.STRUCTURE
-            )
-        }
+        val TYPE = SavedDataType(
+            "fxlib_structure_placement_tracking",
+            { ctx ->
+                CustomPlacedStructureTracker(
+                    ctx.levelOrThrow(),
+                    mutableMapOf(),
+                    0L,
+                )
+            },
+            { ctx -> codec(ctx.levelOrThrow()) },
+            DataFixTypes.STRUCTURE
+        )
 
         @JvmStatic
         fun get(level: ServerLevel): CustomPlacedStructureTracker {
-            return level.dataStorage.computeIfAbsent(factory(level))//), "fxlib_structure_placement_tracking")
+            return level.dataStorage.computeIfAbsent(TYPE)//), "fxlib_structure_placement_tracking")
         }
 
-        private fun load(compoundTag: CompoundTag, level: ServerLevel): CustomPlacedStructureTracker {
-            val out = CustomPlacedStructureTracker(level)
+        private fun codec(level: ServerLevel): Codec<CustomPlacedStructureTracker> {
             val ctx = StructurePieceSerializationContext.fromLevel(level)
-            compoundTag.getCompoundOrNull("spawnedStructureData")?.let { tag ->
-                tag.keySet().forEach { idStr ->
-                    val id = idStr.toLong()
-                    val data = PlacedStructureData.load(tag.getCompound(idStr).get(), ctx, level)
-                    out.structureData[id] = data
 
-                    out.cacheData(data, id)
+            return RecordCodecBuilder.create { instance ->
+                instance.group(
+                    Codec.unboundedMap(
+                        Codec.LONG,
+                        PlacedStructureData.getCodec(ctx, level)
+                    ).fieldOf("spawnedStructureData")
+                        .forGetter { it.structureData },
+
+                    Codec.LONG.fieldOf("references")
+                        .forGetter { it.lastReference }
+                ).apply(instance) { data, refs ->
+                    CustomPlacedStructureTracker(level, data.toMutableMap(), refs).also {
+                        data.forEach { (id, d) -> it.cacheData(d, id) }
+                    }
                 }
             }
-            out.lastReference = compoundTag.getLong("references").get()
-            return out
         }
-    }
-
-    override fun save(compoundTag: CompoundTag, holderLookup: HolderLookup.Provider): CompoundTag {
-        val ctx = StructurePieceSerializationContext.fromLevel(level)
-        compoundTag.put("spawnedStructureData", CompoundTag().also { tag ->
-            structureData.forEach { (refId, data) ->
-                tag.put(refId.toString(), data.save(ctx))
-            }
-        })
-        compoundTag.putLong("references", lastReference)
-        return compoundTag
     }
 
     fun getByChunkPos(chunkPos: ChunkPos, startChunkOnly:Boolean = false): List<PlacedStructureData> {
@@ -164,22 +166,36 @@ data class PlacedStructureData(
     val placement = FixedStructurePlacement(pos)
     val chunkRef = structureStart.chunkPos.toLong()
 
-    fun save(ctx: StructurePieceSerializationContext): CompoundTag {
-        return CompoundTag().also { tag ->
-            tag.put("StructureStart", structureStart.createTag(ctx, structureStart.chunkPos))
-            tag.put("BlockPos", BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, pos).orThrow)
-        }
-    }
-
     companion object {
-        fun load(tag: CompoundTag, ctx: StructurePieceSerializationContext, level: ServerLevel): PlacedStructureData {
-            return PlacedStructureData(
-                StructureStart.loadStaticStart(ctx, tag.getCompound("StructureStart").get(), level.seed)
-                    ?: throw IllegalStateException("Couldn't load structure start from $tag"),
-                BlockPos.CODEC.decode(NbtOps.INSTANCE, tag.get("BlockPos")).getOrThrow {
-                    Exception("Error in decoding BlockPos: $it")
-                }.first,
-            )
-        }
+        fun getCodec(
+            ctx: StructurePieceSerializationContext,
+            level: ServerLevel
+        ): Codec<PlacedStructureData> =
+            RecordCodecBuilder.create { instance ->
+                instance.group(
+                    Codec.PASSTHROUGH
+                        .fieldOf("StructureStart")
+                        .forGetter {
+                            Dynamic(
+                                NbtOps.INSTANCE,
+                                it.structureStart.createTag(ctx, it.structureStart.chunkPos)
+                            )
+                        },
+
+                    BlockPos.CODEC
+                        .fieldOf("BlockPos")
+                        .forGetter { it.pos }
+                ).apply(instance) { dynamic, pos ->
+                    val tag = dynamic.convert(NbtOps.INSTANCE).value as CompoundTag
+
+                    val start = StructureStart.loadStaticStart(
+                        ctx,
+                        tag,
+                        level.seed
+                    ) ?: throw IllegalStateException("Couldn't load structure start")
+
+                    PlacedStructureData(start, pos)
+                }
+            }
     }
 }
