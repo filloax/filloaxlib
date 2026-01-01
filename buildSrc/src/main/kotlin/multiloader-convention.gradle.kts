@@ -202,5 +202,6 @@ val dokkaJavadocJar = tasks.register<Jar>("dokkaJavadocJar") {
 }
 
 tasks.build {
-    dependsOn(dokkaJavadocJar)
+    // Disabled for speeding up build during 26.1 transition
+    //dependsOn(dokkaJavadocJar)
 }
