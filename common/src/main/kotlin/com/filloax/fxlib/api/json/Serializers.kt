@@ -15,7 +15,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.levelgen.structure.BoundingBox
@@ -38,15 +38,15 @@ class RotationSerializer : KSerializer<Rotation> {
     }
 }
 
-@Serializer(forClass = ResourceLocation::class)
-class ResourceLocationSerializer : KSerializer<ResourceLocation> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("fxlib.ResourceLocation", PrimitiveKind.STRING)
+@Serializer(forClass = Identifier::class)
+class IdentifierSerializer : KSerializer<Identifier> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("fxlib.Identifier", PrimitiveKind.STRING)
 
-    override fun deserialize(decoder: Decoder): ResourceLocation {
-        return ResourceLocation.parse(decoder.decodeString())
+    override fun deserialize(decoder: Decoder): Identifier {
+        return Identifier.parse(decoder.decodeString())
     }
 
-    override fun serialize(encoder: Encoder, value: ResourceLocation) {
+    override fun serialize(encoder: Encoder, value: Identifier) {
         encoder.encodeString(value.toString())
     }
 }

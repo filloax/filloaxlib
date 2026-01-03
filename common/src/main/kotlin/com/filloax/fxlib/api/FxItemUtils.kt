@@ -3,7 +3,7 @@ package com.filloax.fxlib.api
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.network.Filterable
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -15,11 +15,11 @@ import net.minecraft.world.item.component.WrittenBookContent
 object FxItemUtils {
     @JvmStatic
     fun itemFromId(id: String): Item {
-        return itemFromId(ResourceLocation.parse(id))
+        return itemFromId(Identifier.parse(id))
     }
 
     @JvmStatic
-    fun itemFromId(id: ResourceLocation): Item {
+    fun itemFromId(id: Identifier): Item {
         return BuiltInRegistries.ITEM.getValue(id)
     }
 
@@ -32,7 +32,7 @@ object FxItemUtils {
 }
 
 fun itemFromId(id: String) = FxItemUtils.itemFromId(id)
-fun itemFromId(id: ResourceLocation) = FxItemUtils.itemFromId(id)
+fun itemFromId(id: Identifier) = FxItemUtils.itemFromId(id)
 fun createWrittenBook(title: Component, author: Component, pages: List<Component>) =
     FxItemUtils.createWrittenBook(title, author, pages)
 

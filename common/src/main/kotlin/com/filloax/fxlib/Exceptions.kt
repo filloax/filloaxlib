@@ -1,11 +1,11 @@
 package com.filloax.fxlib
 
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import java.lang.RuntimeException
 
 class UnknownStructureIdException : RuntimeException {
-    constructor(id: ResourceLocation) : super("No such structure $id")
-    constructor(id: ResourceLocation, message: String) : super("$message | No such structure $id")
+    constructor(id: Identifier) : super("No such structure $id")
+    constructor(id: Identifier, message: String) : super("$message | No such structure $id")
 }
 
 class SaveDataTypeException : RuntimeException {

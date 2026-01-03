@@ -15,7 +15,7 @@ import net.minecraft.core.HolderSet
 import net.minecraft.core.Vec3i
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.Rotation
@@ -61,7 +61,7 @@ import kotlin.math.min
 class ForcePosJigsawStructure(
     settings: StructureSettings,
     startPool: Holder<StructureTemplatePool>,
-    startJigsawName: Optional<ResourceLocation>,
+    startJigsawName: Optional<Identifier>,
     maxDepth: Int,
     startHeight: HeightProvider,
     useExpansionHack: Boolean,
@@ -93,7 +93,7 @@ class ForcePosJigsawStructure(
             spawnOverrides: Map<MobCategory, StructureSpawnOverride> = mapOf(),
             step: GenerationStep.Decoration = GenerationStep.Decoration.SURFACE_STRUCTURES,
             terrainAdaptation: TerrainAdjustment = TerrainAdjustment.NONE,
-            startJigsawName: ResourceLocation? = null,
+            startJigsawName: Identifier? = null,
             size: Int = 7,
             startHeight: HeightProvider = ConstantHeight.ZERO,
             useExpansionHack: Boolean = false,
@@ -122,7 +122,7 @@ class ForcePosJigsawStructure(
                 builder.group(
                     settingsCodec(builder),
                     StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter(JigsawStructure::startPool),
-                    ResourceLocation.CODEC.optionalFieldOf("start_jigsaw_name").forGetter(JigsawStructure::startJigsawName),
+                    Identifier.CODEC.optionalFieldOf("start_jigsaw_name").forGetter(JigsawStructure::startJigsawName),
                     Codec.intRange(0, 7).fieldOf("size").forGetter(JigsawStructure::maxDepth),
                     HeightProvider.CODEC.fieldOf("start_height").forGetter(JigsawStructure::startHeight),
                     Codec.BOOL.fieldOf("use_expansion_hack").forGetter(JigsawStructure::useExpansionHack),
@@ -222,7 +222,7 @@ object JigsawPlacementExtra {
     fun addPieces(
         context: GenerationContext,
         startPool: Holder<StructureTemplatePool>,
-        startJigsawName: Optional<ResourceLocation>,
+        startJigsawName: Optional<Identifier>,
         maxDepth: Int,
         pos: BlockPos,
         useExpansionHack: Boolean,
@@ -256,16 +256,16 @@ object JigsawPlacementExtra {
         } else {
             val blockPos: BlockPos
             if (startJigsawName.isPresent) {
-                val resourceLocation = startJigsawName.get()
+                val identifier = startJigsawName.get()
                 val optional = JigsawPlacement.getRandomNamedJigsaw(
-                    structurePoolElement, resourceLocation, pos, rotation, structureTemplateManager, worldgenRandom
+                    structurePoolElement, identifier, pos, rotation, structureTemplateManager, worldgenRandom
                 )
                 if (optional.isEmpty) {
                     FxLib.logger.error(
                         "No starting jigsaw {} found in start pool {}",
-                        resourceLocation,
+                        identifier,
                         startPool.unwrapKey().map { resourceKey: ResourceKey<StructureTemplatePool?> ->
-                            resourceKey.location().toString()
+                            resourceKey.identifier().toString()
                         }.orElse("<unregistered>")
                     )
                     return Optional.empty()

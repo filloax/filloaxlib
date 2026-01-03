@@ -12,7 +12,7 @@ import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
@@ -51,7 +51,7 @@ object FxLibNeo : VersionFxLib() {
 
         FORGE_BUS.addListener<AddServerReloadListenersEvent> { ev ->
             ev.addListener(
-            ResourceLocation.fromNamespaceAndPath(MOD_ID, "server_language_manager_listener"),
+            Identifier.fromNamespaceAndPath(MOD_ID, "server_language_manager_listener"),
             ServerLanguageManager.ReloadListener())
         }
     }
@@ -80,7 +80,7 @@ object FxLibNeo : VersionFxLib() {
         }
     }
 
-    private fun <T> DeferredRegister<T>.doRegister(name: ResourceLocation, value: T) {
+    private fun <T> DeferredRegister<T>.doRegister(name: Identifier, value: T) {
         register(name.path, Supplier { value })
     }
 

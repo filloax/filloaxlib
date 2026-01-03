@@ -2,7 +2,7 @@ package com.filloax.fxlib.api.registration
 
 import com.filloax.fxlib.FxLib
 import net.minecraft.core.Holder
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import kotlin.reflect.KProperty
 
 /**
@@ -20,14 +20,14 @@ import kotlin.reflect.KProperty
  *     all[id] = this
  * }
  *
- * fun registerEffects(registrator: (ResourceLocation, MobEffect) -> Holder<MobEffect>) {
+ * fun registerEffects(registrator: (Identifier, MobEffect) -> Holder<MobEffect>) {
  *     all.values.forEach{
  *         it.initHolder(registrator(it.id, it.value))
  *     }
  * }
  * ```
  */
-class RegistryHolderDelegate<T>(val id: ResourceLocation, val value: T) {
+class RegistryHolderDelegate<T>(val id: Identifier, val value: T) {
     var holder: Holder<T>? = null
 
     fun initHolder(holder: Holder<T>) {
@@ -49,7 +49,7 @@ class RegistryHolderDelegate<T>(val id: ResourceLocation, val value: T) {
  *    private fun <T : LivingEntity> make(
  *         name: String,
  *         entityTypeBuilder: EntityType.Builder<T>,
- *     ) = registryDelegate(ResourceLocation.fromNamespaceAndPath("test", name)) {
+ *     ) = registryDelegate(Identifier.fromNamespaceAndPath("test", name)) {
  *         all[id] = {
  *             val entityType = entityTypeBuilder.build(id.toString())
  *             init(entityType)
@@ -58,14 +58,14 @@ class RegistryHolderDelegate<T>(val id: ResourceLocation, val value: T) {
  *         }
  *     }
  *
- *     fun registerEntityTypes(registrator: (ResourceLocation, EntityType<*>) -> Unit) {
+ *     fun registerEntityTypes(registrator: (Identifier, EntityType<*>) -> Unit) {
  *         all.forEach {
  *             registrator(it.key, it.value())
  *         }
  *     }
  * ```
  */
-class RegistryDelegate<T>(val id: ResourceLocation, val clazz: Class<T>) {
+class RegistryDelegate<T>(val id: Identifier, val clazz: Class<T>) {
     var value: T? = null
 
     fun init(value: T) {
@@ -81,8 +81,8 @@ class RegistryDelegate<T>(val id: ResourceLocation, val clazz: Class<T>) {
 /**
  * See [RegistryDelegate]
  */
-inline fun <reified T> registryDelegate(id: ResourceLocation, block: RegistryDelegate<T>.() -> Unit) = RegistryDelegate(id, T::class.java).also(block)
+inline fun <reified T> registryDelegate(id: Identifier, block: RegistryDelegate<T>.() -> Unit) = RegistryDelegate(id, T::class.java).also(block)
 /**
  * See [RegistryDelegate]
  */
-inline fun <reified T> registryDelegate(id: ResourceLocation) = RegistryDelegate(id, T::class.java)
+inline fun <reified T> registryDelegate(id: Identifier) = RegistryDelegate(id, T::class.java)

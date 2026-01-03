@@ -1,6 +1,6 @@
 package com.filloax.fxlib
 
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import org.jetbrains.annotations.ApiStatus
 
 /**
@@ -8,8 +8,9 @@ import org.jetbrains.annotations.ApiStatus
  */
 @ApiStatus.Internal
 object InternalUtils {
-    fun resLoc(path: String): ResourceLocation {
-        return ResourceLocation.fromNamespaceAndPath(FxLib.MOD_ID, path)
+    // todo: rename to match the change from ResourceLocation to Identifier in 1.21.11
+    fun resLoc(path: String): Identifier {
+        return Identifier.fromNamespaceAndPath(FxLib.MOD_ID, path)
     }
 
     var shiftDownClientHook: (() -> Boolean)? = null

@@ -28,7 +28,7 @@ public abstract class PlaceCommandMixin {
         if (structure2 instanceof FixablePosition fStructure) {
             fStructure.setNextPlacePosition(pos);
             ChatType.Bound chatType = ChatType.bind(ChatType.MSG_COMMAND_INCOMING, source);
-            OutgoingChatMessage msg = new OutgoingChatMessage.Disguised(Component.translatable("fxlib.commands.placetweak.fixedpos", structure.key().location().toString(), pos.getX(), pos.getY(), pos.getZ()));
+            OutgoingChatMessage msg = new OutgoingChatMessage.Disguised(Component.translatable("fxlib.commands.placetweak.fixedpos", structure.key().identifier().toString(), pos.getX(), pos.getY(), pos.getZ()));
             source.sendChatMessage(msg, true, chatType);
         }
     }

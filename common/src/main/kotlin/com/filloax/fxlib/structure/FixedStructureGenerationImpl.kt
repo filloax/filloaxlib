@@ -16,7 +16,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.BlockPos
 import net.minecraft.core.SectionPos
 import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.ChunkPos
@@ -38,7 +38,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
     override fun register(
         level: ServerLevel,
         id: String, pos: BlockPos,
-        structureId: ResourceLocation,
+        structureId: Identifier,
         rotation: Rotation,
         force: Boolean,
     ) {

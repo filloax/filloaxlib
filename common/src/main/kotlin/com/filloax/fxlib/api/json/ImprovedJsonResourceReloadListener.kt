@@ -4,7 +4,7 @@ import com.filloax.fxlib.api.concatIterators
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import net.minecraft.resources.FileToIdConverter
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener
 import net.minecraft.util.profiling.ProfilerFiller
@@ -22,13 +22,13 @@ abstract class ImprovedJsonResourceReloadListener(
     private val gson: Gson,
     private val directory: String,
     private val enableJsonc: Boolean = true,
-) : SimplePreparableReloadListener<Map<ResourceLocation, JsonElement>>() {
+) : SimplePreparableReloadListener<Map<Identifier, JsonElement>>() {
 
     /**
      * Performs any reloading that can be done off-thread, such as file IO
      */
-    override fun prepare(resourceManager: ResourceManager, profiler: ProfilerFiller): Map<ResourceLocation, JsonElement> {
-        val map = HashMap<ResourceLocation, JsonElement>()
+    override fun prepare(resourceManager: ResourceManager, profiler: ProfilerFiller): Map<Identifier, JsonElement> {
+        val map = HashMap<Identifier, JsonElement>()
         scanDirectory(resourceManager, directory, gson, map, enableJsonc)
         return map
     }
@@ -37,7 +37,7 @@ abstract class ImprovedJsonResourceReloadListener(
         private val LOGGER = LogManager.getLogger()
 
         fun scanDirectory(
-            resourceManager: ResourceManager, dirPath: String, gson: Gson, map: MutableMap<ResourceLocation, JsonElement>,
+            resourceManager: ResourceManager, dirPath: String, gson: Gson, map: MutableMap<Identifier, JsonElement>,
             enableJsonc: Boolean = true,
         ) {
             val fileToIdConverter = FileToIdConverter.json(dirPath)
@@ -49,8 +49,8 @@ abstract class ImprovedJsonResourceReloadListener(
                 )
             else
                 fileToIdConverter.listMatchingResources(resourceManager).iterator()
-            for ((resourceLocation, value) in resources) {
-                val fileIdentifier = fileToIdConverter.fileToId(resourceLocation)
+            for ((identifier, value) in resources) {
+                val fileIdentifier = fileToIdConverter.fileToId(identifier)
                 try {
                     val fileInput = value.openAsReader()
                     try {
@@ -63,11 +63,11 @@ abstract class ImprovedJsonResourceReloadListener(
                         fileInput.close()
                     }
                 } catch (exception: SerializationException) {
-                    LOGGER.error("Couldn't parse data file {} from {}", fileIdentifier, resourceLocation, exception)
+                    LOGGER.error("Couldn't parse data file {} from {}", fileIdentifier, identifier, exception)
                 } catch (exception: IOException) {
-                    LOGGER.error("Couldn't parse data file {} from {}", fileIdentifier, resourceLocation, exception)
+                    LOGGER.error("Couldn't parse data file {} from {}", fileIdentifier, identifier, exception)
                 } catch (exception: IllegalArgumentException) {
-                    LOGGER.error("Couldn't parse data file {} from {}", fileIdentifier, resourceLocation, exception)
+                    LOGGER.error("Couldn't parse data file {} from {}", fileIdentifier, identifier, exception)
                 }
             }
         }

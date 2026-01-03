@@ -2,12 +2,12 @@ package com.filloax.fxlib.structure
 
 import com.filloax.fxlib.InternalUtils.resLoc
 import com.filloax.fxlib.api.structure.tracking.FixedStructurePlacement
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType
 
 object FXLibStructurePlacementTypes {
-    val all = mutableMapOf<ResourceLocation, StructurePlacementType<*>>()
+    val all = mutableMapOf<Identifier, StructurePlacementType<*>>()
 
     var FIXED = make("fixed") { FixedStructurePlacement.CODEC }
 
@@ -16,7 +16,7 @@ object FXLibStructurePlacementTypes {
         return sp
     }
 
-    fun registerStructurePlacementTypes(registrator: (ResourceLocation, StructurePlacementType<*>) -> Unit) {
+    fun registerStructurePlacementTypes(registrator: (Identifier, StructurePlacementType<*>) -> Unit) {
         all.forEach { registrator(it.key, it.value) }
     }
 }

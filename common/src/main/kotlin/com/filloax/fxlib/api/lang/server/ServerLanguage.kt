@@ -10,7 +10,7 @@ import kotlinx.serialization.json.*
 import net.minecraft.locale.Language
 import net.minecraft.network.chat.FormattedText
 import net.minecraft.network.chat.Style
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.resources.ResourceManager
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.util.FormattedCharSink
@@ -38,7 +38,7 @@ object ServerLanguageManager {
 
     class ReloadListener : KotlinJsonResourceReloadListener(JSON, Constants.DATA_LANGUAGES_DIR) {
         override fun apply(
-            elements: Map<ResourceLocation, JsonElement>,
+            elements: Map<Identifier, JsonElement>,
             resourceManager: ResourceManager,
             profiler: ProfilerFiller
         ) {

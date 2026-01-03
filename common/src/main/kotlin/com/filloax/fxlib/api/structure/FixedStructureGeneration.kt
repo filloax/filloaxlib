@@ -5,7 +5,7 @@ import com.filloax.fxlib.structure.FixedStructureGenerationImpl
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Holder
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.levelgen.structure.Structure
@@ -24,7 +24,7 @@ interface FixedStructureGeneration {
     fun register(
         level: ServerLevel,
         id: String, pos: BlockPos,
-        structureId: ResourceLocation,
+        structureId: Identifier,
         rotation: Rotation = Rotation.NONE,
         force: Boolean = false,
     )
@@ -40,7 +40,7 @@ interface FixedStructureGeneration {
         structureKey: ResourceKey<Structure>,
         rotation: Rotation = Rotation.NONE,
         force: Boolean = false,
-    ) = register(level, id, pos, structureKey.location(), rotation, force)
+    ) = register(level, id, pos, structureKey.identifier(), rotation, force)
 
     /**
      * Register a structure to be spawned at the specified pos.
@@ -66,7 +66,7 @@ interface FixedStructureGeneration {
 
 data class StructureSpawnData(
     val pos: BlockPos,
-    val structure: ResourceLocation,
+    val structure: Identifier,
     val spawnId: String,
     val rotation: Rotation? = null,
     val force: Boolean = false

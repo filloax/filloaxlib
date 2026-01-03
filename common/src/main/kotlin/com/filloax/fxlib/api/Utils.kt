@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos.MutableBlockPos
 import net.minecraft.core.Vec3i
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.minecraft.tags.TagKey
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.Level
@@ -46,10 +46,10 @@ object FxUtils {
     @JvmStatic
     fun getStructTagOrKey(structureId: String): Either<TagKey<Structure>, ResourceKey<Structure>> {
         return if (structureId.startsWith("#")) {
-            Either.left(TagKey.create(Registries.STRUCTURE, ResourceLocation.parse(structureId.replaceFirst("#", ""))))
+            Either.left(TagKey.create(Registries.STRUCTURE, Identifier.parse(structureId.replaceFirst("#", ""))))
         }
         else {
-            Either.right(ResourceKey.create(Registries.STRUCTURE, ResourceLocation.parse(structureId)))
+            Either.right(ResourceKey.create(Registries.STRUCTURE, Identifier.parse(structureId)))
         }
     }
 
