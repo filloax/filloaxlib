@@ -36,8 +36,8 @@ class FxLibNetworkingFabric : FxLibNetworking {
 //    }
 
     class PacketRegistratorFabric : PacketRegistrator {
-        val payloadRegistryS2C = PayloadTypeRegistry.playS2C()
-        val payloadRegistryC2S = PayloadTypeRegistry.playC2S()
+        val payloadRegistryS2C: PayloadTypeRegistry<RegistryFriendlyByteBuf> = PayloadTypeRegistry.clientboundPlay()
+        val payloadRegistryC2S: PayloadTypeRegistry<RegistryFriendlyByteBuf> = PayloadTypeRegistry.serverboundPlay()
 
         override fun <T : CustomPacketPayload> playC2S(
             id: CustomPacketPayload.Type<T>,

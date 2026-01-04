@@ -21,7 +21,7 @@ object FxLibFabric : ModInitializer, VersionFxLib() {
     override fun onInitialize() {
         initialize()
 
-        ResourceLoader.get(PackType.SERVER_DATA).registerReloader(
+        ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(
             resLoc("fx_lib_reloader"),
             FabricReloadListener(
                 resLoc(Constants.DATA_LANGUAGES_DIR),
