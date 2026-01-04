@@ -42,23 +42,23 @@ loom {
 }
 
 val modVersion = libs.versions.modversion.get()
-val parchmentMcVersion = libs.versions.parchment.minecraft.get()
-val parchmentVersion = libs.versions.parchment.asProvider().get()
+//val parchmentMcVersion = libs.versions.parchment.minecraft.get()
+//val parchmentVersion = libs.versions.parchment.asProvider().get()
 
 version = "$modVersion-${minecraftVersion}-fabric"
 
 dependencies {
     minecraft( libs.minecraft )
     implementation( libs.jsr305 )
-    mappings(loom.layered {
-        officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchmentMcVersion}:${parchmentVersion}@zip")
-    })
-    modImplementation( libs.fabric )
-    modImplementation( libs.fabric.api ) {
+//    mappings(loom.layered {
+//        officialMojangMappings()
+//        parchment("org.parchmentmc.data:parchment-${parchmentMcVersion}:${parchmentVersion}@zip")
+//    })
+    implementation( libs.fabric )
+    implementation( libs.fabric.api ) {
         exclude(module = "fabric-api-deprecated")
     }
-    modImplementation( libs.fabric.kotlin )
+    implementation( libs.fabric.kotlin )
 
     utils.includeLibs.forEach {
         api(it)

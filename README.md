@@ -73,7 +73,7 @@ dependencies {
   // for example
   implementation("maven.modrinth:filloaxlib:0.31.0-1.21-neoforge")
   // loom notation
-  modImplementation("maven.modrinth:filloaxlib:0.31.0-1.21-fabric")
+  implementation("maven.modrinth:filloaxlib:0.31.0-1.21-fabric")
 
   // this is needed only with the loader-specific modules until I find out how
   // to fix it
