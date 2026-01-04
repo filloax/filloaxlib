@@ -75,5 +75,6 @@ artifacts {
 
 // Test
 tasks.test {
+    failOnNoDiscoveredTests = false
     useJUnitPlatform()
 }
