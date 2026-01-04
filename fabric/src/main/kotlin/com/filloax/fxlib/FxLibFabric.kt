@@ -9,7 +9,7 @@ import com.filloax.fxlib.structure.FXLibStructurePlacementTypes
 import com.filloax.fxlib.structure.FXLibStructurePoolElements
 import com.filloax.fxlib.structure.FXLibStructures
 import net.fabricmc.api.ModInitializer
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.server.packs.PackType
@@ -21,10 +21,13 @@ object FxLibFabric : ModInitializer, VersionFxLib() {
     override fun onInitialize() {
         initialize()
 
-        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(FabricReloadListener(
-            resLoc(Constants.DATA_LANGUAGES_DIR),
-            ServerLanguageManager.ReloadListener(),
-        ))
+        ResourceLoader.get(PackType.SERVER_DATA).registerReloader(
+            resLoc("fx_lib_reloader"),
+            FabricReloadListener(
+                resLoc(Constants.DATA_LANGUAGES_DIR),
+                ServerLanguageManager.ReloadListener(),
+            )
+        )
     }
 
     override fun initPlatformCallbacks() {

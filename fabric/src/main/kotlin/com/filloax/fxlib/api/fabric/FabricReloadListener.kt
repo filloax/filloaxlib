@@ -1,18 +1,16 @@
 package com.filloax.fxlib.api.fabric
 
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+import net.fabricmc.fabric.impl.resource.FabricResourceReloader
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.resources.PreparableReloadListener
 import net.minecraft.server.packs.resources.PreparableReloadListener.PreparationBarrier
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
-// source: https://github.com/TelepathicGrunt/RepurposedStructures
-class FabricReloadListener(private val id: Identifier, private val listener: PreparableReloadListener) :
-    IdentifiableResourceReloadListener {
-    // todo: base class is deprecated, see docs
+// original source: https://github.com/TelepathicGrunt/RepurposedStructures
+class FabricReloadListener(private val id: Identifier, private val listener: PreparableReloadListener): FabricResourceReloader {
 
-    override fun getFabricId(): Identifier {
+    override fun `fabric$getId`(): Identifier {
         return id
     }
 
@@ -21,7 +19,7 @@ class FabricReloadListener(private val id: Identifier, private val listener: Pre
         exectutor: Executor,
         barrier: PreparationBarrier,
         applyExectutor: Executor
-    ): CompletableFuture<Void?> {
+    ): CompletableFuture<Void> {
         return listener.reload(sharedState, exectutor, barrier, applyExectutor)
     }
 }

@@ -80,14 +80,14 @@ object FxLibNeo : VersionFxLib() {
         }
     }
 
-    private fun <T> DeferredRegister<T>.doRegister(name: Identifier, value: T) {
+    private fun <T : Any> DeferredRegister<T>.doRegister(name: Identifier, value: T) {
         register(name.path, Supplier { value })
     }
 
-    private fun <T> createReg(key: ResourceKey<Registry<T>>): DeferredRegister<T> {
+    private fun <T : Any> createReg(key: ResourceKey<Registry<T>>): DeferredRegister<T> {
         return DeferredRegister.create(key, MOD_ID).also(registries::add)
     }
-    private fun <T> createReg(builtin: Registry<T>): DeferredRegister<T> {
+    private fun <T : Any> createReg(builtin: Registry<T>): DeferredRegister<T> {
         return DeferredRegister.create(builtin, MOD_ID).also(registries::add)
     }
 
