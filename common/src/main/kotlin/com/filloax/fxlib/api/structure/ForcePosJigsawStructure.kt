@@ -217,7 +217,7 @@ class ForcePosJigsawStructure(
 object JigsawPlacementExtra {
     /**
      * Copy the vanilla code, + add a rotation param instead of randomly setting it inside the function,
-     * easies way to do this as opposed to mixing it in the function if we call it ourselves anyways
+     * easies way to do this as opposed to mixing it in the function if we call it ourselves anyway
      */
     fun addPieces(
         context: GenerationContext,
@@ -242,12 +242,8 @@ object JigsawPlacementExtra {
         val worldgenRandom = context.random()
         val registry = registryAccess.lookupOrThrow(Registries.TEMPLATE_POOL)
         val structureTemplatePool = startPool.unwrapKey()
-            .flatMap { resourceKey: ResourceKey<StructureTemplatePool?>? ->
-                registry.getOptional(
-                    aliasLookup.lookup(
-                        resourceKey!!
-                    )
-                )
+            .flatMap { resourceKey: ResourceKey<StructureTemplatePool>? ->
+                registry.getOptional(aliasLookup.lookup(resourceKey!!))
             }
             .orElse(startPool.value()) as StructureTemplatePool
         val structurePoolElement = structureTemplatePool.getRandomTemplate(worldgenRandom)
@@ -264,9 +260,11 @@ object JigsawPlacementExtra {
                     FxLib.logger.error(
                         "No starting jigsaw {} found in start pool {}",
                         identifier,
-                        startPool.unwrapKey().map { resourceKey: ResourceKey<StructureTemplatePool?> ->
-                            resourceKey.identifier().toString()
-                        }.orElse("<unregistered>")
+                        startPool.unwrapKey()
+                            .map { resourceKey: ResourceKey<StructureTemplatePool> ->
+                                resourceKey.identifier().toString()
+                            }
+                            .orElse("<unregistered>")
                     )
                     return Optional.empty()
                 }

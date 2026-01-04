@@ -27,7 +27,7 @@ import kotlin.reflect.KProperty
  * }
  * ```
  */
-class RegistryHolderDelegate<T>(val id: Identifier, val value: T) {
+class RegistryHolderDelegate<T : Any>(val id: Identifier, val value: T) {
     var holder: Holder<T>? = null
 
     fun initHolder(holder: Holder<T>) {

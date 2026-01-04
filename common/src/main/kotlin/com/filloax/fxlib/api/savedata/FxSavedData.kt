@@ -19,6 +19,8 @@ import net.minecraft.world.level.storage.DimensionDataStorage
 import kotlin.io.path.createDirectory
 import kotlin.io.path.exists
 
+// todo: check if everything still works after 26.1 transition
+
 /**
  * Utility to have a way to save data in levels/servers that
  * does not change with versions.
