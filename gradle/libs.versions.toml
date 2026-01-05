@@ -26,8 +26,8 @@
     # Get versions from https://projects.neoforged.net/neoforged/neoforge
     neoforge = "26.1.0.0-alpha.4+snapshot-1"
     neoforge-range = "[26.1.0.0-alpha.4+snapshot-1,27)"
-    kotlinforge = "5.10.0"
-    kotlinforge-range = "[5.10,)"
+    kotlinforge = "6.0.0"
+    kotlinforge-range = "[6.0.0,)"
 
 # Dependencies
     mixin = "0.8.7"

@@ -39,7 +39,7 @@ object FxLibNeo : VersionFxLib() {
         runForDist(
             clientTarget = {
                 MOD_BUS.addListener(FxLibClientNeo::initializeClient)
-                Minecraft.getInstance()
+                //Minecraft.getInstance() // it crashes
             },
             serverTarget = {
                 logger.info("Starting server...")

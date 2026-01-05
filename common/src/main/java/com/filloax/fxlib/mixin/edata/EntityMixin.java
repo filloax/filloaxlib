@@ -35,6 +35,6 @@ public abstract class EntityMixin implements WithPersistentData {
 
     @Inject(method = "load", at = @At("HEAD"))
     protected void injectReadMethod(ValueInput input, CallbackInfo ci) {
-        persistentData = input.read("fxlib.entdata", CompoundTag.CODEC).get();
+        persistentData = input.read("fxlib.entdata", CompoundTag.CODEC).orElse(null);
     }
 }
