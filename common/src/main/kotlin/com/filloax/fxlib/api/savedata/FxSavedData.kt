@@ -16,7 +16,7 @@ import net.minecraft.util.datafix.DataFixTypes
 import net.minecraft.world.level.saveddata.SavedData
 import net.minecraft.world.level.saveddata.SavedDataType
 import net.minecraft.world.level.storage.DimensionDataStorage
-import kotlin.io.path.createDirectory
+import kotlin.io.path.createDirectories
 import kotlin.io.path.exists
 
 // todo: check if everything still works after 26.1 transition
@@ -101,7 +101,7 @@ abstract class FxSavedData<T : FxSavedData<T>>(
 
         private fun <T : FxSavedData<T>> preLoad(definition: Definition<T>, level: ServerLevel, dataStorage: DimensionDataStorage, savedDataType: SavedDataType<T>) {
             val filePath = dataStorage.getDataFile(definition.id)
-            filePath.parent.createDirectory()
+            filePath.parent.createDirectories()
             definition.beforeLoad?.invoke(level, dataStorage)
             if (!filePath.exists()) {
                 val foundFilePaths = definition.checkDeprecatedFilePaths.filter { checkFile ->
