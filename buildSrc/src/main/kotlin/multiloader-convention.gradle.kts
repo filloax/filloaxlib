@@ -38,10 +38,10 @@ repositories {
 
     exclusiveContent {
         forRepositories(
-            maven {
-                name = "ParchmentMC"
-                url = uri("https://maven.parchmentmc.org/")
-            },
+//            maven {
+//                name = "ParchmentMC"
+//                url = uri("https://maven.parchmentmc.org/")
+//            },
             maven {
                 name = "NeoForge"
                 url = uri("https://maven.neoforged.net/releases")

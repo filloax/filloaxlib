@@ -1,4 +1,4 @@
-accessWidener	v1	named
+accessWidener	v1	official
 #note: not used in this module, but used in fabric-like modules
 extendable class net/minecraft/world/level/levelgen/structure/structures/JigsawStructure
 accessible field net/minecraft/world/level/levelgen/structure/structures/JigsawStructure startPool Lnet/minecraft/core/Holder;

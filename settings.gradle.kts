@@ -12,7 +12,7 @@ pluginManagement {
             url = uri("https://maven.fabricmc.net/")
             content {
                 includeGroupAndSubgroups("net.fabricmc")
-                includeGroup("fabric-loom")
+                includeGroup("net.fabricmc.fabric-loom")
             }
         }
         maven {
@@ -22,13 +22,13 @@ pluginManagement {
                 includeGroupAndSubgroups("net.minecraftforge")
             }
         }
-        maven {
-            name = "Parchment"
-            url = uri("https://maven.parchmentmc.org")
-            content {
-                includeGroupAndSubgroups("org.parchmentmc")
-            }
-        }
+//        maven {
+//            name = "Parchment"
+//            url = uri("https://maven.parchmentmc.org")
+//            content {
+//                includeGroupAndSubgroups("org.parchmentmc")
+//            }
+//        }
         maven { url = uri("https://repo.sleeping.town/") }
         maven {
             name = "Sponge"

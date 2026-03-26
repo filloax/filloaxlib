@@ -20,10 +20,10 @@ neoForge {
     validateAccessTransformers = true
     accessTransformers.files.setFrom(baseProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
 
-    parchment {
-        minecraftVersion = libs.versions.parchment.minecraft
-        mappingsVersion = libs.versions.parchment.asProvider()
-    }
+//    parchment {
+//        minecraftVersion = libs.versions.parchment.minecraft
+//        mappingsVersion = libs.versions.parchment.asProvider()
+//    }
 
     runs {
         create("client") {

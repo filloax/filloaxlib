@@ -16,10 +16,10 @@ neoForge {
 
     validateAccessTransformers = true
 
-    parchment {
-        minecraftVersion = libs.versions.parchment.minecraft
-        mappingsVersion = libs.versions.parchment.asProvider()
-    }
+//    parchment {
+//        minecraftVersion = libs.versions.parchment.minecraft
+//        mappingsVersion = libs.versions.parchment.asProvider()
+//    }
 
     mods {
         register(modid) {
