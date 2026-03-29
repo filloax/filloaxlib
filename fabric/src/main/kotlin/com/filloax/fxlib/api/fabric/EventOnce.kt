@@ -128,7 +128,7 @@ object EventOnce {
             action(level)
         } else {
             runEventOnce(ServerChunkEvents.CHUNK_LOAD, object : ServerChunkEvents.Load {
-                override fun onChunkLoad(level2: ServerLevel, chunk: LevelChunk) {
+                override fun onChunkLoad(level2: ServerLevel, chunk: LevelChunk, generated: Boolean) {
                     var reschedule = false
                     if (level2 != level) {
                         reschedule = true

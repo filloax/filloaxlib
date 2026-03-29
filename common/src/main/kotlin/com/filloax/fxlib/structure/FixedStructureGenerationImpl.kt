@@ -1,6 +1,7 @@
 package com.filloax.fxlib.structure
 
 import com.filloax.fxlib.FxLib
+import com.filloax.fxlib.InternalUtils.resLoc
 import com.filloax.fxlib.UnknownStructureIdException
 import com.filloax.fxlib.api.ScheduledServerTask
 import com.filloax.fxlib.api.codec.mutableSetOf
@@ -67,10 +68,10 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
         alreadyGeneratedStructures.clear()
     }
 
-    fun onLoadChunk(level: ServerLevel, chunk: LevelChunk) {
+    fun onLoadChunk(level: ServerLevel, chunk: LevelChunk, generated: Boolean) {
         if (level.dimension() != Level.OVERWORLD) return
 
-        val key = chunk.pos.toLong()
+        val key = chunk.pos.pack()
         structsToSpawn[key]?.let { list -> checkChunkSpawns(level, chunk, list) }
         extraStructSpawnChunks[key]?.let { list -> checkChunkSpawns(level, chunk, list) }
     }
@@ -88,7 +89,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
 
            structsToSpawnById.put(spawnData.spawnId, spawnData)
 
-            val key = ChunkPos(spawnData.pos).toLong()
+            val key = ChunkPos(spawnData.pos.x, spawnData.pos.y).pack()
             structsToSpawn.computeIfAbsent(key) { mutableListOf() }.add(spawnData)
             FxLib.logger.info("Queued $spawnData for fixed structure generation...")
 
@@ -164,7 +165,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
             serverLevel.chunkSource.randomState(),
             serverLevel.structureManager,
             serverLevel.seed,
-            ChunkPos(spawnData.pos),
+            ChunkPos(spawnData.pos.x, spawnData.pos.y),
             0,
             serverLevel
         ) { true }
@@ -188,7 +189,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
                 val isLoaded = serverLevel.isLoaded(chunkPos.worldPosition)
                 if (!isLoaded) {
                     FxLib.logger.info("Chunk at $chunkPos (${chunkPos.worldPosition}) not loaded and required! Queueing for next spawn")
-                    val key = chunkPos.toLong()
+                    val key = chunkPos.pack()
                     extraStructSpawnChunks
                         .computeIfAbsent(key) { mutableListOf() }
                         .add(spawnData)
@@ -234,7 +235,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
                     Codec.STRING.mutableSetOf().optionalFieldOf("generatedSpawns", mutableSetOf()).forGetter{it.generatedSpawns}
                 ).apply(builder, FixedStructureGenerationImpl::Save)
             }
-            val DEF = define("FixedStructureGeneration", FixedStructureGenerationImpl::Save, CODEC)
+            val DEF = define(resLoc("FixedStructureGeneration"), FixedStructureGenerationImpl::Save, CODEC)
         }
     }
 }

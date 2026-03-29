@@ -20,7 +20,7 @@ interface FxLibEvents {
 
     fun onServerStopped(event: ServerEvent)
 
-    fun onLoadChunk(event: (level: ServerLevel, chunk: LevelChunk) -> Unit)
+    fun onLoadChunk(event: (level: ServerLevel, chunk: LevelChunk, generated: Boolean) -> Unit)
 
     fun onStartServerTick(event: ServerEvent)
 }

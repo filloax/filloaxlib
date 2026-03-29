@@ -24,7 +24,7 @@ class FxLibEventsFabric : FxLibEvents {
         ServerLifecycleEvents.SERVER_STOPPED.register(event)
     }
 
-    override fun onLoadChunk(event: (level: ServerLevel, chunk: LevelChunk) -> Unit) {
+    override fun onLoadChunk(event: (level: ServerLevel, chunk: LevelChunk, generated: Boolean) -> Unit) {
         ServerChunkEvents.CHUNK_LOAD.register(event)
     }
 

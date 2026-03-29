@@ -35,10 +35,10 @@ class FxLibEventsNeo : FxLibEvents {
         }
     }
 
-    override fun onLoadChunk(event: (level: ServerLevel, chunk: LevelChunk) -> Unit) {
+    override fun onLoadChunk(event: (level: ServerLevel, chunk: LevelChunk, generated: Boolean) -> Unit) {
         NeoForge.EVENT_BUS.addListener { neoEvent: ChunkEvent.Load ->
-            if (neoEvent.level is ServerLevel && neoEvent.chunk is LevelChunk) {
-                event(neoEvent.level as ServerLevel, neoEvent.chunk as LevelChunk)
+            if (neoEvent.level is ServerLevel) {
+                event(neoEvent.level as ServerLevel, neoEvent.chunk as LevelChunk, !neoEvent.isNewChunk)
             }
         }
     }

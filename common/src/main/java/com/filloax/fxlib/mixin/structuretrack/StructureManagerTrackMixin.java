@@ -61,7 +61,7 @@ public abstract class StructureManagerTrackMixin implements ServerLevelAccessor 
         for (long startingChunkRef : structureRefs) {
             List<PlacedStructureData> fixedData = tracker().getByStructure(structure);
             for (PlacedStructureData data : fixedData) {
-                if (data.getStructureStart().getChunkPos().toLong() == startingChunkRef) {
+                if (data.getStructureStart().getChunkPos().pack() == startingChunkRef) {
                     startConsumer.accept(data.getStructureStart());
                 }
             }
@@ -75,7 +75,7 @@ public abstract class StructureManagerTrackMixin implements ServerLevelAccessor 
     private Map<Structure, LongSet> startsForStructurePredicate(ChunkAccess chunk, Operation<Map<Structure, LongSet>> original) {
         return mergeMaps(
                 original.call(chunk),
-                tracker().getChunkStructureRefs().getOrDefault(chunk.getPos().toLong(), EMPTY_MAP)
+                tracker().getChunkStructureRefs().getOrDefault(chunk.getPos().pack(), EMPTY_MAP)
         );
     }
 
@@ -87,7 +87,7 @@ public abstract class StructureManagerTrackMixin implements ServerLevelAccessor 
     private LongSet startsForStructure(ChunkAccess chunk, Structure structure, Operation<LongSet> original) {
         return LongStream.concat(
                 original.call(chunk, structure).longStream(),
-                tracker().getChunkStructureRefs().getOrDefault(chunk.getPos().toLong(), EMPTY_MAP)
+                tracker().getChunkStructureRefs().getOrDefault(chunk.getPos().pack(), EMPTY_MAP)
                         .getOrDefault(structure, LongSet.of()).longStream()
         ).collect(LongOpenHashSet::new, LongSet::add, LongSet::addAll);
     }

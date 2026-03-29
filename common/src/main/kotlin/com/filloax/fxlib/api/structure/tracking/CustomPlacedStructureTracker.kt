@@ -1,6 +1,7 @@
 package com.filloax.fxlib.api.structure.tracking
 
 import com.filloax.fxlib.FxLib
+import com.filloax.fxlib.InternalUtils.resLoc
 import com.filloax.fxlib.api.chunk.boundBoxChunkRange
 import com.filloax.fxlib.api.nbt.getCompoundOrNull
 import com.mojang.serialization.Codec
@@ -71,7 +72,7 @@ class CustomPlacedStructureTracker() : SavedData() {
         }
 
         val TYPE = SavedDataType<CustomPlacedStructureTracker>(
-            "fxlib_structure_placement_tracking",
+            resLoc("fxlib_structure_placement_tracking"),
             ::CustomPlacedStructureTracker,
             CODEC,
             DataFixTypes.STRUCTURE
@@ -121,9 +122,9 @@ class CustomPlacedStructureTracker() : SavedData() {
 
     fun getByChunkPos(chunkPos: ChunkPos, startChunkOnly:Boolean = false): List<PlacedStructureData> {
         return if (startChunkOnly) {
-            structureDataByStartChunk[chunkPos.toLong()]
+            structureDataByStartChunk[chunkPos.pack()]
         } else {
-            structureDataByChunk[chunkPos.toLong()]
+            structureDataByChunk[chunkPos.pack()]
         } ?: listOf()
     }
 
@@ -135,7 +136,7 @@ class CustomPlacedStructureTracker() : SavedData() {
     }
 
     fun getByPos(blockPos: BlockPos): List<PlacedStructureData> {
-        return getByChunkPos(ChunkPos(blockPos)).filter { it.structureStart.boundingBox.isInside(blockPos) }
+        return getByChunkPos(ChunkPos(blockPos.x, blockPos.y)).filter { it.structureStart.boundingBox.isInside(blockPos) }
     }
 
     fun getByStructure(structure: Structure): List<PlacedStructureData> {
@@ -152,7 +153,7 @@ class CustomPlacedStructureTracker() : SavedData() {
         lastReference++
 
 //        val structureManager = level.structureManager()
-//        val chunkRef = structureStart.chunkPos.toLong()
+//        val chunkRef = structureStart.chunkPos.pack()
 
         val data = PlacedStructureData(structureStart, pos)
 
@@ -183,9 +184,9 @@ class CustomPlacedStructureTracker() : SavedData() {
         inverseMap[data] = id
         byStructure.computeIfAbsent(structure) { mutableListOf() }.add(data)
         boundBoxChunkRange(start.boundingBox).forEach {
-            structureDataByChunk.computeIfAbsent(it.toLong()) { mutableListOf() }
+            structureDataByChunk.computeIfAbsent(it.pack()) { mutableListOf() }
                 .add(data)
-            _chunkStructureRefs.computeIfAbsent(it.toLong()) { mutableMapOf() }
+            _chunkStructureRefs.computeIfAbsent(it.pack()) { mutableMapOf() }
                 .computeIfAbsent(structure) { LongOpenHashSet() }
                 .add(chunkRef)
         }
@@ -200,7 +201,7 @@ data class PlacedStructureData(
 ) {
     val structure: Structure = structureStart.structure
     val placement = FixedStructurePlacement(pos)
-    val chunkRef = structureStart.chunkPos.toLong()
+    val chunkRef = structureStart.chunkPos.pack()
 
     fun save(ctx: StructurePieceSerializationContext): CompoundTag {
         return CompoundTag().also { tag ->

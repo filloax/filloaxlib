@@ -14,8 +14,8 @@ abstract class VersionFxLib : FxLib() {
             ScheduledServerTask.onStartServerTick(server)
         }
 
-        fxLibEvents.onLoadChunk { level, chunk ->
-            FixedStructureGenerationImpl.onLoadChunk(level, chunk)
+        fxLibEvents.onLoadChunk { level, chunk, generated ->
+            FixedStructureGenerationImpl.onLoadChunk(level, chunk, generated)
         }
 
         initPlatformCallbacks()
