@@ -2,13 +2,9 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'master'
+      - 'release/**'
 
-#Environment variables that can later be referenced using ${{ env.MINECRAFT_VERSION }}. These are useful for repeating information and allow for quick changes for new mod updates
 env: 
-  JAVA_VERSION_PRE_1_20_5: 17                   
-  JAVA_VERSION: 21                   
-  # RELEASE_NAME: FxLib
   GITHUB_TOKEN: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
 
 permissions:
@@ -16,7 +12,7 @@ permissions:
 
 jobs:
   build:
-
+    if: "contains(github.event.head_commit.message, 'chore: release') && github.event_name != 'pull_request'"
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,32 +20,32 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      
-    # - name: Create Release (Jitpack Source)
-    #   id: create_release
-    #   uses: actions/create-release@v1
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.PUBLISH_GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-    #   with:
-    #     tag_name: ${{ github.ref }}
-    #     release_name: FxLib ${{ steps.get_version.outputs.VERSION }} (Sources)
-    #     body: |
-    #       Sources used in JitPack publishing.
-    #     draft: false
-    #     prerelease: false
 
-    - name: Set up JDK 17 (for old versions)
+    - name: "Read Java version"
+      uses: BrycensRanch/read-properties-action@v1.0.4
+      id: java_version
+      with:
+        file: gradle.properties
+        property: javaVersion
+
+    - name: "Read MC version"
+      uses: SebRollen/toml-action@v1.2.0
+      id: mc_version
+      with:
+        file: 'gradle/libs.versions.toml'
+        field: 'versions.minecraft'
+
+    - name: "Read MC version range"
+      uses: SebRollen/toml-action@v1.2.0
+      id: mc_version_range
+      with:
+        file: 'gradle/libs.versions.toml'
+        field: 'versions.minecraft-range'
+        
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
-        distribution: 'temurin'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
-      
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
+        java-version: ${{ steps.java_version.outputs.javaVersion }}
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
@@ -65,51 +61,81 @@ jobs:
       id: get_version
       run: echo "VERSION=$(./gradlew modVersion | grep VERSION | awk -F'=' '{print $2}')" >> $GITHUB_OUTPUT
 
+    - name: "Show environment variables"
+      run: "echo version=${{steps.get_version.outputs.VERSION}} java_version=${{ steps.java_version.outputs.javaVersion }} mc_version=${{ steps.mc_version.outputs.value }} mc_version_range=${{ steps.mc_version_range.outputs.value }}"
+
     - name: Build with Gradle
+      id: build
       run: ./gradlew build
 
-    # - name: Publish (JitPack source)
+    - name: Extract latest changelog
+      id: changelog
+      run: |
+        latest_version=$(grep -m 1 -oP '(?<=##\s)\d+\.\d+\.\d+' CHANGELOG.md)
+        latest_changelog=$(sed -n "/## $latest_version/,/## /p" CHANGELOG.md | sed '$d')
+        echo "$latest_changelog" > latest_changelog.txt
 
-    - name: Publish (Fabric 1.20.4)
-      uses: Kir-Antipov/mc-publish@v3.3
+    - name: Publish (Github)
+      uses: softprops/action-gh-release@v2
+      if: steps.build.outcome == 'success'
+      id: publish_github
       with:
+        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }}
+        body_path: latest_changelog.txt
+        token: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
+        make_latest: true
+        tag_name: "${{ steps.get_version.outputs.VERSION }}-${{steps.mc_version.outputs.value}}"
+        target_commitish: ${{ env.GITHUB_SHA }}
         files: |
-          1.20.4-fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
-          1.20.4-fabric/build/libs/*-@(dev|sources|javadoc).jar
+          base/build/libs/*.jar
+          fabric/build/libs/*.jar
+          neoforge/build/libs/*.jar
 
-        github-tag: "v${{ steps.get_version.outputs.VERSION }}-1.20.4-fabric"
-        github-token: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
-        github-generate-changelog: true
-
-        name: "FxLib ${{ steps.get_version.outputs.VERSION }} - Fabric 1.20.4"
-        version: "1.20.4-fabric-${{ steps.get_version.outputs.VERSION }}"
-        version-type: release
-
-        loaders: fabric
-        game-versions: "1.20.4"
-        java: "${{env.JAVA_VERSION_PRE_1_20_5}}"
-      env:
-        USERNAME: ${{ github.actor }}
-        TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
-    - name: Publish (Fabric 1.20.6)
-      uses: Kir-Antipov/mc-publish@v3.3
+    - uses: Kir-Antipov/mc-publish@v3.3
+      if: steps.build.outcome == 'success'
+      name: Publish (Online, Fabric)
       with:
+        modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
+
+        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }} Fabric
+        version-type: beta
+
+        game-versions: ${{ steps.mc_version_range.outputs.value }}
+        dependencies: |
+          fabric-language-kotlin(required)
+          fabric-api(required)
+        java: ${{ steps.java_version.outputs.javaVersion }}
+
+        changelog-file: latest_changelog.txt
         files: |
-          1.20.6-fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
-          1.20.6-fabric/build/libs/*-@(dev|sources|javadoc).jar
+          fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+          fabric/build/libs/*-@(dev|sources|javadocs).jar
 
-        github-tag: "v${{ steps.get_version.outputs.VERSION }}-1.20.6-fabric"
-        github-token: "${{ secrets.PUBLISH_GITHUB_TOKEN }}"
-        github-generate-changelog: true
+    - uses: Kir-Antipov/mc-publish@v3.3
+      if: steps.build.outcome == 'success'
+      name: Publish (Online, Neoforge)
+      with:
+        modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
 
-        name: "FxLib ${{ steps.get_version.outputs.VERSION }} - Fabric 1.20.6"
-        version: "1.20.6-fabric-${{ steps.get_version.outputs.VERSION }}"
-        version-type: release
+        loaders: neoforge
+        modrinth-id: JAKPaut3
+        version: "${{ steps.get_version.outputs.VERSION }}-${{ steps.mc_version.outputs.value }}-neoforge"
 
-        loaders: fabric
-        game-versions: "1.20.6"
-        java: "${{env.JAVA_VERSION}}"
+        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }} Neoforged
+        version-type: beta
+
+        game-versions: ${{ steps.mc_version_range.outputs.value }}
+        dependencies:
+        java: ${{ steps.java_version.outputs.javaVersion }}
+
+        changelog-file: latest_changelog.txt
+        files: |
+          neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
+          neoforge/build/libs/*-@(dev|sources|javadocs).jar
+
+    - name: Trigger Jitpack build
+      if: steps.publish_github.outcome == 'success'
+      run: |
+        sleep 5s && curl --max-time 0 -L https://jitpack.io/com/github/filloax/filloaxlib/filloaxlib-common/${{ env.TAG }}/filloaxlib-common-${{ env.TAG }}.pom
       env:
-        USERNAME: ${{ github.actor }}
-        TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TAG: "${{ steps.get_version.outputs.VERSION }}-${{steps.mc_version.outputs.value }}"
