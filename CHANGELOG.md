@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.37
+
+Updated to 26.1
+
 ## 0.36
 
 Added
