@@ -56,6 +56,11 @@ dependencies {
 
 sourceSets.main.get().resources.srcDir(project.file("src/generated/resources"))
 
+val gametest: SourceSet = sourceSets.create("gametest") {
+    compileClasspath += sourceSets.main.get().compileClasspath + sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().runtimeClasspath + sourceSets.main.get().output
+}
+
 configurations {
     create(COMMON_JAVA) {
         isCanBeResolved = false
@@ -65,12 +70,22 @@ configurations {
         isCanBeResolved = false
         isCanBeConsumed = true
     }
+    create(COMMON_GAMETEST_JAVA) {
+        isCanBeResolved = false
+        isCanBeConsumed = true
+    }
+    create(COMMON_GAMETEST_RESOURCES) {
+        isCanBeResolved = false
+        isCanBeConsumed = true
+    }
 }
 
 artifacts {
     sourceSets.main.get().java.sourceDirectories.forEach { add(COMMON_JAVA, it) }
     sourceSets.main.get().kotlin.sourceDirectories.forEach { add(COMMON_JAVA, it) }
     sourceSets.main.get().resources.sourceDirectories.forEach { add(COMMON_RESOURCES, it) }
+    sourceSets["gametest"].kotlin.sourceDirectories.forEach { add(COMMON_GAMETEST_JAVA, it) }
+    sourceSets["gametest"].resources.sourceDirectories.forEach { add(COMMON_GAMETEST_RESOURCES, it) }
 }
 
 // Test

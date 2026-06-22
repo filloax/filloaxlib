@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id("multiloader-loader")
 
@@ -16,7 +18,7 @@ loom {
 
     runs {
         named("client") {
-            configName = "Fabric Client"
+            configName = "Filloaxlib - Fabric Client"
 
             client()
             ideConfigGenerated(true)
@@ -25,7 +27,7 @@ loom {
         }
 
         named("server") {
-            configName = "Fabric Server"
+            configName = "Filloaxlib - Fabric Server"
 
             server()
             ideConfigGenerated(true)
@@ -41,11 +43,29 @@ loom {
     }
 }
 
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = "$modid-test"
+        enableGameTests = true
+        eula = true
+    }
+}
+
 val modVersion = libs.versions.modversion.get()
 //val parchmentMcVersion = libs.versions.parchment.minecraft.get()
 //val parchmentVersion = libs.versions.parchment.asProvider().get()
 
 version = "$modVersion-${minecraftVersion}-fabric"
+
+configurations {
+    create(COMMON_GAMETEST_JAVA) { isCanBeResolved = true }
+}
+
+tasks.named<KotlinCompile>("compileGametestKotlin") {
+    dependsOn(configurations.getByName(COMMON_GAMETEST_JAVA))
+    source(configurations.getByName(COMMON_GAMETEST_JAVA))
+}
 
 dependencies {
     minecraft( libs.minecraft )
@@ -64,4 +84,6 @@ dependencies {
         api(it)
         include(it)
     }
+
+    COMMON_GAMETEST_JAVA(project(path = COMMON_PROJECT, configuration = COMMON_GAMETEST_JAVA))
 }

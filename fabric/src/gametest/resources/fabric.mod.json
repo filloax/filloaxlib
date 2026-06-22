@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "filloaxlib-test",
+  "version": "1.0.0",
+  "name": "FilloaxLib GameTest",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-gametest": [
+      "com.filloax.fxlib.gametest.FxLibFabricGameTests"
+    ]
+  },
+  "depends": {
+    "filloaxlib": "*"
+  }
+}
