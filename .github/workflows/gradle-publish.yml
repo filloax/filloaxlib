@@ -4,9 +4,6 @@ on:
     branches:
       - 'release/**'
 
-permissions:
-  contents: write
-
 jobs:
   build:
     if: "contains(github.event.head_commit.message, 'chore: release') && github.event_name != 'pull_request'"
@@ -14,6 +11,11 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
+      java_version: ${{ steps.java_version.outputs.javaVersion }}
+      mc_version: ${{ steps.mc_version.outputs.value }}
+      mc_version_range: ${{ steps.mc_version_range.outputs.value }}
 
     steps:
     - uses: actions/checkout@v4
@@ -38,101 +40,120 @@ jobs:
       with:
         file: 'gradle/libs.versions.toml'
         field: 'versions.minecraft-range'
-        
+
     - name: Set up JDK
       uses: actions/setup-java@v4
       with:
         java-version: ${{ steps.java_version.outputs.javaVersion }}
         distribution: 'temurin'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+        settings-path: ${{ github.workspace }}
 
     - name: Make Gradle Wrapper Executable
       if: ${{ runner.os != 'Windows' }}
       run: chmod +x ./gradlew
-        
+
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
+      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5
 
     - name: Get version from gradle
       id: get_version
       run: echo "VERSION=$(./gradlew modVersion | grep VERSION | awk -F'=' '{print $2}')" >> $GITHUB_OUTPUT
 
-    - name: "Show environment variables"
-      run: "echo version=${{steps.get_version.outputs.VERSION}} java_version=${{ steps.java_version.outputs.javaVersion }} mc_version=${{ steps.mc_version.outputs.value }} mc_version_range=${{ steps.mc_version_range.outputs.value }}"
-
     - name: Build with Gradle
-      id: build
       run: ./gradlew build
 
     - name: Extract latest changelog
-      id: changelog
       run: |
         latest_version=$(grep -m 1 -oP '(?<=##\s)\d+\.\d+\.\d+' CHANGELOG.md)
         latest_changelog=$(sed -n "/## $latest_version/,/## /p" CHANGELOG.md | sed '$d')
         echo "$latest_changelog" > latest_changelog.txt
 
-    - name: Publish (Github)
-      uses: softprops/action-gh-release@v2
-      if: steps.build.outcome == 'success'
-      id: publish_github
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
       with:
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }}
+        name: build-artifacts
+        path: |
+          base/build/libs/*.jar
+          fabric/build/libs/*.jar
+          neoforge/build/libs/*.jar
+          latest_changelog.txt
+
+  release-github:
+    name: Release (GitHub + Jitpack)
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+
+    - name: Publish (GitHub)
+      id: publish_github
+      uses: softprops/action-gh-release@v2
+      with:
+        name: FilloaxLib ${{ needs.build.outputs.version }} - ${{ needs.build.outputs.mc_version }}
         body_path: latest_changelog.txt
         token: ${{ secrets.GITHUB_TOKEN }}
         make_latest: true
-        tag_name: "${{ steps.get_version.outputs.VERSION }}-${{steps.mc_version.outputs.value}}"
+        tag_name: "${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}"
         target_commitish: ${{ env.GITHUB_SHA }}
         files: |
           base/build/libs/*.jar
           fabric/build/libs/*.jar
           neoforge/build/libs/*.jar
 
-    - uses: Kir-Antipov/mc-publish@v3.3
-      if: steps.build.outcome == 'success'
-      name: Publish (Online, Fabric)
-      with:
-        modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
-
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }} Fabric
-        version-type: beta
-
-        game-versions: ${{ steps.mc_version_range.outputs.value }}
-        dependencies: |
-          fabric-language-kotlin(required)
-          fabric-api(required)
-        java: ${{ steps.java_version.outputs.javaVersion }}
-
-        changelog-file: latest_changelog.txt
-        files: |
-          fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
-          fabric/build/libs/*-@(dev|sources|javadocs).jar
-
-    - uses: Kir-Antipov/mc-publish@v3.3
-      if: steps.build.outcome == 'success'
-      name: Publish (Online, Neoforge)
-      with:
-        modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
-
-        loaders: neoforge
-        modrinth-id: JAKPaut3
-        version: "${{ steps.get_version.outputs.VERSION }}-${{ steps.mc_version.outputs.value }}-neoforge"
-
-        name: FilloaxLib ${{ steps.get_version.outputs.VERSION }} - ${{ steps.mc_version.outputs.value }} Neoforged
-        version-type: beta
-
-        game-versions: ${{ steps.mc_version_range.outputs.value }}
-        dependencies:
-        java: ${{ steps.java_version.outputs.javaVersion }}
-
-        changelog-file: latest_changelog.txt
-        files: |
-          neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
-          neoforge/build/libs/*-@(dev|sources|javadocs).jar
-
     - name: Trigger Jitpack build
       if: steps.publish_github.outcome == 'success'
       run: |
-        sleep 5s && curl --max-time 0 -L https://jitpack.io/com/github/filloax/filloaxlib/filloaxlib-common/${{ env.TAG }}/filloaxlib-common-${{ env.TAG }}.pom
-      env:
-        TAG: "${{ steps.get_version.outputs.VERSION }}-${{steps.mc_version.outputs.value }}"
+        sleep 10s && curl --max-time 0 -L \
+          https://jitpack.io/com/github/filloax/filloaxlib/filloaxlib-common/${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}/filloaxlib-common-${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}.pom
+
+  release-platform:
+    name: Publish (${{ matrix.name }})
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: neoforge
+            name: Neoforge
+            dependencies: |
+              kotlin-for-forge(required)
+          - platform: fabric
+            name: Fabric
+            dependencies: |
+              fabric-language-kotlin(required)
+              fabric-api(required)
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: build-artifacts
+
+    - name: Publish
+      uses: Kir-Antipov/mc-publish@v3.3
+      id: mc_publish
+      with:
+        modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
+        modrinth-id: JAKPaut3
+        name: FilloaxLib ${{ needs.build.outputs.version }} - ${{ needs.build.outputs.mc_version }} ${{ matrix.name }}
+        version: "${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}-${{ matrix.platform }}"
+        version-type: beta
+        files: |
+          ${{ matrix.platform }}/build/libs/!(*-@(dev|sources|javadoc)).jar
+          ${{ matrix.platform }}/build/libs/*-@(dev|sources|javadocs).jar
+        game-versions: ${{ needs.build.outputs.mc_version_range }}
+        dependencies: ${{ matrix.dependencies }}
+        java: ${{ needs.build.outputs.java_version }}
+        loaders: ${{ matrix.platform }}
+        changelog-file: latest_changelog.txt
+
+    - run: echo "Published ${{ matrix.name }}!"
