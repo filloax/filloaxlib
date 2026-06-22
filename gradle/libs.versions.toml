@@ -45,7 +45,7 @@
 # Plugins
     plugin-dokka = "2.0.0"
     plugin-mixin = "0.7.38"
-    plugin-loom = "1.16-SNAPSHOT"
+    plugin-loom = "1.17-SNAPSHOT"
     # Get versions from https://projects.neoforged.net/neoforged/moddevgradle
     plugin-moddev = "2.0.141"
     plugin-idea-ext = "1.4.1"
