@@ -235,7 +235,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
                     Codec.STRING.mutableSetOf().optionalFieldOf("generatedSpawns", mutableSetOf()).forGetter{it.generatedSpawns}
                 ).apply(builder, FixedStructureGenerationImpl::Save)
             }
-            val DEF = define(resLoc("FixedStructureGeneration"), FixedStructureGenerationImpl::Save, CODEC)
+            val DEF = define(resLoc("fixed_structure_generation"), FixedStructureGenerationImpl::Save, CODEC)
         }
     }
 }
