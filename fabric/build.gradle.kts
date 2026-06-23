@@ -22,16 +22,12 @@ loom {
 
             client()
             ideConfigGenerated(true)
-            runDir("runs/" + name)
-            programArg("--username=Dev")
         }
 
         named("server") {
             configName = "Filloaxlib - Fabric Server"
-
             server()
             ideConfigGenerated(true)
-            runDir("runs/" + name)
         }
     }
 
