@@ -5,6 +5,7 @@
   "mixins": [
     "PlaceCommandMixin",
     "edata.EntityMixin",
+    "structuretrack.ChunkGeneratorTrackMixin",
     "structuretrack.StructureManagerTrackMixin",
     "structuretrack.WorldGenRegionAccessor"
   ],
