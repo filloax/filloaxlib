@@ -16,7 +16,6 @@ import com.filloax.fxlib.FxLib
 @EventBusSubscriber(modid = FxLib.MOD_ID)
 object FxLibNeoGameTests {
     @SubscribeEvent
-    @JvmStatic
     fun onRegisterGameTests(event: RegisterGameTestsEvent) {
         val environment = event.registerEnvironment(
             Identifier.fromNamespaceAndPath(FxLib.MOD_ID, "default")
