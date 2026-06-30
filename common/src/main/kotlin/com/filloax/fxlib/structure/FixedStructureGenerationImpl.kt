@@ -89,7 +89,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
 
            structsToSpawnById.put(spawnData.spawnId, spawnData)
 
-            val key = ChunkPos(spawnData.pos.x, spawnData.pos.z).pack()
+            val key = ChunkPos(SectionPos.blockToSectionCoord(spawnData.pos.x), SectionPos.blockToSectionCoord(spawnData.pos.z)).pack()
             structsToSpawn.computeIfAbsent(key) { mutableListOf() }.add(spawnData)
             FxLib.logger.info("Queued $spawnData for fixed structure generation...")
 
@@ -165,7 +165,7 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
             serverLevel.chunkSource.randomState(),
             serverLevel.structureManager,
             serverLevel.seed,
-            ChunkPos(spawnData.pos.x, spawnData.pos.y),
+            ChunkPos(SectionPos.blockToSectionCoord(spawnData.pos.x), SectionPos.blockToSectionCoord(spawnData.pos.z)),
             0,
             serverLevel
         ) { true }
