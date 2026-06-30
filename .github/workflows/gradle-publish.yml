@@ -64,9 +64,7 @@ jobs:
 
     - name: Extract latest changelog
       run: |
-        latest_version=$(grep -m 1 -oP '(?<=##\s)\d+\.\d+\.\d+' CHANGELOG.md)
-        latest_changelog=$(sed -n "/## $latest_version/,/## /p" CHANGELOG.md | sed '$d')
-        echo "$latest_changelog" > latest_changelog.txt
+        awk '/^## /{if(found)exit; found=1} found{print}' CHANGELOG.md > latest_changelog.txt
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
