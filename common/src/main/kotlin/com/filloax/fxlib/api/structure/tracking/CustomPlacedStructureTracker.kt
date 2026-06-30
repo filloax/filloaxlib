@@ -136,7 +136,7 @@ class CustomPlacedStructureTracker() : SavedData() {
     }
 
     fun getByPos(blockPos: BlockPos): List<PlacedStructureData> {
-        return getByChunkPos(ChunkPos(blockPos.x, blockPos.y)).filter { it.structureStart.boundingBox.isInside(blockPos) }
+        return getByChunkPos(ChunkPos(blockPos.x, blockPos.z)).filter { it.structureStart.boundingBox.isInside(blockPos) }
     }
 
     fun getByStructure(structure: Structure): List<PlacedStructureData> {

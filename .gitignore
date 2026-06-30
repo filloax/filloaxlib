@@ -12,3 +12,4 @@
 .kotlin
 fabric/runs/*
 .vscode
+.eclipse
