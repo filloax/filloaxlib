@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.38.0
+
+Update to 26.2
+
 ## 0.37.2
 
 Fix position usage in structure spawning and related
