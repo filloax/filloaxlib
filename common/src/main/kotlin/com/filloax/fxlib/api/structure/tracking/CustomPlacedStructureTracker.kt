@@ -9,6 +9,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import it.unimi.dsi.fastutil.longs.LongSet
 import net.minecraft.core.BlockPos
+import net.minecraft.core.SectionPos
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
 import net.minecraft.nbt.CompoundTag
@@ -136,7 +137,7 @@ class CustomPlacedStructureTracker() : SavedData() {
     }
 
     fun getByPos(blockPos: BlockPos): List<PlacedStructureData> {
-        return getByChunkPos(ChunkPos(blockPos.x, blockPos.z)).filter { it.structureStart.boundingBox.isInside(blockPos) }
+        return getByChunkPos(ChunkPos(SectionPos.blockToSectionCoord(blockPos.x), SectionPos.blockToSectionCoord(blockPos.z))).filter { it.structureStart.boundingBox.isInside(blockPos) }
     }
 
     fun getByStructure(structure: Structure): List<PlacedStructureData> {
