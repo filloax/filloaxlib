@@ -57,7 +57,10 @@ jobs:
 
     - name: Get version from gradle
       id: get_version
-      run: echo "VERSION=$(grep -m1 'modversion' gradle/libs.versions.toml | sed 's/.*= *"\(.*\)"/\1/')" >> $GITHUB_OUTPUT
+      run: |
+        VERSION=$(grep -m1 'modversion' gradle/libs.versions.toml | sed 's/.*= *"\(.*\)"/\1/')
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
 
     - name: Build with Gradle
       run: ./gradlew build
