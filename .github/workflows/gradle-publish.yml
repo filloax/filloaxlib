@@ -20,6 +20,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Show what we are building
+      run: |
+        echo "Building commit: $GITHUB_SHA"
+        git log --oneline -8
+
     - name: "Read Java version"
       uses: BrycensRanch/read-properties-action@v1.0.4
       id: java_version
@@ -62,6 +67,17 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
+    # previously there were issues with using wrong commit hash
+    - name: Verify built jars match the expected version
+      run: |
+        echo "Expected version: ${{ steps.get_version.outputs.VERSION }}"
+        for f in */build/libs/*.jar; do
+          echo "== $f =="
+          unzip -p "$f" fabric.mod.json 2>/dev/null | grep -i '"version"' || true
+          unzip -p "$f" META-INF/neoforge.mods.toml 2>/dev/null | grep -iE '^version' || true
+          unzip -p "$f" META-INF/mods.toml 2>/dev/null | grep -iE '^version' || true
+        done
+
     - name: Extract latest changelog
       run: |
         awk '/^## /{if(found)exit; found=1} found{print}' CHANGELOG.md > latest_changelog.txt
@@ -98,7 +114,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         make_latest: true
         tag_name: "${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}"
-        target_commitish: ${{ env.GITHUB_SHA }}
+        target_commitish: ${{ github.sha }}
         files: |
           base/build/libs/*.jar
           fabric/build/libs/*.jar
@@ -110,48 +126,48 @@ jobs:
         sleep 10s && curl --max-time 0 -L \
           https://jitpack.io/com/github/filloax/filloaxlib/filloaxlib-common/${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}/filloaxlib-common-${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}.pom
 
-  release-platform:
-    name: Publish (${{ matrix.name }})
-    needs: build
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: neoforge
-            name: Neoforge
-            dependencies: |
-              kotlin-for-forge(required)
-          - platform: fabric
-            name: Fabric
-            dependencies: |
-              fabric-language-kotlin(required)
-              fabric-api(required)
+  # release-platform:
+  #   name: Publish (${{ matrix.name }})
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - platform: neoforge
+  #           name: Neoforge
+  #           dependencies: |
+  #             kotlin-for-forge(required)
+  #         - platform: fabric
+  #           name: Fabric
+  #           dependencies: |
+  #             fabric-language-kotlin(required)
+  #             fabric-api(required)
 
-    steps:
-    - uses: actions/checkout@v4
+  #   steps:
+  #   - uses: actions/checkout@v4
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: build-artifacts
+  #   - name: Download build artifacts
+  #     uses: actions/download-artifact@v4
+  #     with:
+  #       name: build-artifacts
 
-    - name: Publish
-      uses: Kir-Antipov/mc-publish@v3.3
-      id: mc_publish
-      with:
-        modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
-        modrinth-id: JAKPaut3
-        name: FilloaxLib ${{ needs.build.outputs.version }} - ${{ needs.build.outputs.mc_version }} ${{ matrix.name }}
-        version: "${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}-${{ matrix.platform }}"
-        version-type: beta
-        files: |
-          ${{ matrix.platform }}/build/libs/!(*-@(dev|sources|javadoc)).jar
-          ${{ matrix.platform }}/build/libs/*-@(dev|sources|javadocs).jar
-        game-versions: ${{ needs.build.outputs.mc_version_range }}
-        dependencies: ${{ matrix.dependencies }}
-        java: ${{ needs.build.outputs.java_version }}
-        loaders: ${{ matrix.platform }}
-        changelog-file: latest_changelog.txt
+  #   - name: Publish
+  #     uses: Kir-Antipov/mc-publish@v3.3
+  #     id: mc_publish
+  #     with:
+  #       modrinth-token: ${{ secrets.TOKEN_MODRINTH }}
+  #       modrinth-id: JAKPaut3
+  #       name: FilloaxLib ${{ needs.build.outputs.version }} - ${{ needs.build.outputs.mc_version }} ${{ matrix.name }}
+  #       version: "${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}-${{ matrix.platform }}"
+  #       version-type: beta
+  #       files: |
+  #         ${{ matrix.platform }}/build/libs/!(*-@(dev|sources|javadoc)).jar
+  #         ${{ matrix.platform }}/build/libs/*-@(dev|sources|javadocs).jar
+  #       game-versions: ${{ needs.build.outputs.mc_version_range }}
+  #       dependencies: ${{ matrix.dependencies }}
+  #       java: ${{ needs.build.outputs.java_version }}
+  #       loaders: ${{ matrix.platform }}
+  #       changelog-file: latest_changelog.txt
 
-    - run: echo "Published ${{ matrix.name }}!"
+  #   - run: echo "Published ${{ matrix.name }}!"
