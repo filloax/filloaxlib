@@ -57,7 +57,7 @@ jobs:
 
     - name: Get version from gradle
       id: get_version
-      run: echo "VERSION=$(./gradlew modVersion | grep VERSION | awk -F'=' '{print $2}')" >> $GITHUB_OUTPUT
+      run: echo "VERSION=$(grep -m1 'modversion' gradle/libs.versions.toml | sed 's/.*= *"\(.*\)"/\1/')" >> $GITHUB_OUTPUT
 
     - name: Build with Gradle
       run: ./gradlew build
@@ -98,7 +98,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         make_latest: true
         tag_name: "${{ needs.build.outputs.version }}-${{ needs.build.outputs.mc_version }}"
-        target_commitish: ${{ env.GITHUB_SHA }}
+        target_commitish: ${{ github.sha }}
         files: |
           base/build/libs/*.jar
           fabric/build/libs/*.jar
@@ -114,6 +114,7 @@ jobs:
     name: Publish (${{ matrix.name }})
     needs: build
     runs-on: ubuntu-latest
+    if: "${{ !contains(github.event.head_commit.message, 'chore: release-github-only') }}"
     strategy:
       fail-fast: false
       matrix:
