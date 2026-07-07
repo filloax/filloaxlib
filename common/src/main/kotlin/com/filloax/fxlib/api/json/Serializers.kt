@@ -20,6 +20,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.levelgen.structure.BoundingBox
 import java.lang.IllegalStateException
+import java.util.UUID
 
 /**
  * Based on Kotlin Serialization API, check the base class KSerializer for doc on the methods
@@ -179,5 +180,20 @@ class BoundingBoxSerializer : KSerializer<BoundingBox> {
             }
             BoundingBox(x1!!, y1!!, z1!!, x2!!, y2!!, z2!!)
         }
+    }
+}
+
+/**
+ * Minecraft uses java UUIDs, kotlin uses kotlin Uuids
+ */
+class UUIDSerializer : KSerializer<UUID> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("fxlib.UUID", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: UUID) {
+        encoder.encodeString(value.toString())
+    }
+
+    override fun deserialize(decoder: Decoder): UUID {
+        return UUID.fromString(decoder.decodeString())
     }
 }
