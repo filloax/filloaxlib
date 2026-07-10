@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.38.1
+
+Fix serializer codecs
+
 ## 0.38.0
 
 Update to 26.2
