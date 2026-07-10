@@ -22,8 +22,7 @@ private val JSON = Json
 /**
  * Use Kotlin serializers to quickly generate codecs for simpler data classes that contain primitives
  * or other types with a serializer.
- * WIP (currently doesn't work with boolean fields when passing through NBT as it gets converted from Byte
- * to Number in json objects
+ * Note: boolean fields are NOT supported when data passes through NBT, use 0/1 as int instead
  */
 fun <T : Any> KSerializer<T>.codec(
     json: Json = JSON,
@@ -57,10 +56,9 @@ private class K2DfuDecoder<A>(
         }
     }
 
-    // NbtOps save booleans as bytes, but DO NOT
-    // read bytes back as booleans, so converting from NbtOps
-    // to JsonOps as-is leads to json numbers being found where booleans
-    // are expected
+    // NbtOps converts via JsonOps which doesn't handle byte tags as numbers;
+    // convert manually to avoid losing data (byte 63: false bug). Boolean
+    // fields are not supported through this bridge, use ints
     private fun convertNbt(tag: Tag): JsonElement {
         return if (tag is CompoundTag) {
             JsonObject().apply {
@@ -70,7 +68,7 @@ private class K2DfuDecoder<A>(
                 }
             }
         } else if (tag is ByteTag) {
-            JsonPrimitive(tag.asByte().get() == 1.toByte())
+            JsonPrimitive(tag.asByte().get().toInt())
         } else Dynamic.convert(NbtOps.INSTANCE, JsonOps.INSTANCE, tag)
     }
 
