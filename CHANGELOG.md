@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.40.0
+
+Add TrackendEntityData to sync entity data between server and client.
+
 ## 0.38.1
 
 Fix serializer codecs
