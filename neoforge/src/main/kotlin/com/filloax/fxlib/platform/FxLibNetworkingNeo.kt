@@ -12,6 +12,7 @@ import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.PacketFlow
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.Entity
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.network.PacketDistributor
@@ -43,6 +44,14 @@ class FxLibNetworkingNeo : FxLibNetworking {
             PacketDistributor.sendToPlayer(player, payload)
         } catch (e: Exception) {
             throw e
+        }
+    }
+
+    override fun <T : CustomPacketPayload> sendPacketToTracking(entity: Entity, payload: T, includeSelf: Boolean) {
+        if (includeSelf) {
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, payload)
+        } else {
+            PacketDistributor.sendToPlayersTrackingEntity(entity, payload)
         }
     }
 
