@@ -3,6 +3,8 @@ package com.filloax.fxlib.platform
 import com.filloax.fxlib.api.platform.ServiceUtil
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.chunk.LevelChunk
 
 typealias ServerEvent = (server: MinecraftServer) -> Unit
@@ -23,6 +25,8 @@ interface FxLibEvents {
     fun onLoadChunk(event: (level: ServerLevel, chunk: LevelChunk, generated: Boolean) -> Unit)
 
     fun onStartServerTick(event: ServerEvent)
+
+    fun onStartTrackingEntity(event: (entity: Entity, player: ServerPlayer) -> Unit)
 }
 
 val fxLibEvents: FxLibEvents = ServiceUtil.findService(FxLibEvents::class.java)

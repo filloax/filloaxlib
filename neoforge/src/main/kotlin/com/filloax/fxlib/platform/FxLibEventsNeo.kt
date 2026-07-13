@@ -1,8 +1,11 @@
 package com.filloax.fxlib.platform
 
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.chunk.LevelChunk
 import net.neoforged.neoforge.common.NeoForge
+import net.neoforged.neoforge.event.entity.player.PlayerEvent
 import net.neoforged.neoforge.event.level.ChunkEvent
 import net.neoforged.neoforge.event.server.ServerStartedEvent
 import net.neoforged.neoforge.event.server.ServerStartingEvent
@@ -46,6 +49,12 @@ class FxLibEventsNeo : FxLibEvents {
     override fun onStartServerTick(event: ServerEvent) {
         NeoForge.EVENT_BUS.addListener { neoEvent: ServerTickEvent.Pre ->
             event(neoEvent.server)
+        }
+    }
+
+    override fun onStartTrackingEntity(event: (entity: Entity, player: ServerPlayer) -> Unit) {
+        NeoForge.EVENT_BUS.addListener { neoEvent: PlayerEvent.StartTracking ->
+            event(neoEvent.target, neoEvent.entity as ServerPlayer)
         }
     }
 }

@@ -5,6 +5,7 @@ import io.netty.channel.ChannelFutureListener
 import net.fabricmc.api.EnvType
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.network.PacketSendListener
@@ -12,6 +13,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.Entity
 
 class FxLibNetworkingFabric : FxLibNetworking {
     override val packetRegistrator: PacketRegistrator = PacketRegistratorFabric()
@@ -22,6 +24,16 @@ class FxLibNetworkingFabric : FxLibNetworking {
         callback: ChannelFutureListener?
     ) {
         ServerPlayNetworking.getSender(player).sendPacket(payload, callback)
+    }
+
+    override fun <T : CustomPacketPayload> sendPacketToTracking(entity: Entity, payload: T, includeSelf: Boolean) {
+        val recipients = PlayerLookup.tracking(entity)
+        for (recipient in recipients) {
+            ServerPlayNetworking.send(recipient, payload)
+        }
+        if (includeSelf && entity is ServerPlayer) {
+            ServerPlayNetworking.send(entity, payload)
+        }
     }
 
     // Removed since 1.21.6

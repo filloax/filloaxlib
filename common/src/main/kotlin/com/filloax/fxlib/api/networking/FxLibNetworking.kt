@@ -11,6 +11,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload.TypeAndCodec
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 
 
@@ -21,6 +22,13 @@ interface FxLibNetworking {
      * Still needs to register the packets (aka the T:CustomPacketPayload used)
      */
     fun <T : CustomPacketPayload> sendPacketToPlayer(player: ServerPlayer, payload: T, callback: ChannelFutureListener ? = null)
+
+    /**
+     * Sends to every player currently tracking [entity] (i.e. that entity is loaded/visible on their
+     * client). Set [includeSelf] to also send to [entity] itself if it's a ServerPlayer - trackers never
+     * include the entity itself.
+     */
+    fun <T : CustomPacketPayload> sendPacketToTracking(entity: Entity, payload: T, includeSelf: Boolean = false)
 
     // Removed since 1.21.6
 //    /**
