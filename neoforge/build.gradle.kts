@@ -25,7 +25,11 @@ neoForge {
     version = libs.versions.neoforge.asProvider().get()
 
     validateAccessTransformers = true
-    accessTransformers.files.setFrom(baseProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
+    accessTransformers {
+        files.setFrom(baseProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
+        // Publishes an extra "accesstransformer" artifact for use in deps dev
+        publish(baseProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
+    }
 
 //    parchment {
 //        minecraftVersion = libs.versions.parchment.minecraft
