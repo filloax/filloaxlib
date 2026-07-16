@@ -197,3 +197,19 @@ class UUIDSerializer : KSerializer<UUID> {
         return UUID.fromString(decoder.decodeString())
     }
 }
+
+/**
+ * Serializer-codecs do not play nice with booleans, so use this for boolean vars
+ */
+class IntToBooleanSerializer : KSerializer<Boolean> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("fxlib.IntToBoolean", PrimitiveKind.INT)
+
+    override fun serialize(encoder: Encoder, value: Boolean) {
+        encoder.encodeInt(if (value) 1 else 0)
+    }
+
+    override fun deserialize(decoder: Decoder): Boolean {
+        return decoder.decodeInt() != 0
+    }
+}
