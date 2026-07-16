@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.41.0
+
+Add IntToBooleanSerializer
+
 ## 0.40.0
 
 Add TrackendEntityData to sync entity data between server and client.
