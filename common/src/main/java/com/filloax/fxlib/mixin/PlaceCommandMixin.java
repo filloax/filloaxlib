@@ -10,6 +10,7 @@ import net.minecraft.network.chat.OutgoingChatMessage;
 import net.minecraft.server.commands.PlaceCommand;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.levelgen.RandomState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,9 +22,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 public abstract class PlaceCommandMixin {
 
     // Add position fixer for structures that support it
-    @Inject(at = @At(value="INVOKE", shift=At.Shift.BEFORE, target="Lnet/minecraft/world/level/levelgen/structure/Structure;generate(Lnet/minecraft/core/Holder;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/world/level/biome/BiomeSource;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager;JLnet/minecraft/world/level/ChunkPos;ILnet/minecraft/world/level/LevelHeightAccessor;Ljava/util/function/Predicate;)Lnet/minecraft/world/level/levelgen/structure/StructureStart;"),
+    @Inject(at = @At(value="INVOKE", shift=At.Shift.BEFORE, target="Lnet/minecraft/world/level/levelgen/structure/Structure;generate(Lnet/minecraft/core/Holder;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/level/chunk/ChunkGenerator;Lnet/minecraft/world/level/biome/BiomeSource;Lnet/minecraft/world/level/biome/Climate$Sampler;Lnet/minecraft/world/level/levelgen/RandomState;Lnet/minecraft/world/level/levelgen/structure/templatesystem/StructureTemplateManager;JLnet/minecraft/world/level/ChunkPos;ILnet/minecraft/world/level/LevelHeightAccessor;Ljava/util/function/Predicate;)Lnet/minecraft/world/level/levelgen/structure/StructureStart;"),
             method = "placeStructure", locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void placeStructureFixPosition(CommandSourceStack source, Holder.Reference<Structure> structure, BlockPos pos, CallbackInfoReturnable<Integer> cir, ServerLevel serverLevel, Structure structure2, ChunkGenerator chunkGenerator
+    private static void placeStructureFixPosition(CommandSourceStack source, Holder.Reference<Structure> structure, BlockPos pos, CallbackInfoReturnable<Integer> cir, ServerLevel serverLevel, Structure structure2, ChunkGenerator chunkGenerator, RandomState randomState
     ) {
         if (structure2 instanceof FixablePosition fStructure) {
             fStructure.setNextPlacePosition(pos);

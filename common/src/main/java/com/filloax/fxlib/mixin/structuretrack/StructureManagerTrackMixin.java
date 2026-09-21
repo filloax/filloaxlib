@@ -8,7 +8,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelAccessor;
@@ -69,7 +68,7 @@ public abstract class StructureManagerTrackMixin implements ServerLevelAccessor 
     }
 
     @WrapOperation(
-            method = "startsForStructure(Lnet/minecraft/world/level/ChunkPos;Ljava/util/function/Predicate;)Ljava/util/List;",
+            method = "startsForStructure(IILjava/util/function/Predicate;)Ljava/util/List;",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/ChunkAccess;getAllReferences()Ljava/util/Map;")
     )
     private Map<Structure, LongSet> startsForStructurePredicate(ChunkAccess chunk, Operation<Map<Structure, LongSet>> original) {
@@ -81,7 +80,7 @@ public abstract class StructureManagerTrackMixin implements ServerLevelAccessor 
 
     // Also covers getStructureAt
     @WrapOperation(
-            method = "startsForStructure(Lnet/minecraft/core/SectionPos;Lnet/minecraft/world/level/levelgen/structure/Structure;)Ljava/util/List;",
+            method = "startsForStructure(IILnet/minecraft/world/level/levelgen/structure/Structure;)Ljava/util/List;",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/ChunkAccess;getReferencesForStructure(Lnet/minecraft/world/level/levelgen/structure/Structure;)Lit/unimi/dsi/fastutil/longs/LongSet;")
     )
     private LongSet startsForStructure(ChunkAccess chunk, Structure structure, Operation<LongSet> original) {
@@ -95,26 +94,20 @@ public abstract class StructureManagerTrackMixin implements ServerLevelAccessor 
     // This in particular gets the structure start if it starts in the same chunk
     // Since we allow more structures in the same chunk, potentially, return the first one
     @Inject(method = "getStartForStructure", at = @At("HEAD"), cancellable = true)
-    private void getStartForStructure(SectionPos sectionPos, Structure structure, StructureAccess structureAccess, CallbackInfoReturnable<StructureStart> cir) {
-        List<PlacedStructureData> data = tracker().getStructuresAtChunkPos(sectionPos.chunk(), structure, true);
+    private void getStartForStructure(Structure structure, StructureAccess structureAccess, CallbackInfoReturnable<StructureStart> cir) {
+        // chunk pos isn't passed anymore in 26.3
+        if (!(structureAccess instanceof ChunkAccess chunk)) return;
+        List<PlacedStructureData> data = tracker().getStructuresAtChunkPos(chunk.getPos(), structure, true);
         if (data.size() > 0) {
             cir.setReturnValue(data.get(0).getStructureStart());
         }
     }
 
-    @Inject(method = "hasAnyStructureAt", at = @At("HEAD"), cancellable = true)
-    private void hasAnyStructureAt(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        List<PlacedStructureData> data = tracker().getByPos(pos);
-        if (data.size() > 0) {
-            cir.setReturnValue(true);
-        }
-    }
-
     // As with other methods here, this will return the first structure in the chunk
     // if more are present
-    @ModifyReturnValue(method = "getAllStructuresAt", at = @At("RETURN"))
-    private Map<Structure, LongSet> getAllStructuresAt(Map<Structure, LongSet> original, BlockPos pos) {
-        List<PlacedStructureData> datas = tracker().getByPos(pos);
+    @ModifyReturnValue(method = "getAllStructuresAt(III)Ljava/util/Map;", at = @At("RETURN"))
+    private Map<Structure, LongSet> getAllStructuresAt(Map<Structure, LongSet> original, int x, int y, int z) {
+        List<PlacedStructureData> datas = tracker().getByPos(new BlockPos(x, y, z));
         return mergeMaps(
                 original,
                 datas.stream().collect(Collectors.toMap(

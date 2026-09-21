@@ -24,6 +24,7 @@ import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Rotation
 import net.minecraft.world.level.chunk.LevelChunk
+import net.minecraft.world.level.levelgen.densityfunction.SamplerContext
 import net.minecraft.world.level.levelgen.structure.BoundingBox
 import net.minecraft.world.level.levelgen.structure.StructureStart
 
@@ -154,6 +155,8 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
         }
 
         val chunkGenerator = serverLevel.chunkSource.generator
+        val randomState = serverLevel.chunkSource.randomState()
+        val climateSampler = randomState.createClimateSampler(SamplerContext.EMPTY_UNCACHED)
 
         val structureStart = alreadyGeneratedStructures[spawnData.spawnId] ?: structure.generate(
             // todo for transition: check if these two parameters are correct
@@ -162,8 +165,9 @@ object FixedStructureGenerationImpl : FixedStructureGeneration {
             server.registryAccess(),
             chunkGenerator,
             chunkGenerator.biomeSource,
-            serverLevel.chunkSource.randomState(),
-            serverLevel.structureManager,
+            climateSampler,
+            randomState,
+            serverLevel.structureTemplateManager,
             serverLevel.seed,
             ChunkPos(SectionPos.blockToSectionCoord(spawnData.pos.x), SectionPos.blockToSectionCoord(spawnData.pos.z)),
             0,

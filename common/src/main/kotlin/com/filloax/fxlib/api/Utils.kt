@@ -116,7 +116,7 @@ fun Level.nearestFreePosition(from: BlockPos, aboveSolid: Boolean = false, onlyA
 
         if (
             getBlockState(current).isAir
-            && (!aboveSolid || getBlockState(current.below()).blocksMotion())
+            && (!aboveSolid || !getBlockState(current.below()).getCollisionShape(this, current.below()).isEmpty)
         ) {
             return current
         }

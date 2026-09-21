@@ -3,15 +3,12 @@ package com.filloax.fxlib.api.structure.tracking
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import com.filloax.fxlib.api.chunk.isBlockPosInChunk
 import com.filloax.fxlib.structure.FXLibStructurePlacementTypes
-import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Vec3i
 import net.minecraft.world.level.ChunkPos
 import net.minecraft.world.level.chunk.ChunkGeneratorStructureState
 import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement
-import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType
-import java.util.*
 
 
 /**
@@ -19,9 +16,8 @@ import java.util.*
  * as it doesn't ever actually get registered and is just mixed
  * in as part of the find structures functions
  */
-class FixedStructurePlacement(locateOffset: Vec3i, val pos: BlockPos) : StructurePlacement(locateOffset, FrequencyReductionMethod.DEFAULT, 0f, 1, Optional.empty()) {
+class FixedStructurePlacement(private val offset: Vec3i, val pos: BlockPos) : StructurePlacement {
     companion object {
-        // Ignore base structure placement codec as we don't need half of that
         val CODEC: MapCodec<FixedStructurePlacement> = RecordCodecBuilder.mapCodec { b -> b.group(
             Vec3i.CODEC.fieldOf("locateOffset").forGetter(FixedStructurePlacement::locateOffset),
             BlockPos.CODEC.fieldOf("pos").forGetter(FixedStructurePlacement::pos),
@@ -30,9 +26,11 @@ class FixedStructurePlacement(locateOffset: Vec3i, val pos: BlockPos) : Structur
 
     constructor(pos: BlockPos): this(Vec3i.ZERO, pos)
 
-    override fun isPlacementChunk(structureState: ChunkGeneratorStructureState, x: Int, z: Int): Boolean {
+    override fun locateOffset(): Vec3i = offset
+
+    override fun isStructureChunk(structureState: ChunkGeneratorStructureState, x: Int, z: Int): Boolean {
         return ChunkPos(x, z).isBlockPosInChunk(pos)
     }
 
-    override fun type(): StructurePlacementType<*> = FXLibStructurePlacementTypes.FIXED
+    override fun codec(): MapCodec<out StructurePlacement> = FXLibStructurePlacementTypes.FIXED
 }
