@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.42.0
+
+Update to 26.3
+
 ## 0.41.0
 
 Add IntToBooleanSerializer
