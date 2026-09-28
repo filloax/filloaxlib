@@ -93,8 +93,6 @@ listOf("apiElements", "runtimeElements", "sourcesElements"/*, "javadocElements"*
         capability("$group:${base.archivesName.get()}:$modversion-${minecraftVersion}")
         capability("$group:$modid-${project.name}:$modversion-${minecraftVersion}")
         capability("$group:$modid:$modversion")
-        // jitpack
-        capability("$group.${base.archivesName.get()}:${base.archivesName.get()}-${project.name}:$modversion-${minecraftVersion}")
     }
     publishing.publications.withType<MavenPublication>().configureEach {
         suppressPomMetadataWarningsFor(variant)
@@ -116,6 +114,11 @@ publishing {
             from(components.findByName("java"))
         }
     }
+}
+
+// Fit jitpack
+tasks.withType<GenerateModuleMetadata>().configureEach {
+    enabled = false
 }
 //endregion
 
