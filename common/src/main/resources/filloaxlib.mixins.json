@@ -4,6 +4,8 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "PlaceCommandMixin",
+    "access.ArgumentTypeInfosAccessor",
+    "access.SavedDataStorageAccessor",
     "edata.EntityMixin",
     "structuretrack.ChunkGeneratorTrackMixin",
     "structuretrack.StructureManagerTrackMixin",
