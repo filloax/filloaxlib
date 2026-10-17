@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.42.1
+
+Change some AT/AW stuff to mixins so it doesn't break some usecases with neoforge (mainly persistent data)
+
 ## 0.42.0
 
 Update to 26.3
