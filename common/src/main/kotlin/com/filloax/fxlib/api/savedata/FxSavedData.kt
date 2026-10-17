@@ -6,6 +6,7 @@ import com.filloax.fxlib.SaveDataTypeException
 import com.filloax.fxlib.api.codec.decodeNbt
 import com.filloax.fxlib.api.codec.encodeNbt
 import com.filloax.fxlib.api.codec.throwableCodecErr
+import com.filloax.fxlib.mixin.access.SavedDataStorageAccessor
 import com.google.common.io.Files
 import com.mojang.serialization.Codec
 import net.minecraft.SharedConstants
@@ -104,7 +105,7 @@ abstract class FxSavedData<T : FxSavedData<T>>(
         }
 
         private fun <T : FxSavedData<T>> preLoad(definition: Definition<T>, level: ServerLevel, dataStorage: SavedDataStorage, savedDataType: SavedDataType<T>) {
-            val filePath = dataStorage.getDataFile(definition.id)
+            val filePath = (dataStorage as SavedDataStorageAccessor).callGetDataFile(definition.id)
             filePath.parent.createDirectories()
             definition.beforeLoad?.invoke(level, dataStorage)
             if (!filePath.exists()) {
@@ -130,7 +131,7 @@ abstract class FxSavedData<T : FxSavedData<T>>(
                     FxLib.logger.warn("In reading saved data ${definition.id}: found more than one deprecated file $foundFilePaths, will move first only")
                 }
                 if (foundFilePaths.isNotEmpty()) {
-                    val oldFile = dataStorage.getDataFile(resLoc(foundFilePaths.first().toString()))
+                    val oldFile = (dataStorage as SavedDataStorageAccessor).callGetDataFile(resLoc(foundFilePaths.first().toString()))
                     Files.move(oldFile.toFile(), filePath.toFile())
                     FxLib.logger.warn("In reading saved data ${definition.id}: moved deprecated file $oldFile to $filePath")
                 }

@@ -1,8 +1,8 @@
 package com.filloax.fxlib.api.registration
 
+import com.filloax.fxlib.mixin.access.ArgumentTypeInfosAccessor
 import com.mojang.brigadier.arguments.ArgumentType
 import net.minecraft.commands.synchronization.ArgumentTypeInfo
-import net.minecraft.commands.synchronization.ArgumentTypeInfos
 import net.minecraft.core.Registry
 
 object CommandsRegistrationHelper {
@@ -13,7 +13,7 @@ object CommandsRegistrationHelper {
         argumentClass: Class<out A>,
         info: ArgumentTypeInfo<A, T>,
     ): ArgumentTypeInfo<A, T> {
-        ArgumentTypeInfos.BY_CLASS[argumentClass] = info
+        ArgumentTypeInfosAccessor.getByClass()[argumentClass] = info
         return Registry.register(registry, id, info)
     }
 }
