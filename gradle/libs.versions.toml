@@ -1,5 +1,5 @@
 [versions]
-    modversion = "0.42.1"
+    modversion = "0.42.2"
 
 # General Dependencies
     minecraft-range = "26.3"

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.42.2
+
+Attempt fixing ATs again
+
 ## 0.42.1
 
 Change some AT/AW stuff to mixins so it doesn't break some usecases with neoforge (mainly persistent data)
