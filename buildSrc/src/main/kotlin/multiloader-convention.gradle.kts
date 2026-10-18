@@ -143,7 +143,6 @@ tasks.jar {
                 "Implementation-Version"  to modversion,
                 "Implementation-Vendor"   to author,
                 "Built-On-Minecraft"      to minecraftVersion,
-                "FMLModType"              to "GAMELIBRARY",
         ))
     }
 }
