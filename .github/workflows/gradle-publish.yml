@@ -1,3 +1,5 @@
+#   "chore: release": all targets
+#   "chore: release(modrinth)": only x platform (github, modrinth)
 on:
   workflow_dispatch:
   push:
@@ -16,8 +18,29 @@ jobs:
       java_version: ${{ steps.java_version.outputs.javaVersion }}
       mc_version: ${{ steps.mc_version.outputs.value }}
       mc_version_range: ${{ steps.mc_version_range.outputs.value }}
+      github: ${{ steps.targets.outputs.github }}
+      modrinth: ${{ steps.targets.outputs.modrinth }}
 
     steps:
+    - name: Read release targets
+      id: targets
+      env:
+        COMMIT_MSG: ${{ github.event.head_commit.message }}
+      run: |
+        ALL="github modrinth"
+        TARGETS=$(grep -o -m1 'chore: release([^)]*)' <<< "$COMMIT_MSG" | sed 's/.*(\(.*\))/\1/' | tr ',' ' ' || true)
+        TARGETS=${TARGETS:-$ALL}
+        for t in $TARGETS; do
+          if ! grep -qw "$t" <<< "$ALL"; then
+            echo "::error::Unknown release target '$t' (valid: $ALL)"
+            exit 1
+          fi
+        done
+        for t in $ALL; do
+          if grep -qw "$t" <<< "$TARGETS"; then echo "$t=true" >> $GITHUB_OUTPUT; else echo "$t=false" >> $GITHUB_OUTPUT; fi
+        done
+        echo "Release targets: $TARGETS"
+
     - uses: actions/checkout@v4
 
     - name: "Read Java version"
@@ -82,6 +105,7 @@ jobs:
   release-github:
     name: Release (GitHub + Jitpack)
     needs: build
+    if: needs.build.outputs.github == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -117,7 +141,7 @@ jobs:
     name: Publish (${{ matrix.name }})
     needs: build
     runs-on: ubuntu-latest
-    if: "${{ !contains(github.event.head_commit.message, 'chore: release-github-only') }}"
+    if: needs.build.outputs.modrinth == 'true'
     strategy:
       fail-fast: false
       matrix:
