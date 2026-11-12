@@ -36,5 +36,16 @@ object FxLibNeoGameTests {
                     Component.literal("Mixins Loaded Test")
             }
         )
+        event.registerTest(
+            Identifier.fromNamespaceAndPath(FxLib.MOD_ID, "test_persist_data_kept_on_respawn"),
+            object : GameTestInstance(testData) {
+                override fun run(helper: GameTestHelper) {
+                    FxLibGameTests.testPersistDataKeptOnRespawn(helper)
+                }
+                override fun codec(): MapCodec<out GameTestInstance> = MapCodec.unit(this)
+                override fun typeDescription(): MutableComponent =
+                    Component.literal("Persist Data Kept On Respawn Test")
+            }
+        )
     }
 }
