@@ -8,20 +8,22 @@ class ScheduledServerTask(private val delayTicks: Int, private val task: Runnabl
         private val tasks = mutableListOf<ScheduledServerTask>()
 
         fun schedule(server: MinecraftServer, delayTicks: Int, task: Runnable) {
-            tasks.add(ScheduledServerTask(delayTicks, task, server.tickCount))
+            synchronized(tasks) {
+                tasks.add(ScheduledServerTask(delayTicks, task, server.tickCount))
+            }
         }
 
         fun onStartServerTick(server: MinecraftServer) {
-            tasks.removeIf { task -> task.executeIfElapsed(server) }
+            val due = synchronized(tasks) {
+                val elapsed = tasks.filter { it.isElapsed(server) }
+                tasks.removeAll(elapsed.toSet())
+                elapsed
+            }
+            due.forEach { it.task.run() }
         }
     }
 
-    private fun executeIfElapsed(server: MinecraftServer): Boolean {
-        val elapsedTicks: Int = server.tickCount - initialTick
-        if (elapsedTicks >= delayTicks) {
-            task.run()
-            return true
-        }
-        return false
+    private fun isElapsed(server: MinecraftServer): Boolean {
+        return server.tickCount - initialTick >= delayTicks
     }
 }
