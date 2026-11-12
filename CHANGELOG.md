@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.42.3
+
+- Fix player data on respawn
+- fix crash if running scheduled task inside scheduled task
+
 ## 0.42.2
 
 Attempt fixing ATs again
@@ -47,9 +52,9 @@ Fixed
 ## 0.35
 
 Added
-- Allow server-side localization, by adding strings in data/<mod>/lang/<lang_code>.json 
-or any combination of folders and JSON files under the data/<mod>/lang/<lang_code>/ folder
-(see example in the test-neoforge branch)
+- Allow server-side localization, by adding strings in data/<mod>/lang/<lang_code>.json
+  or any combination of folders and JSON files under the data/<mod>/lang/<lang_code>/ folder
+  (see example in the test-neoforge branch)
 
 ## 0.34
 
@@ -118,7 +123,7 @@ Changed
 
 Removed:
 - Remove FxSinglePoolElement as its main purpose was selectively disabling waterlogging
-and you can do that in vanilla SinglePoolElements now.
+  and you can do that in vanilla SinglePoolElements now.
 
 ---
 

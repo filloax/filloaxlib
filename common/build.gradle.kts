@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id("multiloader-convention")
 
@@ -78,6 +80,12 @@ configurations {
         isCanBeResolved = false
         isCanBeConsumed = true
     }
+    // Compiled gametest classes, for IDE only: IDEA can't share the gametest srcDir owned by this
+    // module with the loaders, so they consume these compileOnly (runtime uses the source-compiled copy)
+    create(GAMETEST_OUTPUT) {
+        isCanBeResolved = false
+        isCanBeConsumed = true
+    }
 }
 
 artifacts {
@@ -86,6 +94,7 @@ artifacts {
     sourceSets.main.get().resources.sourceDirectories.forEach { add(COMMON_RESOURCES, it) }
     sourceSets["gametest"].kotlin.sourceDirectories.forEach { add(COMMON_GAMETEST_JAVA, it) }
     sourceSets["gametest"].resources.sourceDirectories.forEach { add(COMMON_GAMETEST_RESOURCES, it) }
+    add(GAMETEST_OUTPUT, tasks.named<KotlinCompile>("compileGametestKotlin").map { it.destinationDirectory })
 }
 
 // Test

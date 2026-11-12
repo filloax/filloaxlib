@@ -8,4 +8,9 @@ class FxLibFabricGameTests {
     fun testMixinsLoaded(helper: GameTestHelper) {
         FxLibGameTests.testMixinsLoaded(helper)
     }
+
+    @GameTest
+    fun testPersistDataKeptOnRespawn(helper: GameTestHelper) {
+        FxLibGameTests.testPersistDataKeptOnRespawn(helper)
+    }
 }

@@ -7,6 +7,7 @@
     "access.ArgumentTypeInfosAccessor",
     "access.SavedDataStorageAccessor",
     "edata.EntityMixin",
+    "edata.ServerPlayerMixin",
     "structuretrack.ChunkGeneratorTrackMixin",
     "structuretrack.StructureManagerTrackMixin",
     "structuretrack.WorldGenRegionAccessor"

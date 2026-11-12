@@ -82,4 +82,6 @@ dependencies {
     }
 
     COMMON_GAMETEST_JAVA(project(path = COMMON_PROJECT, configuration = COMMON_GAMETEST_JAVA))
+    // IDE only, see GAMETEST_OUTPUT in common
+    "gametestCompileOnly"(project(path = COMMON_PROJECT, configuration = GAMETEST_OUTPUT))
 }

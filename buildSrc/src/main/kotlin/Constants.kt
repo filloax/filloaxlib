@@ -3,6 +3,7 @@ const val COMMON_JAVA = "commonJava"
 const val COMMON_RESOURCES = "commonResources"
 const val COMMON_GAMETEST_JAVA = "commonGametestJava"
 const val COMMON_GAMETEST_RESOURCES = "commonGametestResources"
+const val GAMETEST_OUTPUT = "gametestOutput"
 
 val INCLUDE_LIBS = listOf(
     "kotlinevents",
