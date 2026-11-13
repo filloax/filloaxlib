@@ -14,7 +14,7 @@ issueTrackerURL="https://github.com/filloax/filloax-lib"
     #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
 
     displayURL="${display_url}"
-    logoFile="${mod_icon}"
+    iconFile="${mod_icon}"
     #credits=""
     authors='''${author}
     Contributions

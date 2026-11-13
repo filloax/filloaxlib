@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.42.4
+
+- Fix neoforge toml
+
 ## 0.42.3
 
 - Fix player data on respawn
